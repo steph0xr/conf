@@ -62,8 +62,8 @@ set secure
 
 
 "find
-nmap <F3> :execute "grep! -Irn --exclude=tags " . shellescape(expand("<cword>")) . " ."<cr>:cw<cr>
-vmap <F3> y:vimgrep '<c-r>"' **/*.c **/*.cpp **/*.h<CR>:cw<cr>
+nnoremap <F3> :execute "grep! -Irn --exclude=tags " . shellescape(expand("<cword>")) . " ."<cr>:cw<cr>
+vnoremap <F3> y:vimgrep '<c-r>"' **/*.c **/*.cpp **/*.h<CR>:cw<cr>
 "vmap :%s/parolaDaSost/Sostituta/gc
 
 
@@ -77,6 +77,8 @@ nnoremap § :Cerca<SPACE>
 
 "ripgrep
 nnoremap <C-f> :Rg -tc<SPACE>
+vnoremap <C-f> :Rg -tc '<c-r>"' :cw<CR>
+"vmap <F3> y:vimgrep '<c-r>"' **/*.c **/*.cpp **/*.h<CR>:cw<cr>
 
 " bind  for breakpoints to clipboard for gdb
 command! Xg :let @+ = 'b ' . expand('%:p') . ':' . line('.')
@@ -99,8 +101,8 @@ nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
 
 "cycle throught items in cwindows
-map ç :cn<CR>
-map é :cp<CR>
+noremap ç :cn<CR>
+noremap é :cp<CR>
 
 "resize panes
 "set nocompatible
@@ -128,10 +130,10 @@ noremap <C-Down> :resize +5<CR>
 "vnoremap p pgvy
 "vnoremap <leader>p "_dP
 "vnoremap p "_dP
-"nnoremap <leader>p "+p
-nnoremap <leader>y "+y
-vnoremap <leader>y "+y
-nnoremap <leader>Y gg"+yG
+noremap <leader>p "+p
+noremap <leader>y "+y
+"vnoremap <leader>y "+y
+"nnoremap <leader>Y gg"+yG
 
 "fun! TrimWhitespace()
 "	let l:save = winsaveview()
