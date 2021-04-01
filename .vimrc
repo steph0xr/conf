@@ -12,7 +12,7 @@ highlight Comment cterm=italic gui=italic
 colorscheme gruvbox
 "highlight Normal guibg=NONE ctermbg=NONE
 "colorscheme desert
-"
+
 syntax enable
 set mouse=a
 language en_US.utf8
@@ -76,9 +76,8 @@ command! -nargs=+ -complete=file -bar Cerca execute 'silent! grep! -Ir <args> --
 nnoremap § :Cerca<SPACE>
 
 "ripgrep
-nnoremap <C-f> :Rg -tc<SPACE>
-vnoremap <C-f> :Rg -tc '<c-r>"' :cw<CR>
-"vmap <F3> y:vimgrep '<c-r>"' **/*.c **/*.cpp **/*.h<CR>:cw<cr>
+nnoremap <c-f> :Rg -tc -tcpp<SPACE>
+vnoremap <c-f> y:Rg -tc -tcpp <C-r>*<CR>:cw<CR>
 
 " bind  for breakpoints to clipboard for gdb
 command! Xg :let @+ = 'b ' . expand('%:p') . ':' . line('.')
@@ -127,15 +126,15 @@ noremap <C-Down> :resize +5<CR>
 
 
 "avoid paste to replace copy register
-"vnoremap p pgvy
+vnoremap p pgvy
 "vnoremap <leader>p "_dP
 "vnoremap p "_dP
 noremap <leader>p "+p
-noremap <leader>y "+y
-"vnoremap <leader>y "+y
-"nnoremap <leader>Y gg"+yG
+nnoremap <leader>y "+yy
+vnoremap <leader>y "+y
+nnoremap <leader>Y gg"+yG
 
-"fun! TrimWhitespace()
+"fun! TrimWhetespace()
 "	let l:save = winsaveview()
 "	keeppatterns %s/\s\+$//e
 "	call winrestview(l:save)
@@ -154,6 +153,7 @@ nnoremap à /
 vnoremap à /
 inoremap jk <ESC>
 let mapleader=" "
+nnoremap <leader><leader> @:
 
 nnoremap : ò
 vnoremap : ò
@@ -248,7 +248,8 @@ let g:cmake_link_compile_commands = 1
 nnoremap <leader>cg :CMakeGenerate<CR>
 nnoremap <leader>cb :CMakeBuild<CR>
 nnoremap <leader>cc :CMakeClean<CR>
-nnoremap <leader>cf :!cd build && ESPPORT=/dev/ttyUSB0 ninja flash<CR>
+nnoremap <leader>cf :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash<CR>
+nnoremap <leader>ce :!cd build && ESPPORT=/dev/ttyUSB0 ninja erase_flash<CR>
 
 ""coc
 "" if hidden is not set, TextEdit might fail.
@@ -363,3 +364,18 @@ autocmd FileType vim              let b:comment_leader = '" '
 noremap <silent> ,cc :<C-B>silent <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')<CR>/<CR>:nohlsearch<CR>
 noremap <silent> ,cu :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')<CR>//e<CR>:nohlsearch<CR>
 
+
+function! MyHighlights() abort
+"    highlight Visual     cterm=NONE ctermbg=76  ctermfg=16  gui=NONE guibg=#5fd700 guifg=#000000
+"    highlight StatusLine cterm=NONE ctermbg=231 ctermfg=160 gui=NONE guibg=#ffffff guifg=#d70000
+"    highlight Normal     cterm=NONE ctermbg=17              gui=NONE guibg=#00005f
+"    highlight NonText    cterm=NONE ctermbg=17              gui=NONE guibg=#00005f
+     hi Normal guibg=NONE ctermbg=NONE
+endfunction
+
+augroup MyColors
+    autocmd!
+    autocmd ColorScheme * call MyHighlights()
+augroup END
+colorscheme gruvbox
+"hi Normal guibg=NONE ctermbg=NONE
