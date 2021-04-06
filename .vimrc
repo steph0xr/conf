@@ -6,8 +6,8 @@ set termguicolors
 let g:gruvbox_italic=1
 let g:gruvbox_transparent_bg=1
 autocmd vimenter * ++nested colorscheme gruvbox
-set bg=light
-"set bg=dark
+"set bg=light
+set bg=dark
 highlight Comment cterm=italic gui=italic
 colorscheme gruvbox
 "highlight Normal guibg=NONE ctermbg=NONE
@@ -72,12 +72,12 @@ nnoremap <leader>sp /\s\+$
 command! RemoveTrailingSpaces %s/\s\+$//g | noh
 
 " bind § to grep shortcut
-command! -nargs=+ -complete=file -bar Cerca execute 'silent! grep! -Ir <args> --exclude=tags' | execute 'redraw!' | execute 'cw'
+command! -nargs=+ -complete=file -bar Cerca execute 'silent! grep! -Ir <args> --exclude=tags --exclude=*.html --exclude=*.js' | execute 'redraw!' | execute 'cw'
 nnoremap § :Cerca<SPACE>
 
 "ripgrep
-nnoremap <c-f> :Rg -tc -tcpp<SPACE>
-vnoremap <c-f> y:Rg -tc -tcpp <C-r>*<CR>:cw<CR>
+nnoremap <c-f> :Rg -tc -tcpp ttxt<SPACE>
+vnoremap <c-f> y:Rg -tc -tcpp ttxt <C-r>*<CR>:cw<CR>
 
 " bind  for breakpoints to clipboard for gdb
 command! Xg :let @+ = 'b ' . expand('%:p') . ':' . line('.')
@@ -107,8 +107,8 @@ noremap é :cp<CR>
 "set nocompatible
 noremap <C-Right> :vertical resize +5<CR>
 noremap <C-Left> :vertical resize -5<CR>
-noremap <C-Up> :resize -5<CR>
-noremap <C-Down> :resize +5<CR>
+noremap <C-Up> :resize +5<CR>
+noremap <C-Down> :resize -5<CR>
 
 "disabilitare freccie
 "nnoremap <Left> :echo "No left for you!"<CR>
@@ -202,7 +202,7 @@ nnoremap <leader>dp :call vimspector#ToggleBreakpoint()<CR>
 
 "youCompleteMe
 let g:ycm_auto_hover=''
-nmap <leader>ll <plug>(YCMHover)
+nmap <leader>k <plug>(YCMHover)
 nnoremap <leader>lo :lopen<CR>
 nnoremap <silent>gt :YcmCompleter GoTo<CR>
 nnoremap <silent>gd :YcmCompleter GoToDeclaration<CR>
@@ -242,12 +242,15 @@ let g:fzf_layout = { 'window': { 'width': 0.8, 'height': 0.8 } }
 "cdelledonne/vim-cmake
 let g:cmake_default_config = 'build'
 "let g:cmake_generate_options = ['-GNinja', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON']
-let g:cmake_generate_options = ['-GNinja', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON', '-DPYTHON_DEPS_CHECKED=1', '-DESP_PLATFORM=1', '-DIDF_TARGET=esp32', '-DCCACHE_ENABLE=0']
+let g:cmake_generate_options = ['-GNinja', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON', '-DPYTHON_DEPS_CHECKED=1', '-DESP_PLATFORM=1', '-DIDF_TARGET=esp32', '-DCCACHE_ENABLE=0', '-DCMAKE_C_COMPILER=/hdd1/repos/llvm-project/build/bin/clang', '-DCMAKE_CXX_COMPILER=/hdd1/repos/llvm-project/build/bin/clang++']
 let g:cmake_root_markers = ['build']
 let g:cmake_link_compile_commands = 1
 nnoremap <leader>cg :CMakeGenerate<CR>
 nnoremap <leader>cb :CMakeBuild<CR>
-nnoremap <leader>cc :CMakeClean<CR>
+nnoremap <leader>cw :CMakeBuild -Dw<CR>
+nnoremap <leader>cx :CMakeClean<CR>
+nnoremap <leader>cc :!cd build && ninja clean<CR>
+nnoremap <leader>cv :!cd build && ninja<CR>
 nnoremap <leader>cf :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash<CR>
 nnoremap <leader>ce :!cd build && ESPPORT=/dev/ttyUSB0 ninja erase_flash<CR>
 
@@ -340,10 +343,10 @@ map <C-F12> <C-w>g<C-]>
 map <F12> <ESC>:w<CR> <C-]>
 
 "jump to header in C++
-nmap ,h :find %:t:r.h<CR>
-nmap ,H :sp %:t:r.h<CR>
-nmap ,s :find %:t:r.cpp<CR>
-nmap ,S :sp %:t:r.cpp<CR>
+nnoremap ,h :find %:t:r.h<CR>
+nnoremap ,H :sp %:t:r.h<CR>
+nnoremap ,s :find %:t:r.cpp<CR>
+nnoremap ,S :sp %:t:r.cpp<CR>
 
 
 "highlight tab and spaces
