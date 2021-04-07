@@ -94,10 +94,10 @@ vnoremap <C-j> :m '>+1<CR>zR<CR>gv=gv
 vnoremap <C-k> :m '<-2<CR>zR<CR>gv=gv
 
 "in normal mode ctrl-jklh to move between splits
-nnoremap <C-J> <C-W><C-J>
-nnoremap <C-K> <C-W><C-K>
-nnoremap <C-L> <C-W><C-L>
-nnoremap <C-H> <C-W><C-H>
+"nnoremap <C-J> <C-W><C-J>
+"nnoremap <C-K> <C-W><C-K>
+"nnoremap <C-L> <C-W><C-L>
+"nnoremap <C-H> <C-W><C-H>
 
 "cycle throught items in cwindows
 noremap ç :cn<CR>
@@ -153,7 +153,8 @@ nnoremap à /
 vnoremap à /
 inoremap jk <ESC>
 let mapleader=" "
-nnoremap <leader><leader> @:
+nnoremap <leader><leader> <c-^>
+nnoremap <leader>. @:
 
 nnoremap : ò
 vnoremap : ò
@@ -231,6 +232,8 @@ nnoremap <leader>sl :source ~/.saved_vim_sessions/
 nnoremap <leader>gs :Gstatus<CR>
 nnoremap <leader>gc :GBranches<CR>
 nnoremap <leader>gl :Git ggd<CR>
+nnoremap <leader>gh :diffget //3<CR>
+nnoremap <leader>gu :diffget //2<CR>
 
 "fuzzy finder
 "set rtp+=~/.fzf
@@ -252,6 +255,7 @@ nnoremap <leader>cx :CMakeClean<CR>
 nnoremap <leader>cc :!cd build && ninja clean<CR>
 nnoremap <leader>cv :!cd build && ninja<CR>
 nnoremap <leader>cf :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash<CR>
+nnoremap <leader>cm :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash monitor<CR>
 nnoremap <leader>ce :!cd build && ESPPORT=/dev/ttyUSB0 ninja erase_flash<CR>
 
 ""coc
@@ -353,8 +357,6 @@ nnoremap ,S :sp %:t:r.cpp<CR>
 map <F4> :match Conceal /\t/
 "set match Error /\S\zs\s\+$
 
-"cycling between buffers
-nnoremap <F6> :bn<CR>
 
 
 " Commenting blocks of code.
@@ -368,11 +370,8 @@ noremap <silent> ,cc :<C-B>silent <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')<C
 noremap <silent> ,cu :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')<CR>//e<CR>:nohlsearch<CR>
 
 
+" colorscheme e bg transparent
 function! MyHighlights() abort
-"    highlight Visual     cterm=NONE ctermbg=76  ctermfg=16  gui=NONE guibg=#5fd700 guifg=#000000
-"    highlight StatusLine cterm=NONE ctermbg=231 ctermfg=160 gui=NONE guibg=#ffffff guifg=#d70000
-"    highlight Normal     cterm=NONE ctermbg=17              gui=NONE guibg=#00005f
-"    highlight NonText    cterm=NONE ctermbg=17              gui=NONE guibg=#00005f
      hi Normal guibg=NONE ctermbg=NONE
 endfunction
 
@@ -382,3 +381,18 @@ augroup MyColors
 augroup END
 colorscheme gruvbox
 "hi Normal guibg=NONE ctermbg=NONE
+
+
+" ..da provare
+"nnoremap <C-k> :cn<CR>zz
+"nnoremap <C-j> :cp<CR>zz
+"nnoremap <leader>k :lnext<CR>zz
+"nnoremap <leader>j :lprev<CR>zz
+
+"cycling between buffers
+nnoremap <TAB> :bn<CR>
+nnoremap <S-TAB> :bp<CR>
+
+"vimdiff
+nnoremap <C-k> [c
+nnoremap <C-j> ]c
