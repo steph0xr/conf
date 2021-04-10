@@ -99,9 +99,6 @@ vnoremap <C-k> :m '<-2<CR>zR<CR>gv=gv
 "nnoremap <C-L> <C-W><C-L>
 "nnoremap <C-H> <C-W><C-H>
 
-"cycle throught items in cwindows
-noremap ç :cn<CR>
-noremap é :cp<CR>
 
 "resize panes
 "set nocompatible
@@ -177,6 +174,45 @@ nnoremap <leader>t :term<CR>
 
 "######      PLUGIN      #######
 
+call plug#begin('~/.vim/plugged')
+
+Plug 'puremourning/vimspector'
+Plug 'tpope/vim-fugitive'
+Plug 'octol/vim-cpp-enhanced-highlight'
+Plug 'cdelledonne/vim-cmake'
+Plug 'jreybert/vimagit'
+Plug 'tpope/vim-obsession'
+Plug 'junegunn/fzf.vim'
+Plug 'junegunn/fzf'
+Plug 'liuchengxu/vista.vim'
+Plug 'vimwiki/vimwiki'
+Plug 'airblade/vim-gitgutter'
+
+"Plug 'junegunn/gv.vim'
+"Plug 'vim-utils/vim-man'
+"Plug 'mbbill/undotree'
+"Plug 'vuciv/vim-bujo'
+"Plug 'tpope/vim-dispatch'
+"Plug 'theprimeagen/vim-be-good'
+"Plug '/home/theprimeagen/personal/af-pluth-pluth'
+"Plug 'gruvbox-community/gruvbox'
+"Plug 'tpope/vim-projectionist'
+
+if has('nvim')
+  " Plebvim lsp Plugins
+  Plug 'neovim/nvim-lspconfig'
+  Plug 'nvim-lua/completion-nvim'
+
+  " Neovim Tree shitter
+  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+  Plug 'nvim-treesitter/playground'
+
+else
+  Plug 'ycm-core/YouCompleteMe'
+endif
+
+call plug#end()
+
 "airline bar
 let g:pymode_options_colorcolumn = 0
 let g:airline#extensions#tabline#enabled = 1
@@ -202,24 +238,29 @@ nnoremap <leader>de :call vimspector#Reset()<CR>
 nnoremap <leader>dp :call vimspector#ToggleBreakpoint()<CR>
 
 "youCompleteMe
-let g:ycm_auto_hover=''
-nmap <leader>k <plug>(YCMHover)
-nnoremap <leader>lo :lopen<CR>
-nnoremap <silent>gt :YcmCompleter GoTo<CR>
-nnoremap <silent>gd :YcmCompleter GoToDeclaration<CR>
-nnoremap <silent>gi :YcmCompleter GoToDefinition<CR>
-nnoremap <silent>gr :YcmCompleter GoToReferences<CR>
-nnoremap <silent>gs :YcmCompleter GoToSymbol<CR>
-let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/.ycm_extra_conf.py'
-let g:ycm_enable_diagnostic_signs=1
-let g:ycm_always_populate_location_list = 1
-set signcolumn=yes
+if !has('nvim')
+  nnoremap <leader>gg <plug>(YCMHover)
+  nnoremap <leader>lo :lopen<CR>
+  nnoremap <silent>gt :YcmCompleter GoTo<CR>
+  nnoremap <silent>gd :YcmCompleter GoToDeclaration<CR>
+  nnoremap <silent>gi :YcmCompleter GoToDefinition<CR>
+  nnoremap <silent>gr :YcmCompleter GoToReferences<CR>
+  nnoremap <silent>gs :YcmCompleter GoToSymbol<CR>
+  let g:ycm_auto_hover=''
+  let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/.ycm_extra_conf.py'
+  let g:ycm_enable_diagnostic_signs=1
+  let g:ycm_always_populate_location_list = 1
+endif
+  set signcolumn=yes
+
 "clangd-xtensa da usare con progetti esp:
 "let g:ycm_clangd_binary_path = "/hdd1/repos/llvm-project/clang-tools-extra/clangd"
 "highlight YcmErrorLine guibg=#f7d1b2
 "nmap <> <ESC> :YcmCompleter Format<CR>
 " Use <c-space> to trigger completion.
 "inoremap <silent><expr> <c-space> coc#refresh()
+
+
 
 "sessione \s
 nnoremap <leader>sd :mksession!<CR>
@@ -231,7 +272,7 @@ nnoremap <leader>sl :source ~/.saved_vim_sessions/
 "git vim-fugitive \g
 nnoremap <leader>gs :Gstatus<CR>
 nnoremap <leader>gc :GBranches<CR>
-nnoremap <leader>gl :Git ggd<CR>
+nnoremap <leader>gl :Git gg<CR>
 nnoremap <leader>gh :diffget //3<CR>
 nnoremap <leader>gu :diffget //2<CR>
 
@@ -245,18 +286,32 @@ let g:fzf_layout = { 'window': { 'width': 0.8, 'height': 0.8 } }
 "cdelledonne/vim-cmake
 let g:cmake_default_config = 'build'
 "let g:cmake_generate_options = ['-GNinja', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON']
-let g:cmake_generate_options = ['-GNinja', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON', '-DPYTHON_DEPS_CHECKED=1', '-DESP_PLATFORM=1', '-DIDF_TARGET=esp32', '-DCCACHE_ENABLE=0', '-DCMAKE_C_COMPILER=/hdd1/repos/llvm-project/build/bin/clang', '-DCMAKE_CXX_COMPILER=/hdd1/repos/llvm-project/build/bin/clang++']
+let g:cmake_generate_options = ['-GNinja', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON', '-DPYTHON_DEPS_CHECKED=1', '-DESP_PLATFORM=1', '-DIDF_TARGET=esp32', '-DCCACHE_ENABLE=0']
 let g:cmake_root_markers = ['build']
 let g:cmake_link_compile_commands = 1
 nnoremap <leader>cg :CMakeGenerate<CR>
 nnoremap <leader>cb :CMakeBuild<CR>
-nnoremap <leader>cw :CMakeBuild -Dw<CR>
+nnoremap <leader>cw :CMakeBuild -v<CR>
 nnoremap <leader>cx :CMakeClean<CR>
 nnoremap <leader>cc :!cd build && ninja clean<CR>
 nnoremap <leader>cv :!cd build && ninja<CR>
 nnoremap <leader>cf :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash<CR>
 nnoremap <leader>cm :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash monitor<CR>
 nnoremap <leader>ce :!cd build && ESPPORT=/dev/ttyUSB0 ninja erase_flash<CR>
+nnoremap <leader>ca :!cmake -GNinja -B ../build && cmake --build ../build -v<CR>
+set makeprg=ninja
+nnoremap <leader>ck :make -C build<CR><CR>:copen<CR>
+
+
+"vim.cpp
+let g:cpp_class_scope_highlight = 1
+let g:cpp_member_variable_highlight = 1
+let g:cpp_class_decl_highlight = 1
+let g:cpp_posix_standard = 1
+"let g:cpp_experimental_simple_template_highlight = 1
+"let g:cpp_experimental_template_highlight = 1
+"let g:cpp_concepts_highlight = 1
+"let g:cpp_no_function_highlight = 1
 
 ""coc
 "" if hidden is not set, TextEdit might fail.
@@ -383,16 +438,22 @@ colorscheme gruvbox
 "hi Normal guibg=NONE ctermbg=NONE
 
 
-" ..da provare
-"nnoremap <C-k> :cn<CR>zz
-"nnoremap <C-j> :cp<CR>zz
-"nnoremap <leader>k :lnext<CR>zz
-"nnoremap <leader>j :lprev<CR>zz
+"cycle throught items in cwindow and lwindow
+nnoremap <C-k> :cp<CR>zz
+nnoremap <C-j> :cn<CR>zz
+nnoremap <leader>k :lnext<CR>zz
+nnoremap <leader>j :lprev<CR>zz
 
 "cycling between buffers
 nnoremap <TAB> :bn<CR>
 nnoremap <S-TAB> :bp<CR>
 
 "vimdiff
-nnoremap <C-k> [c
-nnoremap <C-j> ]c
+nnoremap ç [c
+nnoremap é ]c
+
+
+"xtensa-clang
+let g:ycm_clangd_uses_ycmd_caching = 0
+let g:ycm_clangd_binary_path = "/hdd1/repos/llvm-project/clang-tools-extra/clangd"
+let g:ycm_clangd_args = ['-log=verbose', '-pretty'] "-background-index
