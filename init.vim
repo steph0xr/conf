@@ -2,11 +2,11 @@ set runtimepath^=~/.vim runtimepath+=~/.vim/after
 let &packpath = &runtimepath
 source ~/.vimrc
 
-"lua require'lspconfig'.clangd.setup{cmd = { "/hdd1/repos/llvm-project/clang-tools-extra/clangd", "--background-index" }}
 lua require'lspconfig'.clangd.setup{cmd = { "clangd", "--background-index" }}
+"lua require'lspconfig'.clangd.setup{cmd = { "clangd-xtensa", "--background-index", "--query-driver=/home/steph/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-*" }}
 autocmd BufEnter * lua require'completion'.on_attach()
 
-"LSP
+"vim.lsp - nvim-lspconfig
 set completeopt=menuone,noinsert,noselect
 let g:completion_matching_strategy_list = ['exact', 'substring', 'fuzzy']
 inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"

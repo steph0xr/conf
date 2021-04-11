@@ -157,9 +157,9 @@ nnoremap : ò
 vnoremap : ò
 
 nnoremap <leader>t :term<CR>
+tnoremap <Esc> <C-\><C-n>
 
-"au VimEnter * silent! !xmodmap -e 'clear Lock' -e 'keycode 0x42 = Ctrl'
-"au VimLeave * silent! !xmodmap -e 'clear Lock' -e 'keycode 0x42 = Caps_lock'
+nnoremap <leader>e :20Lex<CR>
 
 
 
@@ -299,13 +299,14 @@ nnoremap ,cb :CMakeBuild<CR>
 nnoremap ,cw :CMakeBuild -v<CR>
 nnoremap ,cx :CMakeClean<CR>
 nnoremap ,cc :!cd build && ninja clean<CR>
-nnoremap ,cv :!cd build && ninja<CR>
+nnoremap ,ce :!cd build && ninja<CR>
 nnoremap ,cf :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash<CR>
 nnoremap ,cm :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash monitor<CR>
 nnoremap ,ce :!cd build && ESPPORT=/dev/ttyUSB0 ninja erase_flash<CR>
 nnoremap ,ca :!cmake -GNinja -B ../build && cmake --build ../build -v<CR>
-nnoremap ,ck :make -C build<CR><CR>:copen<CR>
+nnoremap ,ck :make -C build<CR><CR>:cw<CR>
 set makeprg=ninja
+nnoremap ,cv :CMakeClean<CR>:CMakeGenerate<CR>:make -C build<CR><CR>:cw<CR>
 
 
 "vim.cpp
