@@ -187,6 +187,7 @@ Plug 'junegunn/fzf'
 Plug 'liuchengxu/vista.vim'
 Plug 'vimwiki/vimwiki'
 Plug 'airblade/vim-gitgutter'
+Plug 'preservim/nerdcommenter'
 
 "Plug 'junegunn/gv.vim'
 "Plug 'vim-utils/vim-man'
@@ -212,6 +213,9 @@ else
 endif
 
 call plug#end()
+  
+"comments
+let g:NERDCreateDefaultMappings = 1
 
 "airline bar
 let g:pymode_options_colorcolumn = 0
@@ -273,6 +277,7 @@ nnoremap <leader>sl :source ~/.saved_vim_sessions/
 nnoremap <leader>gs :Gstatus<CR>
 nnoremap <leader>gc :GBranches<CR>
 nnoremap <leader>gl :Git gg<CR>
+nnoremap <leader>gd :Git difftool<CR>
 nnoremap <leader>gh :diffget //3<CR>
 nnoremap <leader>gu :diffget //2<CR>
 
@@ -289,18 +294,18 @@ let g:cmake_default_config = 'build'
 let g:cmake_generate_options = ['-GNinja', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON', '-DPYTHON_DEPS_CHECKED=1', '-DESP_PLATFORM=1', '-DIDF_TARGET=esp32', '-DCCACHE_ENABLE=0']
 let g:cmake_root_markers = ['build']
 let g:cmake_link_compile_commands = 1
-nnoremap <leader>cg :CMakeGenerate<CR>
-nnoremap <leader>cb :CMakeBuild<CR>
-nnoremap <leader>cw :CMakeBuild -v<CR>
-nnoremap <leader>cx :CMakeClean<CR>
-nnoremap <leader>cc :!cd build && ninja clean<CR>
-nnoremap <leader>cv :!cd build && ninja<CR>
-nnoremap <leader>cf :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash<CR>
-nnoremap <leader>cm :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash monitor<CR>
-nnoremap <leader>ce :!cd build && ESPPORT=/dev/ttyUSB0 ninja erase_flash<CR>
-nnoremap <leader>ca :!cmake -GNinja -B ../build && cmake --build ../build -v<CR>
+nnoremap ,cg :CMakeGenerate<CR>
+nnoremap ,cb :CMakeBuild<CR>
+nnoremap ,cw :CMakeBuild -v<CR>
+nnoremap ,cx :CMakeClean<CR>
+nnoremap ,cc :!cd build && ninja clean<CR>
+nnoremap ,cv :!cd build && ninja<CR>
+nnoremap ,cf :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash<CR>
+nnoremap ,cm :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash monitor<CR>
+nnoremap ,ce :!cd build && ESPPORT=/dev/ttyUSB0 ninja erase_flash<CR>
+nnoremap ,ca :!cmake -GNinja -B ../build && cmake --build ../build -v<CR>
+nnoremap ,ck :make -C build<CR><CR>:copen<CR>
 set makeprg=ninja
-nnoremap <leader>ck :make -C build<CR><CR>:copen<CR>
 
 
 "vim.cpp
@@ -421,8 +426,8 @@ autocmd FileType conf,fstab       let b:comment_leader = '# '
 autocmd FileType tex              let b:comment_leader = '% '
 autocmd FileType mail             let b:comment_leader = '> '
 autocmd FileType vim              let b:comment_leader = '" '
-noremap <silent> ,cc :<C-B>silent <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')<CR>/<CR>:nohlsearch<CR>
-noremap <silent> ,cu :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')<CR>//e<CR>:nohlsearch<CR>
+"noremap <silent> ,cc :<C-B>silent <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')<CR>/<CR>:nohlsearch<CR>
+"noremap <silent> ,cu :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')<CR>//e<CR>:nohlsearch<CR>
 
 
 " colorscheme e bg transparent
