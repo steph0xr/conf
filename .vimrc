@@ -76,8 +76,8 @@ command! -nargs=+ -complete=file -bar Cerca execute 'silent! grep! -Ir <args> --
 nnoremap § :Cerca<SPACE>
 
 "ripgrep
-nnoremap <c-f> :Rg -tc -tcpp ttxt<SPACE>
-vnoremap <c-f> y:Rg -tc -tcpp ttxt <C-r>*<CR>:cw<CR>
+nnoremap <c-f> :Rg -tc -tcpp -ttxt<SPACE>
+vnoremap <c-f> y:Rg -tc -tcpp -ttxt <C-r>*<CR>:cw<CR>
 
 " bind  for breakpoints to clipboard for gdb
 command! Xg :let @+ = 'b ' . expand('%:p') . ':' . line('.')
@@ -157,9 +157,10 @@ nnoremap : ò
 vnoremap : ò
 
 nnoremap <leader>t :term<CR>
-tnoremap <Esc> <C-\><C-n>
+"tnoremap <Esc> <C-\><C-n>
 
-nnoremap <leader>e :20Lex<CR>
+nnoremap <leader>el :20Lex<CR>
+nnoremap <leader>ee :Ex<CR>
 
 
 
@@ -200,9 +201,12 @@ Plug 'preservim/nerdcommenter'
 "Plug 'tpope/vim-projectionist'
 
 if has('nvim')
-  " Plebvim lsp Plugins
+  "lsp Plugins
   Plug 'neovim/nvim-lspconfig'
   Plug 'nvim-lua/completion-nvim'
+ " Plug 'nvim-lua/lsp-status.nvim'
+ " Plug 'nvim-telescope/telescope.nvim'
+ " Plug 'nvim-telescope/telescope-fzy-native.nvim'
 
   " Neovim Tree shitter
   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
@@ -213,7 +217,7 @@ else
 endif
 
 call plug#end()
-  
+
 "comments
 let g:NERDCreateDefaultMappings = 1
 
@@ -458,8 +462,11 @@ nnoremap <S-TAB> :bp<CR>
 nnoremap ç [c
 nnoremap é ]c
 
+"set curernt file to path
+nnoremap <leader>cd :cd %:p:h<CR>
+
 
 "xtensa-clang
 let g:ycm_clangd_uses_ycmd_caching = 0
-let g:ycm_clangd_binary_path = "/hdd1/repos/llvm-project/clang-tools-extra/clangd"
+let g:ycm_clangd_binary_path = "clangd-xtensa"
 let g:ycm_clangd_args = ['-log=verbose', '-pretty'] "-background-index
