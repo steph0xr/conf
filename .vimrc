@@ -68,7 +68,7 @@ vnoremap <F3> y:vimgrep '<c-r>"' **/*.c **/*.cpp **/*.h<CR>:cw<cr>
 
 
 "whitespaces highlight (call before :set hlsearch)
-nnoremap <leader>sp /\s\+$
+"nnoremap <leader>sp /\s\+$
 command! RemoveTrailingSpaces %s/\s\+$//g | noh
 
 " bind § to grep shortcut
@@ -121,28 +121,6 @@ noremap <C-Down> :resize -5<CR>
 "vnoremap <Down> :<C-u>echo "No left for you!"<CR>
 "inoremap <Down> <C-o>:echo "No left for you!"<CR>
 
-
-"avoid paste to replace copy register
-vnoremap p pgvy
-"vnoremap <leader>p "_dP
-"vnoremap p "_dP
-noremap <leader>p "+p
-nnoremap <leader>y "+yy
-vnoremap <leader>y "+y
-nnoremap <leader>Y gg"+yG
-
-"fun! TrimWhetespace()
-"	let l:save = winsaveview()
-"	keeppatterns %s/\s\+$//e
-"	call winrestview(l:save)
-"endfun
-"
-"augroup STEVE
-"	autocmd!
-"	autocmd BufWritePre * :call TrimWhitespace()
-"augroup END
-
-
 "remap esc and :
 nnoremap ò :
 vnoremap ò :
@@ -161,6 +139,15 @@ nnoremap <leader>t :term<CR>
 
 nnoremap <leader>el :20Lex<CR>
 nnoremap <leader>ee :Ex<CR>
+
+"avoid paste to replace copy register
+vnoremap p pgvy
+"vnoremap <leader>p "_dP
+"vnoremap p "_dP
+noremap <leader>p "+p
+nnoremap <leader>y "+yy
+vnoremap <leader>y "+y
+nnoremap <leader>Y gg"+yG
 
 
 
@@ -287,7 +274,8 @@ nnoremap <leader>gu :diffget //2<CR>
 
 "fuzzy finder
 "set rtp+=~/.fzf
-nnoremap <silent> <C-p> :Files<CR>
+nnoremap <silent> <c-p> :Files<CR>
+nnoremap <silent> <leader>p :GitFiles<CR>
 let $FZF_DEFAULT_OPT='--reverse'
 let g:fzf_layout = { 'window': { 'width': 0.8, 'height': 0.8 } }
 
@@ -298,19 +286,19 @@ let g:cmake_default_config = 'build'
 let g:cmake_generate_options = ['-GNinja', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON', '-DPYTHON_DEPS_CHECKED=1', '-DESP_PLATFORM=1', '-DIDF_TARGET=esp32', '-DCCACHE_ENABLE=0']
 let g:cmake_root_markers = ['build']
 let g:cmake_link_compile_commands = 1
-nnoremap ,cg :CMakeGenerate<CR>
-nnoremap ,cb :CMakeBuild<CR>
-nnoremap ,cw :CMakeBuild -v<CR>
+nnoremap ,cc :CMakeGenerate<CR>
+nnoremap ,ck :CMakeBuild<CR>
+nnoremap ,cv :CMakeBuild -v<CR>
 nnoremap ,cx :CMakeClean<CR>
-nnoremap ,cc :!cd build && ninja clean<CR>
+nnoremap ,cz :!cd build && ninja clean<CR>
 nnoremap ,ce :!cd build && ninja<CR>
 nnoremap ,cf :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash<CR>
 nnoremap ,cm :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash monitor<CR>
 nnoremap ,ce :!cd build && ESPPORT=/dev/ttyUSB0 ninja erase_flash<CR>
 nnoremap ,ca :!cmake -GNinja -B ../build && cmake --build ../build -v<CR>
-nnoremap ,ck :make -C build<CR><CR>:cw<CR>
+nnoremap ,cb :make -C build<CR><CR>:cw<CR>
 set makeprg=ninja
-nnoremap ,cv :CMakeClean<CR>:CMakeGenerate<CR>:make -C build<CR><CR>:cw<CR>
+nnoremap ,cw :CMakeClean<CR>:CMakeGenerate<CR>:make -C build<CR><CR>:cw<CR>
 
 
 "vim.cpp
@@ -422,19 +410,6 @@ nnoremap ,S :sp %:t:r.cpp<CR>
 map <F4> :match Conceal /\t/
 "set match Error /\S\zs\s\+$
 
-
-
-" Commenting blocks of code.
-autocmd FileType c,cpp,java,scala let b:comment_leader = '// '
-autocmd FileType sh,ruby,python   let b:comment_leader = '# '
-autocmd FileType conf,fstab       let b:comment_leader = '# '
-autocmd FileType tex              let b:comment_leader = '% '
-autocmd FileType mail             let b:comment_leader = '> '
-autocmd FileType vim              let b:comment_leader = '" '
-"noremap <silent> ,cc :<C-B>silent <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')<CR>/<CR>:nohlsearch<CR>
-"noremap <silent> ,cu :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')<CR>//e<CR>:nohlsearch<CR>
-
-
 " colorscheme e bg transparent
 function! MyHighlights() abort
      hi Normal guibg=NONE ctermbg=NONE
@@ -464,6 +439,11 @@ nnoremap é ]c
 
 "set curernt file to path
 nnoremap <leader>cd :cd %:p:h<CR>
+
+"to be tested
+nnoremap <leader>ghw :h <C-R>=expand("<cword>")<CR><CR>
+nnoremap <leader>bs /<C-R>=escape(expand("<cWORD>"), "/")<CR><CR>
+nnoremap <leader><CR> :so ~/.vimrc<CR>
 
 
 "xtensa-clang
