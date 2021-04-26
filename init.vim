@@ -5,10 +5,11 @@ source ~/.vimrc
 
 
 
-lua require'lspconfig'.clangd.setup{cmd = { "clangd", "--background-index", "--query-driver=/usr/bin/gcc"}}
+"lua require'lspconfig'.clangd.setup{cmd = { "clangd", "--background-index", "--query-driver=/usr/bin/gcc"}}
+lua require'lspconfig'.clangd.setup{cmd = { "clangd-xtensa", "--background-index", "--query-driver=/home/steph/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-*" }}
 "lua require'lspconfig'.clangd.setup{cmd = { "clangd", "--background-index" }}
-"lua require'lspconfig'.clangd.setup{cmd = { "clangd-xtensa", "--background-index", "--query-driver=/home/steph/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-*" }}
 autocmd BufEnter * lua require'completion'.on_attach()
+
 
 "vim.lsp - nvim-lspconfig
 set completeopt=menuone,noinsert,noselect
@@ -27,6 +28,7 @@ nnoremap gh :lua vim.lsp.buf.hover()<CR>
 nnoremap gca :lua vim.lsp.buf.code_action()<CR>
 nnoremap gsd :lua vim.lsp.util.show_line_diagnostics(); vim.lsp.util.show_line_diagnostics()<CR>
 nnoremap gn :lua vim.lsp.diagnostic.goto_next()<CR>
+"nnoremap <c-space> :lua vim.lsp.buf.completion()<CR>
 
 "nnoremap <silent> vd <cmd>lua vim.lsp.buf.definition()<CR>
 "nnoremap <silent> gD <cmd>lua vim.lsp.buf.declaration()<CR>

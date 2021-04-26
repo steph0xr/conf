@@ -75,17 +75,14 @@ command! RemoveTrailingSpaces %s/\s\+$//g | noh
 command! -nargs=+ -complete=file -bar Cerca execute 'silent! grep! -Ir <args> --exclude=tags --exclude=*.html --exclude=*.js' | execute 'redraw!' | execute 'cw'
 nnoremap § :Cerca<SPACE>
 
-"ripgrep
-nnoremap <c-f> :Rg -tc -tcpp -ttxt<SPACE>
-vnoremap <c-f> y:Rg -tc -tcpp -ttxt <C-r>*<CR>:cw<CR>
 
 " bind  for breakpoints to clipboard for gdb
 command! Xg :let @+ = 'b ' . expand('%:p') . ':' . line('.')
 nnoremap °° :Xg<CR>
 
 "ALT mapping for moving lines
-nnoremap <C-j> ddp
-nnoremap <C-k> ddkP
+"nnoremap <C-j> ddp
+"nnoremap <C-k> ddkP
 
 "in insert and visual mode ctrl-jk to move line up and down
 inoremap <C-j> <Esc>:m .+1<CR>zR<CR>==gi
@@ -126,7 +123,10 @@ nnoremap ò :
 vnoremap ò :
 nnoremap à /
 vnoremap à /
+nnoremap è }
+nnoremap + {
 inoremap jk <ESC>
+inoremap jj <ESC>
 let mapleader=" "
 nnoremap <leader><leader> <c-^>
 nnoremap <leader>. @:
@@ -135,7 +135,7 @@ nnoremap : ò
 vnoremap : ò
 
 nnoremap <leader>t :term<CR>
-"tnoremap <Esc> <C-\><C-n>
+tnoremap <c-q> <C-\><C-n>
 
 nnoremap <leader>el :20Lex<CR>
 nnoremap <leader>ee :Ex<CR>
@@ -172,6 +172,7 @@ Plug 'jreybert/vimagit'
 Plug 'tpope/vim-obsession'
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf'
+Plug 'wookayin/fzf-ripgrep.vim'
 Plug 'liuchengxu/vista.vim'
 Plug 'vimwiki/vimwiki'
 Plug 'airblade/vim-gitgutter'
@@ -205,8 +206,16 @@ endif
 
 call plug#end()
 
+
+
+
+
+
 "comments
 let g:NERDCreateDefaultMappings = 1
+let g:NERDSpaceDelims = 1 " Add spaces after comment delimiters by default
+let g:NERDCompactSexyComs = 1 " Use compact syntax for prettified multi-line comments
+let g:NERDTrimTrailingWhitespace = 1 " Enable trimming of trailing whitespace when uncommenting
 
 "airline bar
 let g:pymode_options_colorcolumn = 0
@@ -245,6 +254,10 @@ if !has('nvim')
   let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/.ycm_extra_conf.py'
   let g:ycm_enable_diagnostic_signs=1
   let g:ycm_always_populate_location_list = 1
+  "xtensa-clang
+  let g:ycm_clangd_uses_ycmd_caching = 0
+  let g:ycm_clangd_binary_path = "clangd-xtensa"
+  let g:ycm_clangd_args = ['-log=verbose', '-pretty'] "-background-index
 endif
   set signcolumn=yes
 
@@ -274,8 +287,8 @@ nnoremap <leader>gu :diffget //2<CR>
 
 "fuzzy finder
 "set rtp+=~/.fzf
-nnoremap <silent> <c-p> :Files<CR>
-nnoremap <silent> <leader>p :GitFiles<CR>
+nnoremap <silent> <c-p> :GitFiles<CR>
+nnoremap <silent> <leader>f :Files<CR>
 let $FZF_DEFAULT_OPT='--reverse'
 let g:fzf_layout = { 'window': { 'width': 0.8, 'height': 0.8 } }
 
@@ -286,19 +299,23 @@ let g:cmake_default_config = 'build'
 let g:cmake_generate_options = ['-GNinja', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON', '-DPYTHON_DEPS_CHECKED=1', '-DESP_PLATFORM=1', '-DIDF_TARGET=esp32', '-DCCACHE_ENABLE=0']
 let g:cmake_root_markers = ['build']
 let g:cmake_link_compile_commands = 1
-nnoremap ,cc :CMakeGenerate<CR>
-nnoremap ,ck :CMakeBuild<CR>
-nnoremap ,cv :CMakeBuild -v<CR>
+nnoremap ,cb :CMakeBuild<CR>
 nnoremap ,cx :CMakeClean<CR>
-nnoremap ,cz :!cd build && ninja clean<CR>
+nnoremap ,cz :CMakeClose<CR>
+nnoremap ,cv :!cd build && ninja clean<CR>
+"nnoremap ,cb :CMakeBuild -v<CR>
 nnoremap ,ce :!cd build && ninja<CR>
 nnoremap ,cf :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash<CR>
-nnoremap ,cm :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash monitor<CR>
 nnoremap ,ce :!cd build && ESPPORT=/dev/ttyUSB0 ninja erase_flash<CR>
+nnoremap ,ck :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash monitor<CR>
 nnoremap ,ca :!cmake -GNinja -B ../build && cmake --build ../build -v<CR>
-nnoremap ,cb :make -C build<CR><CR>:cw<CR>
+nnoremap ,c :CMakeGenerate!<CR>
+nnoremap ,m :w<CR> :make! -C build<CR><CR>:cw<CR>
 set makeprg=ninja
-nnoremap ,cw :CMakeClean<CR>:CMakeGenerate<CR>:make -C build<CR><CR>:cw<CR>
+"nnoremap ,cw :CMakeClean<CR>:CMakeGenerate<CR>:make! -C build<CR><CR>:cw<CR>
+
+let g:cmake_jump = 0
+
 
 
 "vim.cpp
@@ -440,13 +457,16 @@ nnoremap é ]c
 "set curernt file to path
 nnoremap <leader>cd :cd %:p:h<CR>
 
+
+"ripgrep
+nnoremap <c-f> :Rg *<CR>
+"nnoremap <c-f> :Rg -tc -tcpp -ttxt *<CR>
+" nnoremap <c-f> y:Rg <C-r>"<CR>:cw<CR>
+"nnoremap <c-f> y:Rg -tc -tcpp -ttxt <C-r>"<CR>:cw<CR>
+"
 "to be tested
 nnoremap <leader>ghw :h <C-R>=expand("<cword>")<CR><CR>
 nnoremap <leader>bs /<C-R>=escape(expand("<cWORD>"), "/")<CR><CR>
 nnoremap <leader><CR> :so ~/.vimrc<CR>
 
 
-"xtensa-clang
-let g:ycm_clangd_uses_ycmd_caching = 0
-let g:ycm_clangd_binary_path = "clangd-xtensa"
-let g:ycm_clangd_args = ['-log=verbose', '-pretty'] "-background-index
