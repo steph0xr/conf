@@ -28,7 +28,9 @@ nnoremap gh :lua vim.lsp.buf.hover()<CR>
 nnoremap gca :lua vim.lsp.buf.code_action()<CR>
 nnoremap gsd :lua vim.lsp.util.show_line_diagnostics(); vim.lsp.util.show_line_diagnostics()<CR>
 nnoremap gn :lua vim.lsp.diagnostic.goto_next()<CR>
-"nnoremap <c-space> :lua vim.lsp.buf.completion()<CR>
+nnoremap <leader>gg :LspStop<CR>
+nnoremap grn :lua vim.lsp.buf.rename()<CR>
+nnoremap gc :lua vim.lsp.buf.completion()<CR>
 
 "nnoremap <silent> vd <cmd>lua vim.lsp.buf.definition()<CR>
 "nnoremap <silent> gD <cmd>lua vim.lsp.buf.declaration()<CR>

@@ -4,12 +4,15 @@ execute pathogen#infect()
 set termguicolors
 "set t_Co=256
 let g:gruvbox_italic=1
+let g:gruvbox_bold=0
 let g:gruvbox_transparent_bg=1
-autocmd vimenter * ++nested colorscheme gruvbox
+let g:gruvbox_contrast_dark = 'hard'
+let g:gruvbox_invert_selection='0'
+" autocmd vimenter * ++nested colorscheme gruvbox
 "set bg=light
 set bg=dark
 highlight Comment cterm=italic gui=italic
-colorscheme gruvbox
+" colorscheme gruvbox
 "highlight Normal guibg=NONE ctermbg=NONE
 "colorscheme desert
 
@@ -164,9 +167,12 @@ nnoremap <leader>Y gg"+yG
 
 call plug#begin('~/.vim/plugged')
 
+Plug 'gruvbox-community/gruvbox'
+Plug 'sainnhe/gruvbox-material'
 Plug 'puremourning/vimspector'
 Plug 'tpope/vim-fugitive'
-Plug 'octol/vim-cpp-enhanced-highlight'
+" Plug 'octol/vim-cpp-enhanced-highlight'
+Plug 'bfrg/vim-cpp-modern'
 Plug 'cdelledonne/vim-cmake'
 Plug 'jreybert/vimagit'
 Plug 'tpope/vim-obsession'
@@ -177,6 +183,7 @@ Plug 'liuchengxu/vista.vim'
 Plug 'vimwiki/vimwiki'
 Plug 'airblade/vim-gitgutter'
 Plug 'preservim/nerdcommenter'
+ " Plug 'nvim-telescope/telescope-fzy-native.nvim'
 
 "Plug 'junegunn/gv.vim'
 "Plug 'vim-utils/vim-man'
@@ -192,9 +199,10 @@ if has('nvim')
   "lsp Plugins
   Plug 'neovim/nvim-lspconfig'
   Plug 'nvim-lua/completion-nvim'
- " Plug 'nvim-lua/lsp-status.nvim'
- " Plug 'nvim-telescope/telescope.nvim'
- " Plug 'nvim-telescope/telescope-fzy-native.nvim'
+  " Plug 'nvim-lua/lsp-status.nvim'
+  Plug 'nvim-lua/popup.nvim'
+  Plug 'nvim-lua/plenary.nvim'
+  Plug 'nvim-telescope/telescope.nvim'
 
   " Neovim Tree shitter
   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
@@ -210,6 +218,11 @@ call plug#end()
 
 
 
+"telescope
+nnoremap <leader>ff <cmd>Telescope find_files<cr>
+nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+nnoremap <leader>fb <cmd>Telescope buffers<cr>
+nnoremap <leader>fh <cmd>Telescope help_tags<cr>
 
 "comments
 let g:NERDCreateDefaultMappings = 1
@@ -227,6 +240,8 @@ let g:indentLine_enabled = 1
 
 "Termdebug
 packadd termdebug
+let g:termdebugger = "/home/steph/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gdb"
+
 nnoremap <leader>dd :Termdebug<CR>
 nnoremap <leader>dg :Gdb<CR>
 nnoremap <leader>db :Break<CR>
@@ -278,12 +293,14 @@ nnoremap <leader>ss :mksession ~/.saved_vim_sessions/
 nnoremap <leader>sl :source ~/.saved_vim_sessions/
 
 "git vim-fugitive \g
-nnoremap <leader>gs :Gstatus<CR>
+let g:fugitive_summary_format = "%<(16,trunc)%an || %s" 
+nnoremap <leader>gs :Git<CR>
 nnoremap <leader>gc :GBranches<CR>
 nnoremap <leader>gl :Git gg<CR>
 nnoremap <leader>gd :Git difftool<CR>
-nnoremap <leader>gh :diffget //3<CR>
-nnoremap <leader>gu :diffget //2<CR>
+nnoremap <leader>gh :Gclog -- % -10<CR>
+" nnoremap <leader>gh :diffget //3<CR>
+" nnoremap <leader>gu :diffget //2<CR>
 
 "fuzzy finder
 "set rtp+=~/.fzf
@@ -309,6 +326,7 @@ nnoremap ,cf :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash<CR>
 nnoremap ,ce :!cd build && ESPPORT=/dev/ttyUSB0 ninja erase_flash<CR>
 nnoremap ,ck :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash monitor<CR>
 nnoremap ,ca :!cmake -GNinja -B ../build && cmake --build ../build -v<CR>
+nnoremap ,j :!esp-app-flash<CR>
 nnoremap ,c :CMakeGenerate!<CR>
 nnoremap ,m :w<CR> :make! -C build<CR><CR>:cw<CR>
 set makeprg=ninja
@@ -319,14 +337,23 @@ let g:cmake_jump = 0
 
 
 "vim.cpp
-let g:cpp_class_scope_highlight = 1
-let g:cpp_member_variable_highlight = 1
-let g:cpp_class_decl_highlight = 1
-let g:cpp_posix_standard = 1
+" let g:cpp_class_scope_highlight = 1
+" let g:cpp_member_variable_highlight = 1
+" let g:cpp_class_decl_highlight = 1
+" let g:cpp_posix_standard = 1
 "let g:cpp_experimental_simple_template_highlight = 1
 "let g:cpp_experimental_template_highlight = 1
 "let g:cpp_concepts_highlight = 1
 "let g:cpp_no_function_highlight = 1
+"
+" let g:cpp_no_function_highlight = 1
+" " Enable highlighting of C++11 attributes
+let g:cpp_attributes_highlight = 1
+" " Highlight struct/class member variables (affects both C and C++ files)
+let g:cpp_member_highlight = 1
+" " Put all standard C and C++ keywords under Vim's highlight group 'Statement'
+" " (affects both C and C++ files)
+" let g:cpp_simple_highlight = 1
 
 ""coc
 "" if hidden is not set, TextEdit might fail.
@@ -451,8 +478,14 @@ nnoremap <TAB> :bn<CR>
 nnoremap <S-TAB> :bp<CR>
 
 "vimdiff
-nnoremap ç [c
-nnoremap é ]c
+if &diff
+  nnoremap <C-k> [c<CR>
+  nnoremap <C-j> ]c<CR>
+  nnoremap ç [c
+  nnoremap é ]c
+  nnoremap <leader>r :diffget RE<CR>
+  nnoremap <leader>l :diffget LO<CR>
+endif
 
 "set curernt file to path
 nnoremap <leader>cd :cd %:p:h<CR>
