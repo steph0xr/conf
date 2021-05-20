@@ -129,7 +129,9 @@ vnoremap à /
 nnoremap è }
 nnoremap + {
 inoremap jk <ESC>
+inoremap kj <ESC>
 inoremap jj <ESC>
+inoremap <c-c> <ESC>
 let mapleader=" "
 nnoremap <leader><leader> <c-^>
 nnoremap <leader>. @:
@@ -176,8 +178,8 @@ Plug 'bfrg/vim-cpp-modern'
 Plug 'cdelledonne/vim-cmake'
 Plug 'jreybert/vimagit'
 Plug 'tpope/vim-obsession'
-Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf'
+Plug 'junegunn/fzf.vim'
 Plug 'wookayin/fzf-ripgrep.vim'
 Plug 'liuchengxu/vista.vim'
 Plug 'vimwiki/vimwiki'
@@ -219,6 +221,7 @@ call plug#end()
 
 
 "telescope
+nnoremap <leader>f <cmd>Telescope find_files<cr>
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
@@ -293,19 +296,18 @@ nnoremap <leader>ss :mksession ~/.saved_vim_sessions/
 nnoremap <leader>sl :source ~/.saved_vim_sessions/
 
 "git vim-fugitive \g
-let g:fugitive_summary_format = "%<(16,trunc)%an || %s" 
+let g:fugitive_summary_format = "%<(16,trunc)%an || %s"
 nnoremap <leader>gs :Git<CR>
 nnoremap <leader>gc :GBranches<CR>
-nnoremap <leader>gl :Git gg<CR>
+nnoremap <leader>gg :Git gg<CR>
 nnoremap <leader>gd :Git difftool<CR>
-nnoremap <leader>gh :Gclog -- % -10<CR>
+nnoremap <leader>gh :Gclog<CR>
 " nnoremap <leader>gh :diffget //3<CR>
 " nnoremap <leader>gu :diffget //2<CR>
 
 "fuzzy finder
-"set rtp+=~/.fzf
 nnoremap <silent> <c-p> :GitFiles<CR>
-nnoremap <silent> <leader>f :Files<CR>
+" nnoremap <silent> <leader>f :Files<CR>
 let $FZF_DEFAULT_OPT='--reverse'
 let g:fzf_layout = { 'window': { 'width': 0.8, 'height': 0.8 } }
 
@@ -316,6 +318,7 @@ let g:cmake_default_config = 'build'
 let g:cmake_generate_options = ['-GNinja', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON', '-DPYTHON_DEPS_CHECKED=1', '-DESP_PLATFORM=1', '-DIDF_TARGET=esp32', '-DCCACHE_ENABLE=0']
 let g:cmake_root_markers = ['build']
 let g:cmake_link_compile_commands = 1
+let g:cmake_jump = 1
 nnoremap ,cb :CMakeBuild<CR>
 nnoremap ,cx :CMakeClean<CR>
 nnoremap ,cz :CMakeClose<CR>
@@ -327,12 +330,13 @@ nnoremap ,ce :!cd build && ESPPORT=/dev/ttyUSB0 ninja erase_flash<CR>
 nnoremap ,ck :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash monitor<CR>
 nnoremap ,ca :!cmake -GNinja -B ../build && cmake --build ../build -v<CR>
 nnoremap ,j :!esp-app-flash<CR>
+nnoremap ,r :!esp-reset<CR>
 nnoremap ,c :CMakeGenerate!<CR>
 nnoremap ,m :w<CR> :make! -C build<CR><CR>:cw<CR>
+nnoremap ,M :w<CR> :silent make! -C build<CR><CR>:cw<CR>
 set makeprg=ninja
 "nnoremap ,cw :CMakeClean<CR>:CMakeGenerate<CR>:make! -C build<CR><CR>:cw<CR>
 
-let g:cmake_jump = 0
 
 
 
@@ -492,7 +496,7 @@ nnoremap <leader>cd :cd %:p:h<CR>
 
 
 "ripgrep
-nnoremap <c-f> :Rg *<CR>
+nnoremap <c-f> :RgFzf *<CR>
 "nnoremap <c-f> :Rg -tc -tcpp -ttxt *<CR>
 " nnoremap <c-f> y:Rg <C-r>"<CR>:cw<CR>
 "nnoremap <c-f> y:Rg -tc -tcpp -ttxt <C-r>"<CR>:cw<CR>
