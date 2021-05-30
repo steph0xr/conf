@@ -189,6 +189,36 @@ bar {
 bindsym $mod+Shift+period exec systemctl suspend
 
 # touchpad
-exec --no-startup-id synclient VertEdgeScroll=1 TapButton1=1 TapButton2=1 TapButton3=1
+# exec --no-startup-id synclient VertEdgeScroll=1 TapButton1=1 TapButton2=1 TapButton3=1
+
+exec --no-startup-id ~/dotfiles/env
 
 workspace_auto_back_and_forth yes
+
+# Moving workspaces between screens
+bindsym $mod+p move workspace to output right
+bindsym $mod+o move workspace to output left
+
+# # FKeys
+# # Pulse Audio controls
+# bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5% #increase sound volume
+# bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 0 -5% #decrease sound volume
+# bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 0 toggle # mute sound
+# Alsa
+# bindsym XF86AudioRaiseVolume exec "amixer -q sset Master,0 1+ unmute"
+# bindsym XF86AudioLowerVolume exec "amixer -q sset Master,0 1- unmute"
+# bindsym XF86AudioMute exec "amixer -q sset Master,0 toggle"
+# #
+# # Sreen brightness controls
+# bindsym XF86MonBrightnessUp exec xbacklight -inc 20 # increase screen brightness
+# bindsym XF86MonBrightnessDown exec xbacklight -dec 20 # decrease screen brightness
+bindsym XF86MonBrightnessUp exec xrandr --output eDP-1-1 --brightness 1 # increase screen brightness
+bindsym XF86MonBrightnessDown exec xrandr --output eDP-1-1 --brightness 0.5 # decrease screen brightness
+
+# lockscreen
+bindsym $mod+Shift+x exec i3lock -c 000000
+
+# GET DEM BORDERS OUT OF HEREc:w
+for_window [class="^.*"] border pixel 2
+                          # class                 border  backgr. text    indicator child_border
+for_window [class="^.*"] client.focused          #77dd77 #285577 #ffffff #2e9ef4   #285577

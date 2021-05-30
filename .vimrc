@@ -173,6 +173,7 @@ Plug 'gruvbox-community/gruvbox'
 Plug 'sainnhe/gruvbox-material'
 Plug 'puremourning/vimspector'
 Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-dispatch'
 " Plug 'octol/vim-cpp-enhanced-highlight'
 Plug 'bfrg/vim-cpp-modern'
 Plug 'cdelledonne/vim-cmake'
@@ -329,11 +330,12 @@ nnoremap ,cf :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash<CR>
 nnoremap ,ce :!cd build && ESPPORT=/dev/ttyUSB0 ninja erase_flash<CR>
 nnoremap ,ck :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash monitor<CR>
 nnoremap ,ca :!cmake -GNinja -B ../build && cmake --build ../build -v<CR>
-nnoremap ,j :!esp-app-flash<CR>
-nnoremap ,r :!esp-reset<CR>
+nnoremap ,j :!esp-app-flash<CR><CR>
+nnoremap ,J :silent !esp-app-flash<CR>
+nnoremap ,r :silent !esp-reset<CR>
 nnoremap ,c :CMakeGenerate!<CR>
 nnoremap ,m :w<CR> :make! -C build<CR><CR>:cw<CR>
-nnoremap ,M :w<CR> :silent make! -C build<CR><CR>:cw<CR>
+nnoremap ,M :w<CR> :Make! -C build<CR><CR>:cw<CR>
 set makeprg=ninja
 "nnoremap ,cw :CMakeClean<CR>:CMakeGenerate<CR>:make! -C build<CR><CR>:cw<CR>
 
