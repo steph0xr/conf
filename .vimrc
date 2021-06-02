@@ -334,8 +334,8 @@ nnoremap ,j :!esp-app-flash<CR><CR>
 nnoremap ,J :silent !esp-app-flash<CR>
 nnoremap ,r :silent !esp-reset<CR>
 nnoremap ,c :CMakeGenerate!<CR>
-nnoremap ,m :w<CR> :make! -C build<CR><CR>:cw<CR>
-nnoremap ,M :w<CR> :Make! -C build<CR><CR>:cw<CR>
+nnoremap ,m :w<CR> :Make -C build<CR><CR>:cw<CR>
+nnoremap ,M :w<CR> :make! -C build<CR><CR>:cw<CR>
 set makeprg=ninja
 "nnoremap ,cw :CMakeClean<CR>:CMakeGenerate<CR>:make! -C build<CR><CR>:cw<CR>
 

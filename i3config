@@ -186,7 +186,8 @@ bar {
 # ------------------------------------------
 
 # Suspend
-bindsym $mod+Shift+period exec systemctl suspend
+bindsym $mod+Shift+s exec i3lock -c 000000 && systemctl suspend
+bindsym $mod+Shift+z exec i3lock -c 000000 && systemctl poweroff
 
 # touchpad
 # exec --no-startup-id synclient VertEdgeScroll=1 TapButton1=1 TapButton2=1 TapButton3=1
