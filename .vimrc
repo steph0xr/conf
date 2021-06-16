@@ -224,9 +224,29 @@ call plug#end()
 "telescope
 nnoremap <leader>f <cmd>Telescope find_files<cr>
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
-nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+nnoremap <leader>fl <cmd>Telescope live_grep<cr>
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+nnoremap <leader>f. <cmd>Telescope search_dotfiles<cr>
+nnoremap <leader>fg <cmd>Telescope git_files<cr>
+nnoremap <leader>fgb <cmd>Telescope git_branches<cr>
+nnoremap <leader>fs :lua require('telescope.builtin').grep_string({ search = vim.fn.input("Grep For > ")})<CR>
+nnoremap <leader>fw :lua require('telescope.builtin').grep_string { search = vim.fn.expand("<cword>") }<CR>
+
+" nnoremap <leader>ps :lua require('telescope.builtin').grep_string({ search = vim.fn.input("Grep For > ")})<CR>
+" nnoremap <C-p> :lua require('telescope.builtin').git_files()<CR>
+" nnoremap <Leader>pf :lua require('telescope.builtin').find_files()<CR>
+
+" nnoremap <leader>pw :lua require('telescope.builtin').grep_string { search = vim.fn.expand("<cword>") }<CR>
+" nnoremap <leader>pb :lua require('telescope.builtin').buffers()<CR>
+" nnoremap <leader>vh :lua require('telescope.builtin').help_tags()<CR>
+" nnoremap <leader>vrc :lua require('theprimeagen.telescope').search_dotfiles()<CR>
+" nnoremap <leader>va :lua require('theprimeagen.telescope').anime_selector()<CR>
+" nnoremap <leader>vc :lua require('theprimeagen.telescope').chat_selector()<CR>
+" nnoremap <leader>gc :lua require('theprimeagen.telescope').git_branches()<CR>
+" nnoremap <leader>gw :lua require('telescope').extensions.git_worktree.git_worktrees()<CR>
+" nnoremap <leader>gm :lua require('telescope').extensions.git_worktree.create_git_worktree()<CR>
+
 
 "comments
 let g:NERDCreateDefaultMappings = 1
@@ -329,11 +349,13 @@ nnoremap ,ce :!cd build && ninja<CR>
 nnoremap ,cf :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash<CR>
 nnoremap ,ce :!cd build && ESPPORT=/dev/ttyUSB0 ninja erase_flash<CR>
 nnoremap ,ck :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash monitor<CR>
+" nnoremap ,ca :!cmake -GNinja -DCMAKE_DEF_MAC=e0-e2-e6-4c-b4-dc -B ../build && cmake --build ../build -v<CR>
 nnoremap ,ca :!cmake -GNinja -B ../build && cmake --build ../build -v<CR>
 nnoremap ,j :!esp-app-flash<CR><CR>
 nnoremap ,J :silent !esp-app-flash<CR>
 nnoremap ,r :silent !esp-reset<CR>
-nnoremap ,c :CMakeGenerate!<CR>
+" nnoremap ,c :CMakeGenerate!<CR>
+nnoremap ,c :CMakeGenerate! -DCMAKE_DEF_MAC=e0-e2-e6-4c-b4-dc<CR>
 nnoremap ,m :w<CR> :Make -C build<CR><CR>:cw<CR>
 nnoremap ,M :w<CR> :make! -C build<CR><CR>:cw<CR>
 set makeprg=ninja
