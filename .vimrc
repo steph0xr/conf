@@ -154,6 +154,7 @@ nnoremap <leader>y "+yy
 vnoremap <leader>y "+y
 nnoremap <leader>Y gg"+yG
 
+nnoremap <leader>i ggVG=
 
 
 
@@ -224,12 +225,12 @@ call plug#end()
 "telescope
 nnoremap <leader>f <cmd>Telescope find_files<cr>
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
-nnoremap <leader>fl <cmd>Telescope live_grep<cr>
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
 nnoremap <leader>f. <cmd>Telescope search_dotfiles<cr>
 nnoremap <leader>fg <cmd>Telescope git_files<cr>
-nnoremap <leader>fgb <cmd>Telescope git_branches<cr>
+nnoremap <leader>fr <cmd>Telescope git_branches<cr>
+nnoremap <leader>fl <cmd>Telescope live_grep<cr>
 nnoremap <leader>fs :lua require('telescope.builtin').grep_string({ search = vim.fn.input("Grep For > ")})<CR>
 nnoremap <leader>fw :lua require('telescope.builtin').grep_string { search = vim.fn.expand("<cword>") }<CR>
 
@@ -317,12 +318,12 @@ nnoremap <leader>ss :mksession ~/.saved_vim_sessions/
 nnoremap <leader>sl :source ~/.saved_vim_sessions/
 
 "git vim-fugitive \g
-let g:fugitive_summary_format = "%<(16,trunc)%an || %s"
+let g:fugitive_summary_format = "%<(18,trunc)%an || %<(75,trunc)%s || %d"
 nnoremap <leader>gs :Git<CR>
 nnoremap <leader>gc :GBranches<CR>
 nnoremap <leader>gg :Git gg<CR>
 nnoremap <leader>gd :Git difftool<CR>
-nnoremap <leader>gh :Gclog<CR>
+nnoremap <leader>gl :Gclog<CR>
 " nnoremap <leader>gh :diffget //3<CR>
 " nnoremap <leader>gu :diffget //2<CR>
 
@@ -355,7 +356,9 @@ nnoremap ,j :!esp-app-flash<CR><CR>
 nnoremap ,J :silent !esp-app-flash<CR>
 nnoremap ,r :silent !esp-reset<CR>
 " nnoremap ,c :CMakeGenerate!<CR>
-nnoremap ,c :CMakeGenerate! -DCMAKE_DEF_MAC=e0-e2-e6-4c-b4-dc<CR>
+" nnoremap ,c :CMakeGenerate! -DCMAKE_DEF_MAC=e0-e2-e6-4c-b4-dc<CR>
+nnoremap ,c :CMakeGenerate! -DCMAKE_DEF_MAC=94-b9-7e-42-d4-5c<CR>
+" nnoremap ,c :CMakeGenerate! -DCMAKE_DEF_MAC=94-b9-7e-42-d4-48<CR>
 nnoremap ,m :w<CR> :Make -C build<CR><CR>:cw<CR>
 nnoremap ,M :w<CR> :make! -C build<CR><CR>:cw<CR>
 set makeprg=ninja
@@ -505,14 +508,17 @@ nnoremap <leader>j :lprev<CR>zz
 nnoremap <TAB> :bn<CR>
 nnoremap <S-TAB> :bp<CR>
 
+"reload all buffers
+nnoremap <leader>r :bufdo e<CR>
+
 "vimdiff
 if &diff
   nnoremap <C-k> [c<CR>
   nnoremap <C-j> ]c<CR>
   nnoremap ç [c
   nnoremap é ]c
-  nnoremap <leader>r :diffget RE<CR>
-  nnoremap <leader>l :diffget LO<CR>
+  nnoremap <leader>re :diffget RE<CR>
+  nnoremap <leader>lo :diffget LO<CR>
 endif
 
 "set curernt file to path
