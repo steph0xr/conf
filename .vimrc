@@ -318,12 +318,13 @@ nnoremap <leader>ss :mksession ~/.saved_vim_sessions/
 nnoremap <leader>sl :source ~/.saved_vim_sessions/
 
 "git vim-fugitive \g
-let g:fugitive_summary_format = "%<(18,trunc)%an || %<(75,trunc)%s || %d"
+let g:fugitive_summary_format = "%<(18,trunc)%an|| %<(75,trunc)%s|| %<(55,trunc)%d||%<(12,trunc)%ar - %aI"
 nnoremap <leader>gs :Git<CR>
 nnoremap <leader>gc :GBranches<CR>
 nnoremap <leader>gg :Git gg<CR>
 nnoremap <leader>gd :Git difftool<CR>
 nnoremap <leader>gl :Gclog<CR>
+nnoremap <leader>gk :G log --graph --abbrev-commit --decorate=no --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(dim white)%s%C(reset) %C(bold blue)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all --tags <CR>
 " nnoremap <leader>gh :diffget //3<CR>
 " nnoremap <leader>gu :diffget //2<CR>
 
