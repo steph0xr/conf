@@ -42,7 +42,7 @@
 	string = log --oneline -S #va aggiunto il nome della stringa poi. cerca in quale commit  una stringa è stata modificata
 	d = diff --color | /hdd1/repos/diff-so-fancy/diff-so-fancy 
 	listalltracked = ls-tree --full-tree --name-only -r HEAD
-  deleteRemoteBranch = git push origin --delete
+  deleteRemoteBranch = push origin --delete
 
 [diff]
 	tool = kdiff3
