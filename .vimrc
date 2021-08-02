@@ -131,7 +131,7 @@ nnoremap + {
 inoremap jk <ESC>
 inoremap kj <ESC>
 inoremap jj <ESC>
-inoremap <c-c> <ESC>
+" inoremap <c-c> <ESC>
 let mapleader=" "
 nnoremap <leader><leader> <c-^>
 nnoremap <leader>. @:

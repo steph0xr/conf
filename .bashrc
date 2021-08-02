@@ -206,3 +206,23 @@ alias vi="nvim"
 # else
     # start_agent;
 # fi
+
+#-------------------------------------------------------------------------------
+# Aliases / Functions
+#-------------------------------------------------------------------------------
+alias dul='du -h --max-depth=1'
+alias hi='history | tail -20'
+
+# Git aliases
+alias ga='git add'
+alias gc='git commit'
+alias gco='git checkout'
+alias gcp='git cherry-pick'
+alias gd='git diff'
+alias gl='git prettylog'
+alias gp='git push'
+alias gs='git status -s'
+alias gt='git tag'
+alias gg='git gg'
+alias g='git g'
+alias gf='git fetch --all'

@@ -6,6 +6,11 @@ xset r rate 250 60
 # multi screen
 xrandr --output HDMI-0 --auto --right-of eDP-1-1
 
+# _vga=$( xrandr  | sed -n 's/^\(VGA.\).*/\1/pg')
+# alias laptop='xrandr --output LVDS1 --auto --output $_vga --off'
+# alias monitor='xrandr --output LVDS1 --off --output $_vga --auto'
+# alias dual='xrandr --output LVDS1 --auto --left-of $_vga --output $_vga --auto'
+
 # caps lock remap to ctrl
 setxkbmap -option ctrl:nocaps
 
