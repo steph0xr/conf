@@ -226,4 +226,8 @@ for_window [class="^.*"] client.focused          #77dd77 #285577 #ffffff #2e9ef4
 
 # startup default application
 # for_window [class="Firefox"] move container to workspace 1
-exec --no-startup-id firefox
+# exec --no-startup-id firefox
+exec --no-startup-id i3-msg 'workspace 1:Web; exec /usr/bin/firefox'
+exec --no-startup-id i3-msg 'workspace 6:Tel; exec linphone'
+
+bindsym $mod+m fullscreen disable, focus left, fullscreen enable

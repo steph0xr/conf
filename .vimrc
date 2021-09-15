@@ -1,5 +1,3 @@
-execute pathogen#infect()
-
 "colorscheme
 set termguicolors
 "set t_Co=256
@@ -187,6 +185,7 @@ Plug 'liuchengxu/vista.vim'
 Plug 'vimwiki/vimwiki'
 Plug 'airblade/vim-gitgutter'
 Plug 'preservim/nerdcommenter'
+Plug 'rhysd/vim-clang-format'
  " Plug 'nvim-telescope/telescope-fzy-native.nvim'
 
 "Plug 'junegunn/gv.vim'
@@ -212,8 +211,8 @@ if has('nvim')
   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
   Plug 'nvim-treesitter/playground'
 
-else
-  Plug 'ycm-core/YouCompleteMe'
+" else
+  " Plug 'ycm-core/YouCompleteMe'
 endif
 
 call plug#end()
@@ -357,9 +356,12 @@ nnoremap ,j :!esp-app-flash<CR><CR>
 nnoremap ,J :silent !esp-app-flash<CR>
 nnoremap ,r :silent !esp-reset<CR>
 " nnoremap ,c :CMakeGenerate!<CR>
-" nnoremap ,c :CMakeGenerate! -DCMAKE_DEF_MAC=e0-e2-e6-4c-b4-dc<CR>
-nnoremap ,c :CMakeGenerate! -DCMAKE_DEF_MAC=94-b9-7e-42-d4-5c<CR>
+nnoremap ,c :CMakeGenerate! -DCMAKE_DEF_MAC=e0-e2-e6-4c-e7-2c<CR>
+" nnoremap ,c :CMakeGenerate! -DCMAKE_DEF_MAC=94-b9-7e-42-d4-5c<CR>
+" nnoremap ,c :CMakeGenerate! -DCMAKE_DEF_MAC=e0-e2-e6-4c-b4-ec<CR>
 " nnoremap ,c :CMakeGenerate! -DCMAKE_DEF_MAC=94-b9-7e-42-d4-48<CR>
+" nnoremap ,c :CMakeGenerate! -DCMAKE_DEF_MAC=e0-e2-e6-4c-b4-dc<CR>
+"
 nnoremap ,m :w<CR> :Make -C build<CR><CR>:cw<CR>
 nnoremap ,M :w<CR> :make! -C build<CR><CR>:cw<CR>
 set makeprg=ninja
@@ -476,10 +478,11 @@ map <C-F12> <C-w>g<C-]>
 map <F12> <ESC>:w<CR> <C-]>
 
 "jump to header in C++
-nnoremap ,h :find %:t:r.h<CR>
-nnoremap ,H :sp %:t:r.h<CR>
-nnoremap ,s :find %:t:r.cpp<CR>
-nnoremap ,S :sp %:t:r.cpp<CR>
+nnoremap ,s :ClangdSwitchSourceHeader<CR>
+" nnoremap ,h :find %:t:r.h<CR>
+" nnoremap ,H :sp %:t:r.h<CR>
+" nnoremap ,s :find %:t:r.cpp<CR>
+" nnoremap ,S :sp %:t:r.cpp<CR>
 
 
 "highlight tab and spaces
@@ -537,4 +540,12 @@ nnoremap <leader>ghw :h <C-R>=expand("<cword>")<CR><CR>
 nnoremap <leader>bs /<C-R>=escape(expand("<cWORD>"), "/")<CR><CR>
 nnoremap <leader><CR> :so ~/.vimrc<CR>
 
+"formatting
+let g:clang_format#detect_style_file = 1
+let g:clang_format#enable_fallback_style = 0
+nnoremap ,f :ClangFormat<CR>
+
+"cpp copy class method definition for pasting in class declaration 
+" nnoremap <leader>hh yypwd2wA;<ESC>I  <ESC>ddk<CR>
+nnoremap <leader>hh pwd2wA;<ESC>I  <ESC>
 

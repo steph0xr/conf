@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # keyboard settings
-xset r rate 250 60
+xset r rate 250 60 
 
 # multi screen
 xrandr --output HDMI-0 --auto --right-of eDP-1-1

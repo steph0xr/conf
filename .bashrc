@@ -174,7 +174,7 @@ export PS1="${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 #cose per expressif
-alias get_idf='. /hdd1/esp/esp-idf-v4.2/export.sh'
+alias get_idf='. /hdd1/esp/esp-idf-v4.3/export.sh'
 #alias python=python3
 
 # export NVM_DIR="$HOME/.nvm"
@@ -182,6 +182,7 @@ alias get_idf='. /hdd1/esp/esp-idf-v4.2/export.sh'
 # [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 alias vi="nvim"
+alias hidden='ls -a | grep "^\."'
 
 # #ssh x i3wm
 # SSH_ENV="$HOME/.ssh/agent-environment"
@@ -226,3 +227,4 @@ alias gt='git tag'
 alias gg='git gg'
 alias g='git g'
 alias gf='git fetch --all'
+alias grh='git reset --hard'
