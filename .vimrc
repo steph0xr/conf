@@ -1,160 +1,158 @@
-"colorscheme
-set termguicolors
-"set t_Co=256
-let g:gruvbox_italic=1
-let g:gruvbox_bold=0
-let g:gruvbox_transparent_bg=1
-let g:gruvbox_contrast_dark = 'hard'
-let g:gruvbox_invert_selection='0'
-" autocmd vimenter * ++nested colorscheme gruvbox
-"set bg=light
-set bg=dark
-highlight Comment cterm=italic gui=italic
-" colorscheme gruvbox
-"highlight Normal guibg=NONE ctermbg=NONE
-"colorscheme desert
+  "colorscheme
+  set termguicolors
+  "set t_Co=256
+  let g:gruvbox_italic=1
+  let g:gruvbox_bold=0
+  let g:gruvbox_transparent_bg=1
+  let g:gruvbox_contrast_dark = 'hard'
+  let g:gruvbox_invert_selection='0'
+  " autocmd vimenter * ++nested colorscheme gruvbox
+  "set bg=light
+  set bg=dark
+  highlight Comment cterm=italic gui=italic
+  " colorscheme gruvbox
+  "highlight Normal guibg=NONE ctermbg=NONE
+  "colorscheme desert
 
-syntax enable
-set mouse=a
-language en_US.utf8
-"set textwidth=80
+  syntax enable
+  set mouse=a
+  language en_US.utf8
+  "set textwidth=80
 
-"general
-set nocompatible
-filetype plugin on
-set noswapfile
-"set autochdir
+  "general
+  set nocompatible
+  filetype plugin on
+  set noswapfile
+  "set autochdir
 
-set expandtab
-set tabstop=2 "number of visual spaces per TAB
-set softtabstop=2 " number of spaces in tab when editing
-set smartindent
-set shiftwidth=2
+  set expandtab
+  set tabstop=2 "number of visual spaces per TAB
+  set softtabstop=2 " number of spaces in tab when editing
+  set smartindent
+  set shiftwidth=2
 
-set relativenumber "set numbers to lines
-set nu "add absolute number to current line
-set showcmd " show command in bottom bar
-set wildmenu " visual autocomplete for command menu
-set modeline
-set ls=2 "show name
-set incsearch           " search as characters are entered
-set hidden "switch between buffer witout saving
-set path+=** "search down into subfolders-provides tab-completion for all file related task
+  set relativenumber "set numbers to lines
+  set nu "add absolute number to current line
+  set showcmd " show command in bottom bar
+  set wildmenu " visual autocomplete for command menu
+  set modeline
+  set ls=2 "show name
+  set incsearch           " search as characters are entered
+  set hidden "switch between buffer witout saving
+  set path+=** "search down into subfolders-provides tab-completion for all file related task
 
-set foldmethod=syntax "folding
-set foldlevel=99
+  set foldmethod=syntax "folding
+  set foldlevel=99
 
-set scrolloff=8
-set signcolumn=yes
-set guicursor+=n-v-c:blinkon0
-set guicursor+=i:blinkwait10
-"set noerrorbells
-set noshowmode
-set cmdheight=2
-set shortmess+=c
-set updatetime=50
-set nohlsearch
+  set scrolloff=8
+  set signcolumn=yes
+  set guicursor+=n-v-c:blinkon0
+  set guicursor+=i:blinkwait10
+  "set noerrorbells
+  set noshowmode
+  set cmdheight=2
+  set shortmess+=c
+  set updatetime=50
+  set nohlsearch
 
-"permettere di caricare .vimrc specifici di progetto in subfolders
-set exrc
-set secure
-
-
+  "permettere di caricare .vimrc specifici di progetto in subfolders
+  set exrc
+  set secure
 
 
-"find
-nnoremap <F3> :execute "grep! -Irn --exclude=tags " . shellescape(expand("<cword>")) . " ."<cr>:cw<cr>
-vnoremap <F3> y:vimgrep '<c-r>"' **/*.c **/*.cpp **/*.h<CR>:cw<cr>
-"vmap :%s/parolaDaSost/Sostituta/gc
 
 
-"whitespaces highlight (call before :set hlsearch)
-"nnoremap <leader>sp /\s\+$
-command! RemoveTrailingSpaces %s/\s\+$//g | noh
-
-" bind § to grep shortcut
-command! -nargs=+ -complete=file -bar Cerca execute 'silent! grep! -Ir <args> --exclude=tags --exclude=*.html --exclude=*.js' | execute 'redraw!' | execute 'cw'
-nnoremap § :Cerca<SPACE>
+  "find
+  nnoremap <F3> :execute "grep! -Irn --exclude=tags " . shellescape(expand("<cword>")) . " ."<cr>:cw<cr>
+  vnoremap <F3> y:vimgrep '<c-r>"' **/*.c **/*.cpp **/*.h<CR>:cw<cr>
+  "vmap :%s/parolaDaSost/Sostituta/gc
 
 
-" bind  for breakpoints to clipboard for gdb
-command! Xg :let @+ = 'b ' . expand('%:p') . ':' . line('.')
-nnoremap °° :Xg<CR>
+  "whitespaces highlight (call before :set hlsearch)
+  "nnoremap <leader>sp /\s\+$
+  command! RemoveTrailingSpaces %s/\s\+$//g | noh
 
-"ALT mapping for moving lines
-"nnoremap <C-j> ddp
-"nnoremap <C-k> ddkP
-
-"in insert and visual mode ctrl-jk to move line up and down
-inoremap <C-j> <Esc>:m .+1<CR>zR<CR>==gi
-inoremap <C-k> <Esc>:m .-2<CR>zR<CR>==gi
-vnoremap <C-j> :m '>+1<CR>zR<CR>gv=gv
-vnoremap <C-k> :m '<-2<CR>zR<CR>gv=gv
-
-"in normal mode ctrl-jklh to move between splits
-"nnoremap <C-J> <C-W><C-J>
-"nnoremap <C-K> <C-W><C-K>
-"nnoremap <C-L> <C-W><C-L>
-"nnoremap <C-H> <C-W><C-H>
+  " bind § to grep shortcut
+  command! -nargs=+ -complete=file -bar Cerca execute 'silent! grep! -Ir <args> --exclude=tags --exclude=*.html --exclude=*.js' | execute 'redraw!' | execute 'cw'
+  nnoremap § :Cerca<SPACE>
 
 
-"resize panes
-"set nocompatible
-noremap <C-Right> :vertical resize +5<CR>
-noremap <C-Left> :vertical resize -5<CR>
-noremap <C-Up> :resize +5<CR>
-noremap <C-Down> :resize -5<CR>
+  " bind  for breakpoints to clipboard for gdb
+  command! Xg :let @+ = 'b ' . expand('%:p') . ':' . line('.')
+  nnoremap °° :Xg<CR>
 
-"disabilitare freccie
-"nnoremap <Left> :echo "No left for you!"<CR>
-"vnoremap <Left> :<C-u>echo "No left for you!"<CR>
-"inoremap <Left> <C-o>:echo "No left for you!"<CR>
-"nnoremap <Right> :echo "No left for you!"<CR>
-"vnoremap <Right> :<C-u>echo "No left for you!"<CR>
-"inoremap <Right> <C-o>:echo "No left for you!"<CR>
-"nnoremap <Up> :echo "No left for you!"<CR>
-"vnoremap <Up> :<C-u>echo "No left for you!"<CR>
-"inoremap <Up> <C-o>:echo "No left for you!"<CR>
-"nnoremap <Down> :echo "No left for you!"<CR>
-"vnoremap <Down> :<C-u>echo "No left for you!"<CR>
-"inoremap <Down> <C-o>:echo "No left for you!"<CR>
+  "ALT mapping for moving lines
+  "nnoremap <C-j> ddp
+  "nnoremap <C-k> ddkP
 
-"remap esc and :
-nnoremap ò :
-vnoremap ò :
-nnoremap à /
-vnoremap à /
-nnoremap è }
-nnoremap + {
-inoremap jk <ESC>
-inoremap kj <ESC>
-inoremap jj <ESC>
-" inoremap <c-c> <ESC>
-let mapleader=" "
-nnoremap <leader><leader> <c-^>
-nnoremap <leader>. @:
+  "in insert and visual mode ctrl-jk to move line up and down
+  inoremap <C-j> <Esc>:m .+1<CR>zR<CR>==gi
+  inoremap <C-k> <Esc>:m .-2<CR>zR<CR>==gi
+  vnoremap <C-j> :m '>+1<CR>zR<CR>gv=gv
+  vnoremap <C-k> :m '<-2<CR>zR<CR>gv=gv
 
-nnoremap : ò
-vnoremap : ò
-
-nnoremap <leader>t :term<CR>
-tnoremap <c-q> <C-\><C-n>
-
-nnoremap <leader>el :20Lex<CR>
-nnoremap <leader>ee :Ex<CR>
-
-"avoid paste to replace copy register
-vnoremap p pgvy
-"vnoremap <leader>p "_dP
-"vnoremap p "_dP
-noremap <leader>p "+p
-nnoremap <leader>y "+yy
-vnoremap <leader>y "+y
-nnoremap <leader>Y gg"+yG
-
-nnoremap <leader>i ggVG=
+  "in normal mode ctrl-jklh to move between splits
+  "nnoremap <C-J> <C-W><C-J>
+  "nnoremap <C-K> <C-W><C-K>
+  "nnoremap <C-L> <C-W><C-L>
+  "nnoremap <C-H> <C-W><C-H>
 
 
+  "resize panes
+  "set nocompatible
+  noremap <C-Right> :vertical resize +5<CR>
+  noremap <C-Left> :vertical resize -5<CR>
+  noremap <C-Up> :resize +5<CR>
+  noremap <C-Down> :resize -5<CR>
+
+  "disabilitare freccie
+  "nnoremap <Left> :echo "No left for you!"<CR>
+  "vnoremap <Left> :<C-u>echo "No left for you!"<CR>
+  "inoremap <Left> <C-o>:echo "No left for you!"<CR>
+  "nnoremap <Right> :echo "No left for you!"<CR>
+  "vnoremap <Right> :<C-u>echo "No left for you!"<CR>
+  "inoremap <Right> <C-o>:echo "No left for you!"<CR>
+  "nnoremap <Up> :echo "No left for you!"<CR>
+  "vnoremap <Up> :<C-u>echo "No left for you!"<CR>
+  "inoremap <Up> <C-o>:echo "No left for you!"<CR>
+  "nnoremap <Down> :echo "No left for you!"<CR>
+  "vnoremap <Down> :<C-u>echo "No left for you!"<CR>
+  "inoremap <Down> <C-o>:echo "No left for you!"<CR>
+
+  "remap esc and :
+  nnoremap ò :
+  vnoremap ò :
+  nnoremap à /
+  vnoremap à /
+  nnoremap è }
+  nnoremap + {
+  inoremap jk <ESC>
+  inoremap kj <ESC>
+  inoremap jj <ESC>
+  " inoremap <c-c> <ESC>
+  let mapleader=" "
+  nnoremap <leader><leader> <c-^>
+  nnoremap <leader>. @:
+
+  nnoremap : ò
+  vnoremap : ò
+
+  nnoremap <leader>t :term<CR>
+  tnoremap <c-q> <C-\><C-n>
+
+  nnoremap <leader>el :20Lex<CR>
+  nnoremap <leader>ee :Ex<CR>
+
+  "avoid paste to replace copy register
+  vnoremap p pgvy
+  "vnoremap <leader>p "_dP
+  "vnoremap p "_dP
+  noremap <leader>p "+p
+  nnoremap <leader>y "+yy
+  vnoremap <leader>y "+y
+  nnoremap <leader>Y gg"+yG
+
+  nnoremap <leader>i ggVG=
 
 
 
@@ -164,65 +162,66 @@ nnoremap <leader>i ggVG=
 
 
 
-"######      PLUGIN      #######
-
-call plug#begin('~/.vim/plugged')
-
-Plug 'gruvbox-community/gruvbox'
-Plug 'sainnhe/gruvbox-material'
-Plug 'puremourning/vimspector'
-Plug 'tpope/vim-fugitive'
-Plug 'tpope/vim-dispatch'
-" Plug 'octol/vim-cpp-enhanced-highlight'
-Plug 'bfrg/vim-cpp-modern'
-Plug 'cdelledonne/vim-cmake'
-Plug 'jreybert/vimagit'
-Plug 'tpope/vim-obsession'
-Plug 'junegunn/fzf'
-Plug 'junegunn/fzf.vim'
-Plug 'wookayin/fzf-ripgrep.vim'
-Plug 'liuchengxu/vista.vim'
-Plug 'vimwiki/vimwiki'
-Plug 'airblade/vim-gitgutter'
-Plug 'preservim/nerdcommenter'
-Plug 'rhysd/vim-clang-format'
- " Plug 'nvim-telescope/telescope-fzy-native.nvim'
-
-"Plug 'junegunn/gv.vim'
-"Plug 'vim-utils/vim-man'
-"Plug 'mbbill/undotree'
-"Plug 'vuciv/vim-bujo'
-"Plug 'tpope/vim-dispatch'
-"Plug 'theprimeagen/vim-be-good'
-"Plug '/home/theprimeagen/personal/af-pluth-pluth'
-"Plug 'gruvbox-community/gruvbox'
-"Plug 'tpope/vim-projectionist'
-
-if has('nvim')
-  "lsp Plugins
-  Plug 'neovim/nvim-lspconfig'
-  Plug 'nvim-lua/completion-nvim'
-  " Plug 'nvim-lua/lsp-status.nvim'
-  Plug 'nvim-lua/popup.nvim'
-  Plug 'nvim-lua/plenary.nvim'
-  Plug 'nvim-telescope/telescope.nvim'
-
-  " Neovim Tree shitter
-  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-  Plug 'nvim-treesitter/playground'
-
-" else
-  " Plug 'ycm-core/YouCompleteMe'
-endif
-
-call plug#end()
 
 
+  "######      PLUGIN      #######
+
+  call plug#begin('~/.vim/plugged')
+
+  Plug 'gruvbox-community/gruvbox'
+  Plug 'sainnhe/gruvbox-material'
+  Plug 'puremourning/vimspector'
+  Plug 'tpope/vim-fugitive'
+  Plug 'tpope/vim-dispatch'
+  " Plug 'octol/vim-cpp-enhanced-highlight'
+  Plug 'bfrg/vim-cpp-modern'
+  Plug 'cdelledonne/vim-cmake'
+  Plug 'jreybert/vimagit'
+  Plug 'tpope/vim-obsession'
+  Plug 'junegunn/fzf'
+  Plug 'junegunn/fzf.vim'
+  Plug 'wookayin/fzf-ripgrep.vim'
+  Plug 'liuchengxu/vista.vim'
+  Plug 'vimwiki/vimwiki'
+  Plug 'airblade/vim-gitgutter'
+  Plug 'preservim/nerdcommenter'
+  Plug 'rhysd/vim-clang-format'
+   " Plug 'nvim-telescope/telescope-fzy-native.nvim'
+
+  "Plug 'junegunn/gv.vim'
+  "Plug 'vim-utils/vim-man'
+  "Plug 'mbbill/undotree'
+  "Plug 'vuciv/vim-bujo'
+  "Plug 'tpope/vim-dispatch'
+  "Plug 'theprimeagen/vim-be-good'
+  "Plug '/home/theprimeagen/personal/af-pluth-pluth'
+  "Plug 'gruvbox-community/gruvbox'
+  "Plug 'tpope/vim-projectionist'
+
+  if has('nvim')
+    "lsp Plugins
+    Plug 'neovim/nvim-lspconfig'
+    Plug 'nvim-lua/completion-nvim'
+    " Plug 'nvim-lua/lsp-status.nvim'
+    Plug 'nvim-lua/popup.nvim'
+    Plug 'nvim-lua/plenary.nvim'
+    Plug 'nvim-telescope/telescope.nvim'
+
+    " Neovim Tree shitter
+    Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+    Plug 'nvim-treesitter/playground'
+
+  " else
+    " Plug 'ycm-core/YouCompleteMe'
+  endif
+
+  call plug#end()
 
 
 
-"telescope
-nnoremap <leader>f <cmd>Telescope find_files<cr>
+
+
+  "telescope
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
@@ -232,6 +231,8 @@ nnoremap <leader>fr <cmd>Telescope git_branches<cr>
 nnoremap <leader>fl <cmd>Telescope live_grep<cr>
 nnoremap <leader>fs :lua require('telescope.builtin').grep_string({ search = vim.fn.input("Grep For > ")})<CR>
 nnoremap <leader>fw :lua require('telescope.builtin').grep_string { search = vim.fn.expand("<cword>") }<CR>
+nnoremap <leader>fe :lua require('telescope.builtin').grep_string { search = vim.fn.expand("<cword>"), previewer = false }<CR>
+nnoremap <leader>f :lua require('telescope.builtin').find_files({previewer = false})<cr>
 
 " nnoremap <leader>ps :lua require('telescope.builtin').grep_string({ search = vim.fn.input("Grep For > ")})<CR>
 " nnoremap <C-p> :lua require('telescope.builtin').git_files()<CR>
@@ -261,6 +262,15 @@ let g:indentLine_enabled = 1
 "let g:airline_theme='solarized_flood'
 "let g:airline_powerline_fonts = 1
 "let g:airline#extensions#wordcount#enabled = 0
+
+" statusline
+set statusline=
+set statusline=%<%f%h%m%r%= 
+set statusline+=%{FugitiveStatusline()}\ \|
+set statusline+=\%b\ 0x%B\|\ %l,%c%V\ \ %P
+" set statusline = "%%-4.4(%d%%)%%-15.23(%s%%)|%%-14.14(%s%%)%%-20.20(%s%%)%%-6.6(%s%%)%%-30.70(%s%%)"
+" set statusline=%<%f%h%m%r%=%b\ 0x%B\ \ %l,%c%V\ %P
+
 
 "Termdebug
 packadd termdebug
@@ -318,17 +328,18 @@ nnoremap <leader>sl :source ~/.saved_vim_sessions/
 
 "git vim-fugitive \g
 let g:fugitive_summary_format = "%<(18,trunc)%an|| %<(75,trunc)%s|| %<(55,trunc)%d||%<(12,trunc)%ar - %aI"
+nnoremap <leader>g :Git status -s<CR>
 nnoremap <leader>gs :Git<CR>
 nnoremap <leader>gc :GBranches<CR>
 nnoremap <leader>gg :Git gg<CR>
 nnoremap <leader>gd :Git difftool<CR>
-nnoremap <leader>gl :Gclog<CR>
+nnoremap <leader>gl :Gclog -10<CR>
 nnoremap <leader>gk :G log --graph --abbrev-commit --decorate=no --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(dim white)%s%C(reset) %C(bold blue)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all --tags <CR>
 " nnoremap <leader>gh :diffget //3<CR>
 " nnoremap <leader>gu :diffget //2<CR>
 
 "fuzzy finder
-nnoremap <silent> <c-p> :GitFiles<CR>
+" nnoremap <silent> <c-p> :GitFiles<CR>
 " nnoremap <silent> <leader>f :Files<CR>
 let $FZF_DEFAULT_OPT='--reverse'
 let g:fzf_layout = { 'window': { 'width': 0.8, 'height': 0.8 } }
