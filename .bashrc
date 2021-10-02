@@ -182,6 +182,7 @@ alias get_idf='. /hdd1/esp/esp-idf-v4.3/export.sh'
 # [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 alias vi="nvim"
+alias vim="nvim"
 alias hidden='ls -a | grep "^\."'
 
 # #ssh x i3wm
@@ -229,3 +230,5 @@ alias g='git g'
 alias gf='git fetch --all'
 alias grh='git reset --hard'
 alias gsu='git submodule update'
+alias gdt='git difftool --tool=vimdiff --no-prompt'
+alias gmt='git mergetool --tool=vimdiff --no-prompt'

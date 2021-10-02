@@ -181,7 +181,21 @@ bindsym $mod+r mode "resize"
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
-        status_command i3status
+    status_command i3status
+    font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
+    font pango:DejaVu Sans Mono 8 
+    separator_symbol "|"
+    colors {
+        background #000000
+        statusline #ffffff
+        separator #666666
+
+        focused_workspace  #4c7899 #285577 #ffffff
+        active_workspace   #333333 #5f676a #ffffff
+        inactive_workspace #333333 #222222 #888888
+        urgent_workspace   #2f343a #900000 #ffffff
+        binding_mode       #2f343a #900000 #ffffff
+    }
 }
 
 
@@ -229,9 +243,14 @@ for_window [class="^.*"] border pixel 2
 for_window [class="^.*"] client.focused          #77dd77 #285577 #ffffff #2e9ef4   #285577
 
 # startup default application
-# for_window [class="Firefox"] move container to workspace 1
-# exec --no-startup-id firefox
-exec --no-startup-id i3-msg 'workspace 1:Web; exec /usr/bin/firefox'
-exec --no-startup-id i3-msg 'workspace 6:Tel; exec ~/linphone'
+exec --no-startup-id i3-msg 'workspace 1; exec /usr/bin/firefox'
+exec --no-startup-id i3-msg 'workspace 6; exec /home/steph/linphone'
 
-bindsym $mod+m fullscreen disable, focus left, fullscreen enable
+bindsym $mod+n fullscreen disable, focus left, fullscreen enable
+
+# start explorer 
+bindsym $mod+i exec thunar 
+
+# Toggle between stacking/tabbed ecc..
+bindsym $mod+x layout toggle all
+

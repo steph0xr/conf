@@ -122,8 +122,8 @@
   "remap esc and :
   nnoremap ò :
   vnoremap ò :
-  nnoremap à /
-  vnoremap à /
+  nnoremap - /
+  vnoremap - /
   nnoremap è }
   nnoremap + {
   inoremap jk <ESC>
@@ -136,6 +136,10 @@
 
   nnoremap : ò
   vnoremap : ò
+
+  "search under cursor no ita 
+  nnoremap £ #
+  " nnoremap ) *
 
   nnoremap <leader>t :term<CR>
   tnoremap <c-q> <C-\><C-n>
@@ -170,7 +174,7 @@
 
   Plug 'gruvbox-community/gruvbox'
   Plug 'sainnhe/gruvbox-material'
-  Plug 'puremourning/vimspector'
+  " Plug 'puremourning/vimspector'
   Plug 'tpope/vim-fugitive'
   Plug 'tpope/vim-dispatch'
   " Plug 'octol/vim-cpp-enhanced-highlight'
@@ -514,8 +518,8 @@ colorscheme gruvbox
 
 
 "cycle throught items in cwindow and lwindow
-nnoremap <C-k> :cp<CR>zz
-nnoremap <C-j> :cn<CR>zz
+nnoremap <expr> <C-k> &diff? '[c' : ':cp<CR>zz'
+nnoremap <expr> <C-j> &diff? ']c' : ':cn<CR>zz'
 nnoremap <leader>k :lnext<CR>zz
 nnoremap <leader>j :lprev<CR>zz
 
@@ -528,12 +532,19 @@ nnoremap <leader>r :bufdo e<CR>
 
 "vimdiff
 if &diff
-  nnoremap <C-k> [c<CR>
-  nnoremap <C-j> ]c<CR>
-  nnoremap ç [c
-  nnoremap é ]c
-  nnoremap <leader>re :diffget RE<CR>
-  nnoremap <leader>lo :diffget LO<CR>
+  hi DiffAdd    guifg=#003300 guibg=#DDFFDD
+  hi DiffDelete    guifg=#003300 guibg=#FF0000
+  hi DiffChange guifg=#003300 guibg=#DDDDFF
+  hi DiffText   guifg=#006600 guibg=#DDDDFF
+  syntax off
+  nnoremap <C-k> [c
+  nnoremap <C-j> ]c
+  nnoremap <leader>g :diffget<CR>
+  nnoremap <leader>p :diffput<CR>
+  nnoremap <leader>r :diffget RE<CR>
+  nnoremap <leader>l :diffget LO<CR>
+  nnoremap <leader>b :diffget BA<CR>
+  nnoremap <C-q> :cquit<CR>
 endif
 
 "set curernt file to path
@@ -559,4 +570,8 @@ nnoremap ,f :ClangFormat<CR>
 "cpp copy class method definition for pasting in class declaration 
 " nnoremap <leader>hh yypwd2wA;<ESC>I  <ESC>ddk<CR>
 nnoremap <leader>hh pwd2wA;<ESC>I  <ESC>
+
+"cmake output filtering
+nnoremap <leader>x <c-w>jG:%s/error//gn<cr>
+nnoremap ,x <c-w>jG/error<cr>:%s/error//gn<cr>
 

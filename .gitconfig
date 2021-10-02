@@ -44,11 +44,12 @@
 	d = diff --color | /hdd1/repos/diff-so-fancy/diff-so-fancy 
 	listalltracked = ls-tree --full-tree --name-only -r HEAD
   deleteRemoteBranch = push origin --delete
+  co = checkout
 
 [diff]
 	tool = kdiff3
 [core]
-	editor = vim
+	editor = nvim
 	autocrlf = false #mettere a true sotto windows
   ; pager = /hdd1/repos/diff-so-fancy/diff-so-fancy | less --tabs=1,5 -R
 [push]
@@ -58,6 +59,9 @@
 	lineNumber = true
 [difftool]
 	prompt = true
+  trustExitCode = true #esce completamente dal processo di diff con C-q (vim)
+[mergetool]
+  trustExitCode = true
 [merge]
 	tool = kdiff3
 [credential]
