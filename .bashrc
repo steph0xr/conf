@@ -212,6 +212,7 @@ alias hidden='ls -a | grep "^\."'
 #-------------------------------------------------------------------------------
 # Aliases / Functions
 #-------------------------------------------------------------------------------
+alias tmux="TERM=screen-256color-bce tmux"
 alias dul='du -h --max-depth=1'
 alias hi='history | tail -20'
 

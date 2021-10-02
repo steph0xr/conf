@@ -544,6 +544,7 @@ if &diff
   nnoremap <leader>r :diffget RE<CR>
   nnoremap <leader>l :diffget LO<CR>
   nnoremap <leader>b :diffget BA<CR>
+  nnoremap <leader>< /<<<<<<<<CR>
   nnoremap <C-q> :cquit<CR>
 endif
 
@@ -558,8 +559,9 @@ nnoremap <c-f> :RgFzf *<CR>
 "nnoremap <c-f> y:Rg -tc -tcpp -ttxt <C-r>"<CR>:cw<CR>
 "
 "to be tested
-nnoremap <leader>ghw :h <C-R>=expand("<cword>")<CR><CR>
-nnoremap <leader>bs /<C-R>=escape(expand("<cWORD>"), "/")<CR><CR>
+" nnoremap <leader>ghw :h <C-R>=expand("<cword>")<CR><CR>
+" nnoremap <leader>bs /<C-R>=escape(expand("<cWORD>"), "/")<CR><CR>
+
 nnoremap <leader><CR> :so ~/.vimrc<CR>
 
 "formatting

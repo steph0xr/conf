@@ -47,7 +47,8 @@
   co = checkout
 
 [diff]
-	tool = kdiff3
+	guitool = kdiff3
+	tool = vimdiff 
 [core]
 	editor = nvim
 	autocrlf = false #mettere a true sotto windows
@@ -61,8 +62,11 @@
 	prompt = true
   trustExitCode = true #esce completamente dal processo di diff con C-q (vim)
 [mergetool]
+	guitool = kdiff3
+	tool = vimdiff 
   trustExitCode = true
 [merge]
-	tool = kdiff3
+	guitool = kdiff3
+	tool = vimdiff 
 [credential]
 	helper = store
