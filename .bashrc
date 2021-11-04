@@ -215,6 +215,7 @@ alias hidden='ls -a | grep "^\."'
 alias tmux="TERM=screen-256color-bce tmux"
 alias dul='du -h --max-depth=1'
 alias hi='history | tail -20'
+alias gdb='gdb -q' 
 
 # Git aliases
 alias ga='git add'

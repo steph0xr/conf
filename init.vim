@@ -28,12 +28,12 @@ set shortmess+=c
 
 nnoremap gd :lua vim.lsp.buf.definition()<CR>
 nnoremap gi :lua vim.lsp.buf.implementation()<CR>
-nnoremap gsh :lua vim.lsp.buf.signature_help()<CR>
 nnoremap gr :lua vim.lsp.buf.references()<CR>
 nnoremap gn :lua vim.lsp.buf.rename()<CR>
 nnoremap gh :lua vim.lsp.buf.hover()<CR>
 nnoremap gca :lua vim.lsp.buf.code_action()<CR>
-nnoremap gsd :lua vim.lsp.util.show_line_diagnostics(); vim.lsp.util.show_line_diagnostics()<CR>
+" nnoremap gsd :lua vim.lsp.util.show_line_diagnostics(); vim.lsp.util.show_line_diagnostics()<CR>
+" nnoremap gsh :lua vim.lsp.buf.signature_help()<CR>
 nnoremap gn :lua vim.lsp.diagnostic.goto_next()<CR>
 nnoremap grn :lua vim.lsp.buf.rename()<CR>
 nnoremap gc :lua vim.lsp.buf.completion()<CR>
