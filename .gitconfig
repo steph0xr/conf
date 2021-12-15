@@ -38,7 +38,8 @@
 
 	t = tag -n
 	conflicts = diff --name-only --diff-filter=U
-	follow = log --follow -p --
+	followsimple = log --follow -p --
+	follow = git log --follow --oneline --decorate --format='%C(blod blue)%h%C(reset) | %s | %an' -p --
 	fc = log --follow --oneline --
 	string = log --oneline -S #va aggiunto il nome della stringa poi. cerca in quale commit  una stringa è stata modificata
 	d = diff --color | /hdd1/repos/diff-so-fancy/diff-so-fancy 

@@ -362,20 +362,14 @@ let $FZF_DEFAULT_OPT='--reverse'
 let g:fzf_layout = { 'window': { 'width': 0.8, 'height': 0.8 } }
 
 "harpoon
-nnoremap hh :lua require("harpoon.mark").add_file()<CR>
-nnoremap hs :lua require("harpoon.ui").toggle_quick_menu()<CR>
+nnoremap <leader>hh :lua require("harpoon.mark").add_file()<CR>
+nnoremap <leader>hf :lua require("harpoon.ui").toggle_quick_menu()<CR>
 nnoremap <leader>1 :lua require("harpoon.ui").nav_file(1)<CR>
 nnoremap <leader>2 :lua require("harpoon.ui").nav_file(2)<CR>
 nnoremap <leader>3 :lua require("harpoon.ui").nav_file(3)<CR>
 nnoremap <leader>4 :lua require("harpoon.ui").nav_file(4)<CR>
 nnoremap <leader>5 :lua require("harpoon.ui").nav_file(5)<CR>
 nnoremap <leader>6 :lua require("harpoon.ui").nav_file(6)<CR>
-nnoremap h1 :lua require("harpoon.ui").nav_file(1)<CR>
-nnoremap h2 :lua require("harpoon.ui").nav_file(2)<CR>
-nnoremap h3 :lua require("harpoon.ui").nav_file(3)<CR>
-nnoremap h4 :lua require("harpoon.ui").nav_file(4)<CR>
-nnoremap h5 :lua require("harpoon.ui").nav_file(5)<CR>
-nnoremap h6 :lua require("harpoon.ui").nav_file(6)<CR>
 
 
 "cdelledonne/vim-cmake
@@ -553,8 +547,8 @@ colorscheme gruvbox
 "cycle throught items in cwindow and lwindow
 nnoremap <expr> <C-k> &diff? '[c' : ':cp<CR>zz'
 nnoremap <expr> <C-j> &diff? ']c' : ':cn<CR>zz'
-nnoremap <leader>k :lnext<CR>zz
-nnoremap <leader>j :lprev<CR>zz
+" nnoremap <leader>k :lnext<CR>zz
+" nnoremap <leader>j :lprev<CR>zz
 
 "cycling between buffers
 " nnoremap <TAB> :bn<CR>

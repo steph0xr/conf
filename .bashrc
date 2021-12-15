@@ -216,6 +216,7 @@ alias tmux="TERM=screen-256color-bce tmux"
 alias dul='du -h --max-depth=1'
 alias hi='history | tail -20'
 alias gdb='gdb -q' 
+alias sx='source /home/steph/.xinitrc'
 
 # Git aliases
 alias ga='git add'
@@ -232,5 +233,6 @@ alias g='git g'
 alias gf='git fetch --all'
 alias grh='git reset --hard'
 alias gsu='git submodule update'
+alias gss='git submodule status'
 alias gdt='git difftool --tool=vimdiff --no-prompt'
 alias gmt='git mergetool --tool=vimdiff --no-prompt'

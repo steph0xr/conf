@@ -238,7 +238,7 @@ bindsym XF86MonBrightnessDown exec xrandr --output eDP-1-1 --brightness 0.5 # de
 bindsym $mod+Shift+x exec i3lock -c 000000
 
 # GET DEM BORDERS OUT OF HEREc:w
-for_window [class="^.*"] border pixel 2
+for_window [class="^.*"] border pixel 3
                           # class                 border  backgr. text    indicator child_border
 for_window [class="^.*"] client.focused          #77dd77 #285577 #ffffff #2e9ef4   #285577
 
