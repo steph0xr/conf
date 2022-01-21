@@ -57,7 +57,7 @@
 
   "permettere di caricare .vimrc specifici di progetto in subfolders
   set exrc
-  set secure
+  " set secure
 
   " bind ° to grep shortcut
   " command! -nargs=+ -complete=file -bar CercaNoStack execute 'silent! grep! -Ir <args> --exclude=tags --exclude=*.{html,js,json} --exclude-dir={customized-bin,stack_zigbee,build,gecko_sdk_suite_v3.1.2,gecko_sdk_suite_v3.0.2}' | execute 'redraw!' | execute 'cw'
@@ -373,41 +373,37 @@ nnoremap <leader>6 :lua require("harpoon.ui").nav_file(6)<CR>
 
 
 "cdelledonne/vim-cmake
-let g:cmake_default_config = 'build'
-"let g:cmake_generate_options = ['-GNinja', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON']
-let g:cmake_generate_options = ['-GNinja', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON', '-DPYTHON_DEPS_CHECKED=1', '-DESP_PLATFORM=1', '-DIDF_TARGET=esp32', '-DCCACHE_ENABLE=1']
-" let g:cmake_generate_options = ['-GNinja', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON', '-DPYTHON_DEPS_CHECKED=1', '-DESP_PLATFORM=1', '-DIDF_TARGET=esp32', '-DCCACHE_ENABLE=0', '-DCMAKE_BUILD_TYPE=Release']
-let g:cmake_root_markers = ['build']
-let g:cmake_link_compile_commands = 1
-let g:cmake_jump = 1
+" let g:cmake_default_config = 'build'
+" "let g:cmake_generate_options = ['-GNinja', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON']
+" let g:cmake_generate_options = ['-GNinja', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON', '-DPYTHON_DEPS_CHECKED=1', '-DESP_PLATFORM=1', '-DIDF_TARGET=esp32', '-DCCACHE_ENABLE=1']
+" let g:cmake_root_markers = ['build']
+" let g:cmake_link_compile_commands = 1
+" let g:cmake_jump = 1
 nnoremap ,cb :CMakeBuild<CR>
 nnoremap ,cx :CMakeClean<CR>
 nnoremap ,cz :CMakeClose<CR>
-nnoremap ,cv :!cd build && ninja clean<CR>
-"nnoremap ,cb :CMakeBuild -v<CR>
-nnoremap ,ce :!cd build && ninja<CR>
-nnoremap ,cf :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash<CR>
-nnoremap ,ce :!cd build && ESPPORT=/dev/ttyUSB0 ninja erase_flash<CR>
-nnoremap ,ck :!cd build && ESPPORT=/dev/ttyUSB0 ESPBAUD=2000000 ninja flash monitor<CR>
-" nnoremap ,ca :!cmake -GNinja -DCMAKE_DEF_MAC=e0-e2-e6-4c-b4-dc -B ../build && cmake --build ../build -v<CR>
-nnoremap ,ca :!cmake -GNinja -B ../build && cmake --build ../build -v<CR>
-" nnoremap ,j :!esp-app-flash<CR>
-nnoremap ,l :Dispatch idf.py app-flash<CR>
-nnoremap ,L :Dispatch idf.py flash<CR>
-nnoremap ,j :Dispatch esp-app-flash<CR>
-nnoremap ,J :Dispatch esp-flash<CR>
-nnoremap ,r :silent !esp-reset<CR>
-" nnoremap ,c :CMakeGenerate!<CR>
 nnoremap ,c :CMakeGenerate!<CR>
-" nnoremap ,c :CMakeGenerate! -DCMAKE_DEF_MAC=e0-e2-e6-4c-e7-2c<CR>
-"
-" nnoremap ,m :!ninja -C build<CR><CR>:cw<CR>
-nnoremap ,m :Make -C build<CR><CR>:cw<CR>
+" Make dispatch to tmux
+" nnoremap ,m :Make -C build<CR><CR>:cw<CR>
+nnoremap ,k :Make -v -C build<CR><CR>:cw<CR>
 nnoremap ,M :make! -C build<CR><CR>:cw<CR>
 set makeprg=ninja
 "nnoremap ,cw :CMakeClean<CR>:CMakeGenerate<CR>:make! -C build<CR><CR>:cw<CR>
-nnoremap ,d :Dispatch espcoredump.py --port /dev/ttyUSB1 dbg_corefile build/mini-gateway.elf -o 4284416 --save-core coredump<CR>
-nnoremap ,e :Dispatch idf.py erase_flash<CR>
+
+" " ESP32
+" nnoremap ,cv :!cd build && ninja clean<CR>
+" "nnoremap ,cb :CMakeBuild -v<CR>
+" nnoremap ,ce :!cd build && ninja<CR>
+" nnoremap ,ca :!cmake -GNinja -B ../build && cmake --build ../build -v<CR>
+" " nnoremap ,j :!esp-app-flash<CR>
+" nnoremap ,l :Dispatch idf.py app-flash<CR>
+" nnoremap ,L :Dispatch idf.py flash<CR>
+" nnoremap ,j :Dispatch esp-app-flash<CR>
+" nnoremap ,J :Dispatch esp-flash<CR>
+" nnoremap ,r :silent !esp-reset<CR>
+" nnoremap ,d :Dispatch espcoredump.py --port /dev/ttyUSB1 dbg_corefile build/mini-gateway.elf -o 4284416 --save-core coredump<CR>
+" nnoremap ,e :Dispatch idf.py erase_flash<CR>
+
 
 
 
@@ -609,5 +605,5 @@ nnoremap ,x <c-w>jG/error<cr>:%s/error//gn<cr>
 noremap Q <Nop>
 
 "keep found in center of screen
-nnoremap n nzzzv 
-nnoremap N Nzzzv 
+nnoremap n nzzzv
+nnoremap N Nzzzv

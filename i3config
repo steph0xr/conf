@@ -254,3 +254,4 @@ bindsym $mod+i exec thunar
 # Toggle between stacking/tabbed ecc..
 bindsym $mod+x layout toggle all
 
+# exec --no-startup-id /usr/lib/policykit-1/polkit-agent-helper-1 &
