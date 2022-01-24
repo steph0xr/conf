@@ -152,6 +152,7 @@
   nnoremap <leader>ee :Ex<CR>
 
   nnoremap <leader>ev :vsplit ~/.vimrc<cr>
+  nnoremap <leader>ei :vsplit ~/.config/nvim/init.vim<cr>
   nnoremap <leader>eg :vsplit ~/.gitconfig<cr>
 
   "avoid paste to replace copy register
@@ -213,7 +214,10 @@
   if has('nvim')
     "lsp Plugins
     Plug 'neovim/nvim-lspconfig'
-    Plug 'nvim-lua/completion-nvim'
+    " Plug 'nvim-lua/completion-nvim'
+    Plug 'hrsh7th/nvim-cmp'
+    " Plug 'L3MON4D3/LuaSnip'
+    Plug 'hrsh7th/vim-vsnip'
     " Plug 'nvim-lua/lsp-status.nvim'
     Plug 'nvim-lua/popup.nvim'
     Plug 'nvim-lua/plenary.nvim'
@@ -305,25 +309,25 @@ nnoremap <leader>di :call vimspector#Launch()<CR>
 nnoremap <leader>de :call vimspector#Reset()<CR>
 nnoremap <leader>dp :call vimspector#ToggleBreakpoint()<CR>
 
-"youCompleteMe
-if !has('nvim')
-  nnoremap <leader>gg <plug>(YCMHover)
-  nnoremap <leader>lo :lopen<CR>
-  nnoremap <silent>gt :YcmCompleter GoTo<CR>
-  nnoremap <silent>gd :YcmCompleter GoToDeclaration<CR>
-  nnoremap <silent>gi :YcmCompleter GoToDefinition<CR>
-  nnoremap <silent>gr :YcmCompleter GoToReferences<CR>
-  nnoremap <silent>gs :YcmCompleter GoToSymbol<CR>
-  let g:ycm_auto_hover=''
-  let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/.ycm_extra_conf.py'
-  let g:ycm_enable_diagnostic_signs=1
-  let g:ycm_always_populate_location_list = 1
-  "xtensa-clang
-  let g:ycm_clangd_uses_ycmd_caching = 0
-  let g:ycm_clangd_binary_path = "clangd-xtensa"
-  let g:ycm_clangd_args = ['-log=verbose', '-pretty'] "-background-index
-endif
-  set signcolumn=yes
+" "youCompleteMe
+" if !has('nvim')
+  " nnoremap <leader>gg <plug>(YCMHover)
+  " nnoremap <leader>lo :lopen<CR>
+  " nnoremap <silent>gt :YcmCompleter GoTo<CR>
+  " nnoremap <silent>gd :YcmCompleter GoToDeclaration<CR>
+  " nnoremap <silent>gi :YcmCompleter GoToDefinition<CR>
+  " nnoremap <silent>gr :YcmCompleter GoToReferences<CR>
+  " nnoremap <silent>gs :YcmCompleter GoToSymbol<CR>
+  " let g:ycm_auto_hover=''
+  " let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/.ycm_extra_conf.py'
+  " let g:ycm_enable_diagnostic_signs=1
+  " let g:ycm_always_populate_location_list = 1
+  " "xtensa-clang
+  " let g:ycm_clangd_uses_ycmd_caching = 0
+  " let g:ycm_clangd_binary_path = "clangd-xtensa"
+  " let g:ycm_clangd_args = ['-log=verbose', '-pretty'] "-background-index
+" endif
+  " set signcolumn=yes
 
 "clangd-xtensa da usare con progetti esp:
 "let g:ycm_clangd_binary_path = "/hdd1/repos/llvm-project/clang-tools-extra/clangd"
@@ -373,10 +377,9 @@ nnoremap <leader>6 :lua require("harpoon.ui").nav_file(6)<CR>
 
 
 "cdelledonne/vim-cmake
-" let g:cmake_default_config = 'build'
-" "let g:cmake_generate_options = ['-GNinja', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON']
-" let g:cmake_generate_options = ['-GNinja', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON', '-DPYTHON_DEPS_CHECKED=1', '-DESP_PLATFORM=1', '-DIDF_TARGET=esp32', '-DCCACHE_ENABLE=1']
-" let g:cmake_root_markers = ['build']
+let g:cmake_default_config = 'build'
+let g:cmake_root_markers = ['build']
+let g:cmake_generate_options = ['-GNinja', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON']
 " let g:cmake_link_compile_commands = 1
 " let g:cmake_jump = 1
 nnoremap ,cb :CMakeBuild<CR>
@@ -388,24 +391,8 @@ nnoremap ,m :Make -C build<CR><CR>:cw<CR>
 nnoremap ,k :Make -v -C build<CR><CR>:cw<CR>
 nnoremap ,M :make! -C build<CR><CR>:cw<CR>
 set makeprg=ninja
+nnoremap ,K :Start build/main/main<CR><CR>:cw<CR>
 "nnoremap ,cw :CMakeClean<CR>:CMakeGenerate<CR>:make! -C build<CR><CR>:cw<CR>
-
-" ESP32
-nnoremap ,cv :!cd build && ninja clean<CR>
-"nnoremap ,cb :CMakeBuild -v<CR>
-nnoremap ,ce :!cd build && ninja<CR>
-nnoremap ,ca :!cmake -GNinja -B ../build && cmake --build ../build -v<CR>
-" nnoremap ,j :!esp-app-flash<CR>
-nnoremap ,l :Dispatch idf.py app-flash<CR>
-nnoremap ,L :Dispatch idf.py flash<CR>
-nnoremap ,j :Dispatch esp-app-flash<CR>
-nnoremap ,J :Dispatch esp-flash<CR>
-nnoremap ,r :silent !esp-reset<CR>
-nnoremap ,d :Dispatch espcoredump.py --port /dev/ttyUSB1 dbg_corefile build/mini-gateway.elf -o 4284416 --save-core coredump<CR>
-nnoremap ,e :Dispatch idf.py erase_flash<CR>
-
-
-
 
 
 "vim.cpp
@@ -426,57 +413,6 @@ let g:cpp_member_highlight = 1
 " " Put all standard C and C++ keywords under Vim's highlight group 'Statement'
 " " (affects both C and C++ files)
 " let g:cpp_simple_highlight = 1
-
-""coc
-"" if hidden is not set, TextEdit might fail.
-"set hidden
-"" Some servers have issues with backup files, see #649
-"set nobackup
-"set nowritebackup
-"" Better display for messages
-"set cmdheight=2
-"" You will have bad experience for diagnostic messages when it's default 4000.
-""set updatetime=300
-"" don't give |ins-completion-menu| messages.
-"set shortmess+=c
-"" always show signcolumns
-"set signcolumn=yes
-"" Use tab for trigger completion with characters ahead and navigate.
-"" Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
-"inoremap <silent><expr> <TAB>
-"      \ pumvisible() ? "\<C-n>" :
-"      \ <SID>check_back_space() ? "\<TAB>" :
-"      \ coc#refresh()
-"inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-"function! s:check_back_space() abort
-"  let col = col('.') - 1
-"  return !col || getline('.')[col - 1]  =~# '\s'
-"endfunction
-"" Use <c-space> to trigger completion.
-""inoremap <silent><expr> <c-space> coc#refresh()
-"" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
-"" Coc only does snippet and additional edit on confirm.
-""inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-"" Use `[c` and `]c` to navigate diagnostics
-""nmap <silent> [c <Plug>(coc-diagnostic-prev)
-""nmap <silent> ]c <Plug>(coc-diagnostic-next)
-"" Remap keys for gotos
-""nmap <silent> gd <Plug>(coc-definition)
-""nmap <silent> gy <Plug>(coc-type-definition)
-""nmap <silent> gi <Plug>(coc-implementation)
-""nmap <silent> gr <Plug>(coc-references)
-"" Use K to show documentation in preview window
-""nnoremap <silent> K :call <SID>show_documentation()<CR>
-""function! s:show_documentation()
-""  if (index(['vim','help'], &filetype) >= 0)
-""    execute 'h '.expand('<cword>')
-""  else
-""    call CocAction('doHover')
-""  endif
-""endfunction
-"" Highlight symbol under cursor on CursorHold
-""autocmd CursorHold * silent call CocActionAsync('highlight')
-
 
 "ctags stuff..
 "example to include some libraries: map <F2> :!ctags -R --sort=yes --c++-kinds=+p --fields=+iaS --extra=+q . /usr/include/alsa/ /usr/include/Wt/<CR>
@@ -586,7 +522,8 @@ nnoremap <c-f> :RgFzf *<CR>
 " nnoremap <leader>ghw :h <C-R>=expand("<cword>")<CR><CR>
 " nnoremap <leader>bs /<C-R>=escape(expand("<cWORD>"), "/")<CR><CR>
 
-nnoremap <leader><CR> :so ~/.vimrc<CR>
+nnoremap <leader><CR> :so $MYVIMRC<CR>
+" nnoremap <leader><CR> :so ~/.vimrc<CR>
 
 "formatting
 let g:clang_format#detect_style_file = 1
