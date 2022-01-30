@@ -57,7 +57,7 @@
 
   "permettere di caricare .vimrc specifici di progetto in subfolders
   set exrc
-  " set secure
+  set secure
 
   " bind ° to grep shortcut
   " command! -nargs=+ -complete=file -bar CercaNoStack execute 'silent! grep! -Ir <args> --exclude=tags --exclude=*.{html,js,json} --exclude-dir={customized-bin,stack_zigbee,build,gecko_sdk_suite_v3.1.2,gecko_sdk_suite_v3.0.2}' | execute 'redraw!' | execute 'cw'
@@ -216,8 +216,14 @@
     Plug 'neovim/nvim-lspconfig'
     " Plug 'nvim-lua/completion-nvim'
     Plug 'hrsh7th/nvim-cmp'
-    " Plug 'L3MON4D3/LuaSnip'
-    Plug 'hrsh7th/vim-vsnip'
+    Plug 'hrsh7th/cmp-nvim-lsp'
+    Plug 'hrsh7th/cmp-buffer'
+    Plug 'hrsh7th/cmp-path'
+    Plug 'hrsh7th/cmp-cmdline'
+    Plug 'L3MON4D3/LuaSnip'
+    " Plug 'hrsh7th/vim-vsnip'
+    " Plug 'hrsh7th/cmp-vsnip'
+    Plug 'onsails/lspkind-nvim'
     " Plug 'nvim-lua/lsp-status.nvim'
     Plug 'nvim-lua/popup.nvim'
     Plug 'nvim-lua/plenary.nvim'
@@ -379,6 +385,7 @@ nnoremap <leader>6 :lua require("harpoon.ui").nav_file(6)<CR>
 "cdelledonne/vim-cmake
 let g:cmake_default_config = 'build'
 let g:cmake_root_markers = ['build']
+" let g:cmake_build_dir_location = ['.']
 let g:cmake_generate_options = ['-GNinja', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON']
 " let g:cmake_link_compile_commands = 1
 " let g:cmake_jump = 1
@@ -536,7 +543,7 @@ nnoremap ,f :ClangFormat<CR>
 
 "cmake output filtering
 nnoremap <leader>x <c-w>jG:%s/error//gn<cr>
-nnoremap ,x <c-w>jG/error<cr>:%s/error//gn<cr>
+nnoremap ,x <c-w>j<c-w>jG/error<cr>:%s/error//gn<cr>
 
 "no ex mode
 noremap Q <Nop>
@@ -544,3 +551,5 @@ noremap Q <Nop>
 "keep found in center of screen
 nnoremap n nzzzv
 nnoremap N Nzzzv
+
+autocmd FileType cpp set keywordprg=cppman

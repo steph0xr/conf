@@ -4,29 +4,20 @@ source ~/.vimrc
 
 
 "vim.lsp - nvim-lspconfig
-" lua require'lspconfig'.clangd.setup{cmd = { "clangd-xtensa", "--background-index", "--query-driver=/home/steph/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-*" }}
-"lua require'lspconfig'.clangd.setup{cmd = { "clangd", "--background-index", "--query-driver=/usr/bin/gcc"}}
-lua require'lspconfig'.clangd.setup{cmd = { "clangd", "--background-index" }}
+lua <<EOF
+
+local lspconfig = require'lspconfig'.clangd.setup {
+--cmd = { "clangd", "--background-index", "--query-driver=/usr/bin/gcc"}
+  cmd = { 
+    "clangd", 
+    "--background-index" 
+  },
+}
+EOF
 
 " lua vim.lsp.set_log_level("debug")
 "
 
-" "nvim-completion
-" autocmd BufEnter * lua require'completion'.on_attach()
-" " lua vim.api.nvim_buf_set_option(0, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-" set completeopt=menuone,noinsert,noselect
-" let g:completion_sorting = "length"
-" let g:completion_matching_strategy_list = ['exact', 'substring', 'fuzzy']
-" let g:completion_trigger_character = ['::'] " c++ class
-" let g:completion_enable_auto_popup = 1
-" " completion with tab
-" inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
-" inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-" " completion trigger in insert mode
-" imap <tab> <Plug>(completion_smart_tab)
-" imap <s-tab> <Plug>(completion_smart_s_tab)
-" " Avoid showing message extra message when using completion
-" set shortmess+=c
 
 nnoremap gd :lua vim.lsp.buf.definition()<CR>
 nnoremap gi :lua vim.lsp.buf.implementation()<CR>
@@ -52,19 +43,32 @@ nnoremap <leader>LL :lua vim.cmd('e'..vim.lsp.get_log_path())<CR>
 "nnoremap <silent> <C-p> <cmd>lua vim.lsp.diagnostic.goto_next()<CR>
 "
 
+set completeopt=menu,menuone,noselect
 
 lua <<EOF
 -- luasnip setup
 -- local luasnip = require 'luasnip'
 -- local vsnip = require 'vsnip'
 
+-- local lspkind = require("lspkind")
+-- require('lspkind').init({
+--     with_text = true,
+-- })
+
 -- Setup nvim-cmp.
 local cmp = require 'cmp'
+local source_mapping = {
+	buffer = "[Buffer]",
+	nvim_lsp = "[LSP]",
+	nvim_lua = "[Lua]",
+	cmp_tabnine = "[TN]",
+	path = "[Path]",
+}
 cmp.setup({
 	snippet = {
 		expand = function(args)
-			-- require("luasnip").lsp_expand(args.body)
-			vim.fn["vsnip#anonymous"](args.body)
+			require("luasnip").lsp_expand(args.body)
+--			vim.fn["vsnip#anonymous"](args.body)
 			-- vim.fn["UltiSnips#Anon"](args.body)
 		end,
 	},
@@ -73,15 +77,45 @@ cmp.setup({
 		["<C-d>"] = cmp.mapping.scroll_docs(4),
 		["<C-Space>"] = cmp.mapping.complete(),
 		["<C-e>"] = cmp.mapping.close(),
+    ['<CR>'] = cmp.mapping.confirm({ select = true }),
 	},
-
+--  formatting = {
+--        format = function(entry, vim_item)
+--            vim_item.kind = lspkind.presets.default[vim_item.kind]
+--            local menu = source_mapping[entry.source.name]
+--            if entry.source.name == 'cmp_tabnine' then
+--                if entry.completion_item.data ~= nil and entry.completion_item.data.detail ~= nil then
+--                    menu = entry.completion_item.data.detail .. ' ' .. menu
+--                end
+--                vim_item.kind = ''
+--            end
+--            vim_item.menu = menu
+--            return vim_item
+--        end
+--  },
 	sources = {
-		{ name = 'vsnip' },
-		-- { name = "nvim_lsp" },
-		-- { name = "luasnip" },
+		-- { name = 'vsnip' },
+		{ name = "nvim_lsp" },
+		{ name = "luasnip" },
 		{ name = "buffer" },
 		-- { name = 'ultisnips' },
 	},
 })
 EOF
 
+" "nvim-completion
+" autocmd BufEnter * lua require'completion'.on_attach()
+" " lua vim.api.nvim_buf_set_option(0, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+" set completeopt=menuone,noinsert,noselect
+" let g:completion_sorting = "length"
+" let g:completion_matching_strategy_list = ['exact', 'substring', 'fuzzy']
+" let g:completion_trigger_character = ['::'] " c++ class
+" let g:completion_enable_auto_popup = 1
+" " completion with tab
+" inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+" inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+" " completion trigger in insert mode
+" imap <tab> <Plug>(completion_smart_tab)
+" imap <s-tab> <Plug>(completion_smart_s_tab)
+" " Avoid showing message extra message when using completion
+" set shortmess+=c
