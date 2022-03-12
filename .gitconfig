@@ -46,6 +46,7 @@
 	listalltracked = ls-tree --full-tree --name-only -r HEAD
   deleteRemoteBranch = push origin --delete
   co = checkout
+  cos = checkout --recurse-submodules
 
 [diff]
 	guitool = kdiff3

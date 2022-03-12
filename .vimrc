@@ -125,6 +125,7 @@
   nnoremap ò :
   vnoremap ò :
   nnoremap - /
+  nnoremap à /
   vnoremap - /
   nnoremap è }
   nnoremap + {
@@ -258,18 +259,10 @@ nnoremap <leader>fa :lua require('telescope.builtin').grep_string({ search = vim
 nnoremap <leader>fs :lua require('telescope.builtin').grep_string({ file_ignore_patterns = {'%.js','%.html'}, search = vim.fn.input("Grep For > ")})<CR>
 nnoremap <leader>fw :lua require('telescope.builtin').grep_string { file_ignore_patterns = {'%.js','%.html'}, search = vim.fn.expand("<cword>") }<CR>
 nnoremap <leader>fe :lua require('telescope.builtin').grep_string { file_ignore_patterns = {'%.js','%.html'}, search = vim.fn.expand("<cword>"), previewer = false }<CR>
-
 " nnoremap <leader>ps :lua require('telescope.builtin').grep_string({ search = vim.fn.input("Grep For > ")})<CR>
 " nnoremap <C-p> :lua require('telescope.builtin').git_files()<CR>
 " nnoremap <Leader>pf :lua require('telescope.builtin').find_files()<CR>
-
-" nnoremap <leader>pw :lua require('telescope.builtin').grep_string { search = vim.fn.expand("<cword>") }<CR>
-" nnoremap <leader>pb :lua require('telescope.builtin').buffers()<CR>
 " nnoremap <leader>vh :lua require('telescope.builtin').help_tags()<CR>
-" nnoremap <leader>vrc :lua require('theprimeagen.telescope').search_dotfiles()<CR>
-" nnoremap <leader>va :lua require('theprimeagen.telescope').anime_selector()<CR>
-" nnoremap <leader>vc :lua require('theprimeagen.telescope').chat_selector()<CR>
-" nnoremap <leader>gc :lua require('theprimeagen.telescope').git_branches()<CR>
 " nnoremap <leader>gw :lua require('telescope').extensions.git_worktree.git_worktrees()<CR>
 " nnoremap <leader>gm :lua require('telescope').extensions.git_worktree.create_git_worktree()<CR>
 
@@ -299,21 +292,29 @@ set statusline+=\%b\ 0x%B\|\ %l,%c%V\ \ %P
 
 "Termdebug
 packadd termdebug
-let g:termdebugger = "/home/steph/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gdb"
+" let g:termdebugger = "/home/steph/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gdb"
 
+" let g:termdebug_popup = 0
+let g:termdebug_wide = 163
 nnoremap <leader>dd :Termdebug<CR>
 nnoremap <leader>dg :Gdb<CR>
 nnoremap <leader>db :Break<CR>
+nnoremap <leader>dbs :call TermDebugSendCommand('save br .breaks')<CR> 
+nnoremap <leader>dbl :call TermDebugSendCommand('source .breaks')<CR> 
+nnoremap <leader>dx :Clear<CR>
 nnoremap <leader>ds :Step<CR>
 nnoremap <leader>dr :Run<CR>
 nnoremap <leader>dl :Over<CR>
 nnoremap <leader>dj :Step<CR>
 nnoremap <leader>dk :Finish<CR>
 nnoremap <leader>dc :Continue<CR>
+nnoremap <leader>dq :call TermDebugSendCommand('q')<CR>
+"termina sessione remota gdbServer:
+nnoremap ,de :call TermDebugSendCommand('mon exit')<CR> 
 "packadd! vimspector
-nnoremap <leader>di :call vimspector#Launch()<CR>
-nnoremap <leader>de :call vimspector#Reset()<CR>
-nnoremap <leader>dp :call vimspector#ToggleBreakpoint()<CR>
+" nnoremap <leader>di :call vimspector#Launch()<CR>
+" nnoremap <leader>de :call vimspector#Reset()<CR>
+" nnoremap <leader>dp :call vimspector#ToggleBreakpoint()<CR>
 
 " "youCompleteMe
 " if !has('nvim')
@@ -384,8 +385,7 @@ nnoremap <leader>6 :lua require("harpoon.ui").nav_file(6)<CR>
 
 "cdelledonne/vim-cmake
 let g:cmake_default_config = 'build'
-let g:cmake_root_markers = ['build']
-" let g:cmake_build_dir_location = ['.']
+let g:cmake_root_markers = ['.git', 'build']
 let g:cmake_generate_options = ['-GNinja', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON']
 " let g:cmake_link_compile_commands = 1
 " let g:cmake_jump = 1
@@ -394,11 +394,13 @@ nnoremap ,cx :CMakeClean<CR>
 nnoremap ,cz :CMakeClose<CR>
 nnoremap ,c :CMakeGenerate!<CR>
 " Make dispatch to tmux
-nnoremap ,m :Make -C build<CR><CR>:cw<CR>
+nnoremap ,m :w<CR>:Make -C build<CR><CR>:cw<CR>
 nnoremap ,k :Make -v -C build<CR><CR>:cw<CR>
 nnoremap ,M :make! -C build<CR><CR>:cw<CR>
 set makeprg=ninja
-nnoremap ,K :Start build/main/main<CR><CR>:cw<CR>
+nnoremap ,r :Start build/src/application/EVStateManagerAPP<CR>
+nnoremap ,R :Dispatch build/main/main<CR>
+" nnoremap ,e :w<CR>:Make -C build<CR><CR>:cw<CR> \| :Start build/main/main<CR><CR>:cw<CR>
 "nnoremap ,cw :CMakeClean<CR>:CMakeGenerate<CR>:make! -C build<CR><CR>:cw<CR>
 
 
