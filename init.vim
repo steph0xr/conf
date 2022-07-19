@@ -119,3 +119,76 @@ EOF
 " imap <s-tab> <Plug>(completion_smart_s_tab)
 " " Avoid showing message extra message when using completion
 " set shortmess+=c
+
+
+lua require('dap-python').setup('~/.virtualenvs/debugpy/bin/python')
+lua require("dapui").setup()
+
+nnoremap <silent> <leader>du <Cmd>lua require'dapui'.toggle()<CR>
+
+nnoremap <silent> <leader>dc <Cmd>lua require'dap'.continue()<CR>
+nnoremap <silent> <leader>ds <Cmd>lua require'dap'.terminate()<CR>
+nnoremap <silent> <leader>dn <Cmd>lua require'dap'.step_over()<CR>
+nnoremap <silent> <leader>dj <Cmd>lua require'dap'.step_into()<CR>
+nnoremap <silent> <leader>dk <Cmd>lua require'dap'.step_out()<CR>
+nnoremap <silent> <leader>db <Cmd>lua require'dap'.toggle_breakpoint()<CR>
+nnoremap <silent> <leader>dB <Cmd>lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>
+nnoremap <silent> <leader>dlp <Cmd>lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>
+nnoremap <silent> <leader>dr <Cmd>lua require'dap'.repl.open()<CR>
+nnoremap <silent> <leader>dl <Cmd>lua require'dap'.run_last()<CR>
+
+lua <<EOF
+-- automatic launch dap-ui 
+local dap, dapui = require("dap"), require("dapui")
+dap.listeners.after.event_initialized["dapui_config"] = function()
+  dapui.open()
+end
+dap.listeners.before.event_terminated["dapui_config"] = function()
+  dapui.close()
+end
+dap.listeners.before.event_exited["dapui_config"] = function()
+  dapui.close()
+end
+
+-- c++ debug adapter configutation
+local dap = require('dap')
+dap.adapters.cppdbg = {
+  id = 'cppdbg',
+  type = 'executable',
+  command = '/opt/vscode-cpptools/extension/debugAdapters/bin/OpenDebugAD7',
+}
+
+local dap = require('dap')
+dap.configurations.cpp = {
+  -- {
+  --   name = "Launch file",
+  --   type = "cppdbg",
+  --   request = "launch",
+  --   program = function()
+  --     return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+  --   end,
+  --   cwd = '${workspaceFolder}',
+  --   stopOnEntry = true,
+  -- },
+  {
+    name = "Launch cmake file",
+    type = "cppdbg",
+    request = "launch",
+    program = vim.fn.getcwd() .. '/build/main/main',
+    cwd = '${workspaceFolder}',
+    stopOnEntry = true,
+  },
+  {
+    name = 'esp32 Attach to gdbserver :3333',
+    type = 'cppdbg',
+    request = 'launch',
+    MIMode = 'gdb',
+    miDebuggerServerAddress = 'localhost:3333',
+    -- miDebuggerPath = '/usr/bin/gdb',
+    miDebuggerPath = 'xtensa-esp32-elf-gdb',
+    cwd = '${workspaceFolder}',
+    program = vim.fn.getcwd() .. '/build/driver_testing.elf',
+  },
+}
+
+EOF

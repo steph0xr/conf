@@ -65,8 +65,8 @@
 
 
   "find
-  nnoremap <F3> :execute "grep! -Irn --exclude=tags " . shellescape(expand("<cword>")) . " ."<cr>:cw<cr>
-  vnoremap <F3> y:vimgrep '<c-r>"' **/*.c **/*.cpp **/*.h<CR>:cw<cr>
+  " nnoremap <F3> :execute "grep! -Irn --exclude=tags " . shellescape(expand("<cword>")) . " ."<cr>:cw<cr>
+  " vnoremap <F3> y:vimgrep '<c-r>"' **/*.c **/*.cpp **/*.h<CR>:cw<cr>
   "vmap :%s/parolaDaSost/Sostituta/gc
 
 
@@ -106,6 +106,10 @@
   noremap <C-Left> :vertical resize -5<CR>
   noremap <C-Up> :resize +5<CR>
   noremap <C-Down> :resize -5<CR>
+  noremap \l :vertical resize +5<CR>
+  noremap \h :vertical resize -5<CR>
+  noremap \k :resize +5<CR>
+  noremap \j :resize -5<CR>
 
   "disabilitare freccie
   "nnoremap <Left> :echo "No left for you!"<CR>
@@ -127,8 +131,8 @@
   nnoremap - /
   nnoremap à /
   vnoremap - /
-  nnoremap è }
-  nnoremap + {
+  nnoremap ) }
+  nnoremap ( {
   inoremap jk <ESC>
   inoremap kj <ESC>
   inoremap jj <ESC>
@@ -165,7 +169,7 @@
   vnoremap <leader>y "+y
   nnoremap <leader>Y gg"+yG
 
-  nnoremap <leader>i ggVG=
+  " nnoremap <leader>i ggVG=
 
 
 
@@ -235,6 +239,12 @@
     Plug 'nvim-treesitter/playground'
     Plug 'ThePrimeagen/harpoon'
 
+    Plug 'mfussenegger/nvim-dap'
+    Plug 'rcarriga/nvim-dap-ui'
+    Plug 'mfussenegger/nvim-dap-python'
+    Plug 'szw/vim-maximizer'
+
+
   " else
     " Plug 'ycm-core/YouCompleteMe'
   endif
@@ -253,10 +263,16 @@ nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
 nnoremap <leader>f. <cmd>Telescope search_dotfiles<cr>
 nnoremap <leader>fg <cmd>Telescope git_files<cr>
+nnoremap <leader>fc <cmd>Telescope git_commits<cr>
 nnoremap <leader>fr <cmd>Telescope git_branches<cr>
 nnoremap <leader>fl <cmd>Telescope live_grep<cr>
 nnoremap <leader>fa :lua require('telescope.builtin').grep_string({ search = vim.fn.input("Grep For > ")})<CR>
 nnoremap <leader>fs :lua require('telescope.builtin').grep_string({ file_ignore_patterns = {'%.js','%.html'}, search = vim.fn.input("Grep For > ")})<CR>
+" nnoremap <leader>fv :lua require('telescope.builtin').grep_string({ file_ignore_patterns = {'%.js','%.html'}, search_dirs={"%:p"}, word_match = "-w", search = vim.fn.input("Grep For > "), previewer = false})<CR>
+vnoremap <leader>fv :lua require('telescope.builtin').grep_string({ file_ignore_patterns = {'%.js','%.html'}, search_dirs={"%:p"}, search = vim.fn.expand("<cword>"), previewer = false })<CR>
+nnoremap <leader>fo :lua require('telescope.builtin').live_grep({ file_ignore_patterns = {'%.js','%.html'}, search_dirs={"%:p"}, previewer = false })<CR>
+" nnoremap <leader>fo :lua require('telescope.builtin').grep_string({ file_ignore_patterns = {'%.js','%.html'}, word_match = "-w", search = vim.fn.input("Grep For > ")})<CR>
+" nnoremap <leader>fo :lua require'telescope.builtin'.live_grep{ file_ignore_patterns = {'%.js','%.html'}, search_dirs={"%:p"} }
 nnoremap <leader>fw :lua require('telescope.builtin').grep_string { file_ignore_patterns = {'%.js','%.html'}, search = vim.fn.expand("<cword>") }<CR>
 nnoremap <leader>fe :lua require('telescope.builtin').grep_string { file_ignore_patterns = {'%.js','%.html'}, search = vim.fn.expand("<cword>"), previewer = false }<CR>
 " nnoremap <leader>ps :lua require('telescope.builtin').grep_string({ search = vim.fn.input("Grep For > ")})<CR>
@@ -297,17 +313,19 @@ packadd termdebug
 " let g:termdebug_popup = 0
 let g:termdebug_wide = 163
 nnoremap <leader>dd :Termdebug<CR>
-nnoremap <leader>dg :Gdb<CR>
-nnoremap <leader>db :Break<CR>
-nnoremap <leader>dbs :call TermDebugSendCommand('save br .breaks')<CR> 
-nnoremap <leader>dbl :call TermDebugSendCommand('source .breaks')<CR> 
-nnoremap <leader>dx :Clear<CR>
-nnoremap <leader>ds :Step<CR>
-nnoremap <leader>dr :Run<CR>
-nnoremap <leader>dl :Over<CR>
-nnoremap <leader>dj :Step<CR>
-nnoremap <leader>dk :Finish<CR>
-nnoremap <leader>dc :Continue<CR>
+
+" nnoremap <leader>dg :Gdb<CR>
+" nnoremap <leader>db :Break<CR>
+" nnoremap <leader>dbs :call TermDebugSendCommand('save br .breaks')<CR>
+" nnoremap <leader>dbl :call TermDebugSendCommand('source .breaks')<CR>
+" nnoremap <leader>dx :Clear<CR>
+" nnoremap <leader>ds :Step<CR>
+" nnoremap <leader>dr :Run<CR>
+" nnoremap <leader>dl :Over<CR>
+" nnoremap <leader>dj :Step<CR>
+" nnoremap <leader>dk :Finish<CR>
+" nnoremap <leader>dc :Continue<CR>
+
 nnoremap <leader>dq :call TermDebugSendCommand('q')<CR>
 "termina sessione remota gdbServer:
 nnoremap ,de :call TermDebugSendCommand('mon exit')<CR> 
@@ -360,7 +378,7 @@ nnoremap gs :Git<CR>
 nnoremap <leader>gc :GBranches<CR>
 nnoremap <leader>gg :Flog -all -date=relative -raw-args=--author-date-order -max-count=2000<CR>
 nnoremap <leader>gd :Git difftool<CR>
-nnoremap <leader>gl :Gclog -10<CR>
+nnoremap <leader>gl :Gclog<CR>
 nnoremap <leader>gk :G log --graph --abbrev-commit --decorate=no --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(dim white)%s%C(reset) %C(bold blue)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all --tags <CR>
 " let g:flog_default_arguments = {'max_count': 2000, 'all': 1, 'date': 'relative'}
 " let g:flog_default_arguments = {'max_count': 2000, 'all': 1, 'format': '%C(bold blue)%>|(26)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(dim white)%s%C(reset) %C(bold blue)- %an%C(reset)%C(bold yellow)%d%C(reset)'}
@@ -532,6 +550,7 @@ nnoremap <c-f> :RgFzf *<CR>
 " nnoremap <leader>bs /<C-R>=escape(expand("<cWORD>"), "/")<CR><CR>
 
 nnoremap <leader><CR> :so $MYVIMRC<CR>
+nnoremap <leader>i :so ~/.config/nvim/init.vim<CR>
 " nnoremap <leader><CR> :so ~/.vimrc<CR>
 
 "formatting
