@@ -41,7 +41,8 @@
   set hidden "switch between buffer witout saving
   set path+=** "search down into subfolders-provides tab-completion for all file related task
 
-  set foldmethod=syntax "folding
+  " set foldmethod=syntax "folding
+  autocmd FileType c setlocal foldmethod=syntax
   set foldlevel=99
 
   set scrolloff=8
@@ -76,12 +77,22 @@
 
   " bind § to grep shortcut
   command! -nargs=+ -complete=file -bar Cerca execute 'silent! grep! -IrE <args> --exclude=tags --exclude=*.html --exclude=*.js' | execute 'redraw!' | execute 'cw'
-  nnoremap § :Cerca<SPACE>
+  " nnoremap § :Cerca<SPACE>
+
+  " command! -nargs=+ -complete=file -bar Cerca execute 'silent! vimgrep! <args>' | execute 'redraw!' | execute 'cw'
+
+  " command -nargs=* Vgrep vimgrep /\v<args>/g **/* | copen
+  command -nargs=* VgrepInGit vimgrep /\v<args>/g `git ls-files` | copen
+  nnoremap § :VgrepInGit<SPACE>
 
 
   " bind  for breakpoints to clipboard for gdb
   command! Xg :let @+ = 'b ' . expand('%:p') . ':' . line('.')
   nnoremap °° :Xg<CR>
+
+  command! Diff :windo diffthis
+  nnoremap ,d :Diff<CR>
+
 
   "ALT mapping for moving lines
   "nnoremap <C-j> ddp
@@ -147,7 +158,7 @@
   " vnoremap / -
 
   "search under cursor no ita 
-  nnoremap £ #
+  nnoremap é #
   " nnoremap ) *
 
   nnoremap <leader>t :term<CR>
@@ -204,6 +215,7 @@
   Plug 'airblade/vim-gitgutter'
   Plug 'preservim/nerdcommenter'
   Plug 'rhysd/vim-clang-format'
+  Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
    " Plug 'nvim-telescope/telescope-fzy-native.nvim'
 
   "Plug 'junegunn/gv.vim'
@@ -269,8 +281,8 @@ nnoremap <leader>fl <cmd>Telescope live_grep<cr>
 nnoremap <leader>fa :lua require('telescope.builtin').grep_string({ search = vim.fn.input("Grep For > ")})<CR>
 nnoremap <leader>fs :lua require('telescope.builtin').grep_string({ file_ignore_patterns = {'%.js','%.html'}, search = vim.fn.input("Grep For > ")})<CR>
 " nnoremap <leader>fv :lua require('telescope.builtin').grep_string({ file_ignore_patterns = {'%.js','%.html'}, search_dirs={"%:p"}, word_match = "-w", search = vim.fn.input("Grep For > "), previewer = false})<CR>
-vnoremap <leader>fv :lua require('telescope.builtin').grep_string({ file_ignore_patterns = {'%.js','%.html'}, search_dirs={"%:p"}, search = vim.fn.expand("<cword>"), previewer = false })<CR>
-nnoremap <leader>fo :lua require('telescope.builtin').live_grep({ file_ignore_patterns = {'%.js','%.html'}, search_dirs={"%:p"}, previewer = false })<CR>
+vnoremap <leader>fv :lua require('telescope.builtin').grep_string({search_dirs={"%:p"}, search = vim.fn.expand("<cword>"), previewer = false })<CR>
+nnoremap <leader>fo :lua require("telescope.builtin").live_grep({search_dirs={vim.fn.expand("%:p")}})<CR>
 " nnoremap <leader>fo :lua require('telescope.builtin').grep_string({ file_ignore_patterns = {'%.js','%.html'}, word_match = "-w", search = vim.fn.input("Grep For > ")})<CR>
 " nnoremap <leader>fo :lua require'telescope.builtin'.live_grep{ file_ignore_patterns = {'%.js','%.html'}, search_dirs={"%:p"} }
 nnoremap <leader>fw :lua require('telescope.builtin').grep_string { file_ignore_patterns = {'%.js','%.html'}, search = vim.fn.expand("<cword>") }<CR>
@@ -328,7 +340,7 @@ nnoremap <leader>dd :Termdebug<CR>
 
 nnoremap <leader>dq :call TermDebugSendCommand('q')<CR>
 "termina sessione remota gdbServer:
-nnoremap ,de :call TermDebugSendCommand('mon exit')<CR> 
+" nnoremap ,de :call TermDebugSendCommand('mon exit')<CR>
 "packadd! vimspector
 " nnoremap <leader>di :call vimspector#Launch()<CR>
 " nnoremap <leader>de :call vimspector#Reset()<CR>
@@ -407,12 +419,13 @@ let g:cmake_root_markers = ['.git', 'build']
 let g:cmake_generate_options = ['-GNinja', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON']
 " let g:cmake_link_compile_commands = 1
 " let g:cmake_jump = 1
+" let g:cmake_jump_on_error = 0
 nnoremap ,cb :CMakeBuild<CR>
 nnoremap ,cx :CMakeClean<CR>
 nnoremap ,cz :CMakeClose<CR>
 nnoremap ,c :CMakeGenerate!<CR>
 " Make dispatch to tmux
-nnoremap ,m :w<CR>:Make -C build<CR><CR>:cw<CR>
+nnoremap ,m :Make -C build<CR><CR>:cw<CR>
 nnoremap ,k :Make -v -C build<CR><CR>:cw<CR>
 nnoremap ,M :make! -C build<CR><CR>:cw<CR>
 set makeprg=ninja
@@ -500,6 +513,8 @@ augroup MyColors
     autocmd ColorScheme * call MyHighlights()
 augroup END
 colorscheme gruvbox
+" colorscheme tokyonight-night
+" colorscheme tokyonight-storm
 "hi Normal guibg=NONE ctermbg=NONE
 
 
@@ -540,7 +555,7 @@ nnoremap <leader>cd :cd %:p:h<CR>
 
 
 "ripgrep
-nnoremap <c-f> :RgFzf *<CR>
+" nnoremap <c-f> :RgFzf *<CR>
 "nnoremap <c-f> :Rg -tc -tcpp -ttxt *<CR>
 " nnoremap <c-f> y:Rg <C-r>"<CR>:cw<CR>
 "nnoremap <c-f> y:Rg -tc -tcpp -ttxt <C-r>"<CR>:cw<CR>
@@ -556,10 +571,10 @@ nnoremap <leader>i :so ~/.config/nvim/init.vim<CR>
 "formatting
 let g:clang_format#detect_style_file = 1
 let g:clang_format#enable_fallback_style = 0
-nnoremap ,f :ClangFormat<CR>
+" nnoremap ,f :ClangFormat<CR>
 
 "cpp copy class method definition for pasting in class declaration 
-" nnoremap <leader>hh yypwd2wA;<ESC>I  <ESC>ddk<CR>
+nnoremap ,h ==wwd2wA;<ESC>:w<CR>
 " nnoremap <leader>hh pwd2wA;<ESC>I  <ESC>
 
 "cmake output filtering
@@ -574,3 +589,7 @@ nnoremap n nzzzv
 nnoremap N Nzzzv
 
 autocmd FileType cpp set keywordprg=cppman
+
+nnoremap ,f :setlocal foldmethod=syntax<CR>
+
+" map ,f :call getline(search("^[^ \t#/]\\{2}.*[^:]\s*$", 'bW')) <CR> %%b

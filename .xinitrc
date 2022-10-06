@@ -4,7 +4,7 @@
 xset r rate 250 60 
 
 # multi screen
-xrandr --output HDMI-0 --auto --right-of eDP-1-1
+xrandr --output HDMI-0 --auto --mode "1920x1080" --right-of eDP-1-1
 
 # _vga=$( xrandr  | sed -n 's/^\(VGA.\).*/\1/pg')
 # alias laptop='xrandr --output LVDS1 --auto --output $_vga --off'
