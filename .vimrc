@@ -327,16 +327,16 @@ let g:termdebug_wide = 163
 nnoremap <leader>dd :Termdebug<CR>
 
 " nnoremap <leader>dg :Gdb<CR>
-" nnoremap <leader>db :Break<CR>
+nnoremap <leader>ddb :Break<CR>
 " nnoremap <leader>dbs :call TermDebugSendCommand('save br .breaks')<CR>
 " nnoremap <leader>dbl :call TermDebugSendCommand('source .breaks')<CR>
 " nnoremap <leader>dx :Clear<CR>
-" nnoremap <leader>ds :Step<CR>
+nnoremap <leader>dds :Step<CR>
 " nnoremap <leader>dr :Run<CR>
 " nnoremap <leader>dl :Over<CR>
 " nnoremap <leader>dj :Step<CR>
 " nnoremap <leader>dk :Finish<CR>
-" nnoremap <leader>dc :Continue<CR>
+nnoremap <leader>ddc :Continue<CR>
 
 nnoremap <leader>dq :call TermDebugSendCommand('q')<CR>
 "termina sessione remota gdbServer:
@@ -404,7 +404,7 @@ let g:fzf_layout = { 'window': { 'width': 0.8, 'height': 0.8 } }
 
 "harpoon
 nnoremap <leader>hh :lua require("harpoon.mark").add_file()<CR>
-nnoremap <leader>hf :lua require("harpoon.ui").toggle_quick_menu()<CR>
+nnoremap <leader>hs :lua require("harpoon.ui").toggle_quick_menu()<CR>
 nnoremap <leader>1 :lua require("harpoon.ui").nav_file(1)<CR>
 nnoremap <leader>2 :lua require("harpoon.ui").nav_file(2)<CR>
 nnoremap <leader>3 :lua require("harpoon.ui").nav_file(3)<CR>
@@ -590,6 +590,6 @@ nnoremap N Nzzzv
 
 autocmd FileType cpp set keywordprg=cppman
 
-nnoremap ,f :setlocal foldmethod=syntax<CR>
+nnoremap ,f :setlocal foldmethod=syntax<CR>zM
 
 " map ,f :call getline(search("^[^ \t#/]\\{2}.*[^:]\s*$", 'bW')) <CR> %%b
