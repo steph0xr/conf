@@ -1,5 +1,6 @@
-"debug
-let g:termdebugger = "/home/steph/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gdb"
+"Termdebug
+packadd termdebug
+let g:termdebugger = "xtensa-esp32-elf-gdb"
 
 "xtensa-clang
 let g:ycm_clangd_uses_ycmd_caching = 0
@@ -22,9 +23,9 @@ nnoremap ,cx :CMakeClean<CR>
 nnoremap ,cz :CMakeClose<CR>
 nnoremap ,c :CMakeGenerate!<CR>
 " Make dispatch to tmux
-nnoremap ,m :Make -C build<CR><CR>:cw<CR>
-nnoremap ,k :Make -v -C build<CR><CR>:cw<CR>
-nnoremap ,M :make! -C build<CR><CR>:cw<CR>
+nnoremap ,m :wa<CR> :Make -C build<CR><CR>:cw<CR>
+nnoremap ,M :Make -v -C build<CR><CR>:cw<CR>
+" nnoremap , :make! -C build<CR><CR>:cw<CR>
 set makeprg=ninja
 "nnoremap ,cw :CMakeClean<CR>:CMakeGenerate<CR>:make! -C build<CR><CR>:cw<CR>
 
@@ -34,10 +35,21 @@ nnoremap ,cv :!cd build && ninja clean<CR>
 nnoremap ,ce :!cd build && ninja<CR>
 nnoremap ,ca :!cmake -GNinja -B ../build && cmake --build ../build -v<CR>
 " nnoremap ,j :!esp-app-flash<CR>
-nnoremap ,l :Dispatch idf.py app-flash<CR>
-nnoremap ,L :Dispatch idf.py flash<CR>
-nnoremap ,j :Dispatch esp-app-flash<CR>
-nnoremap ,J :Dispatch esp-flash<CR>
+" nnoremap ,J :Dispatch idf.py app-flash<CR>
+nnoremap ,J :Dispatch idf.py flash monitor<CR>
+nnoremap ,aa :Dispatch! idf.py flash monitor<CR>
+nnoremap ,Z :Dispatch idf.py monitor<CR>
+nnoremap ,zz :Dispatch! idf.py monitor<CR>
+nnoremap ,k :exe "!tmux send -t make 'C-]'"<CR><C-L>
+nnoremap ,< :exe "!tmux select-window -t make"<CR>
+" nnoremap ,< :exe "!tmux set mouse on"<CR>
+nmap ,a ,k,aa,<
+nmap ,z ,k,zz,<
+
+" nnoremap ,k :Dispatch! idf.py monitor<CR>
+nnoremap ,l :Dispatch .conf/esp-app-flash.sh<CR>
+nnoremap ,L :Dispatch .conf/esp-flash.sh<CR>
 nnoremap ,r :silent !esp-reset<CR>
-nnoremap ,d :Dispatch espcoredump.py --port /dev/ttyUSB1 dbg_corefile build/mini-gateway.elf -o 4284416 --save-core coredump<CR>
-nnoremap ,e :Dispatch idf.py erase_flash<CR>
+" nnoremap ,d :Dispatch espcoredump.py --port /dev/ttyUSB1 dbg_corefile build/mini-gateway.elf -o 4284416 --save-core coredump<CR>
+nnoremap ,ee :Dispatch idf.py erase_flash<CR>
+nnoremap ,eo :Dispatch idf.py erase_otadata<CR>

@@ -216,6 +216,7 @@
   Plug 'preservim/nerdcommenter'
   Plug 'rhysd/vim-clang-format'
   Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
+  Plug 'ThePrimeagen/vim-be-good'
    " Plug 'nvim-telescope/telescope-fzy-native.nvim'
 
   "Plug 'junegunn/gv.vim'
@@ -404,7 +405,7 @@ let g:fzf_layout = { 'window': { 'width': 0.8, 'height': 0.8 } }
 
 "harpoon
 nnoremap <leader>hh :lua require("harpoon.mark").add_file()<CR>
-nnoremap <leader>hs :lua require("harpoon.ui").toggle_quick_menu()<CR>
+nnoremap <leader>hf :lua require("harpoon.ui").toggle_quick_menu()<CR>
 nnoremap <leader>1 :lua require("harpoon.ui").nav_file(1)<CR>
 nnoremap <leader>2 :lua require("harpoon.ui").nav_file(2)<CR>
 nnoremap <leader>3 :lua require("harpoon.ui").nav_file(3)<CR>
@@ -426,7 +427,6 @@ nnoremap ,cz :CMakeClose<CR>
 nnoremap ,c :CMakeGenerate!<CR>
 " Make dispatch to tmux
 nnoremap ,m :Make -C build<CR><CR>:cw<CR>
-nnoremap ,k :Make -v -C build<CR><CR>:cw<CR>
 nnoremap ,M :make! -C build<CR><CR>:cw<CR>
 set makeprg=ninja
 nnoremap ,r :Start build/src/application/EVStateManagerAPP<CR>
@@ -591,5 +591,7 @@ nnoremap N Nzzzv
 autocmd FileType cpp set keywordprg=cppman
 
 nnoremap ,f :setlocal foldmethod=syntax<CR>zM
+
+nnoremap ,p iprintf("\n");<ESC>
 
 " map ,f :call getline(search("^[^ \t#/]\\{2}.*[^:]\s*$", 'bW')) <CR> %%b
