@@ -326,20 +326,20 @@ packadd termdebug
 " let g:termdebug_popup = 0
 let g:termdebug_wide = 163
 nnoremap <leader>dd :Termdebug<CR>
+nnoremap <leader>ddd :Termdebug<CR>
 
 " nnoremap <leader>dg :Gdb<CR>
 nnoremap <leader>ddb :Break<CR>
 " nnoremap <leader>dbs :call TermDebugSendCommand('save br .breaks')<CR>
 " nnoremap <leader>dbl :call TermDebugSendCommand('source .breaks')<CR>
-" nnoremap <leader>dx :Clear<CR>
+nnoremap <leader>ddx :Clear<CR>
 nnoremap <leader>dds :Step<CR>
-" nnoremap <leader>dr :Run<CR>
-" nnoremap <leader>dl :Over<CR>
-" nnoremap <leader>dj :Step<CR>
-" nnoremap <leader>dk :Finish<CR>
+nnoremap <leader>ddr :Run<CR>
+nnoremap <leader>ddn :Over<CR>
+nnoremap <leader>dds :Step<CR>
+nnoremap <leader>ddf :Finish<CR>
 nnoremap <leader>ddc :Continue<CR>
-
-nnoremap <leader>dq :call TermDebugSendCommand('q')<CR>
+nnoremap <leader>ddq :call TermDebugSendCommand('q')<CR>
 "termina sessione remota gdbServer:
 " nnoremap ,de :call TermDebugSendCommand('mon exit')<CR>
 "packadd! vimspector
@@ -595,3 +595,5 @@ nnoremap ,f :setlocal foldmethod=syntax<CR>zM
 nnoremap ,p iprintf("\n");<ESC>
 
 " map ,f :call getline(search("^[^ \t#/]\\{2}.*[^:]\s*$", 'bW')) <CR> %%b
+
+let g:netrw_keepdir=0

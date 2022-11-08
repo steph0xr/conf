@@ -158,6 +158,12 @@ dap.adapters.cppdbg = {
   command = '/opt/vscode-cpptools/extension/debugAdapters/bin/OpenDebugAD7',
 }
 
+local env_file = vim.fn.getcwd() .. '/build/project_description.json'
+local esp_env = vim.fn.join(vim.fn.readfile(env_file), "\n")
+local data = vim.fn.json_decode(esp_env)
+ local elf = vim.fn.get(data, 'app_elf', {})
+--print(elf)
+
 local dap = require('dap')
 dap.configurations.cpp = {
   -- {
@@ -170,25 +176,41 @@ dap.configurations.cpp = {
   --   cwd = '${workspaceFolder}',
   --   stopOnEntry = true,
   -- },
-  {
-    name = "Launch cmake file",
-    type = "cppdbg",
-    request = "launch",
-    program = vim.fn.getcwd() .. '/build/main/main',
-    cwd = '${workspaceFolder}',
-    stopOnEntry = true,
-  },
+  -- default cmake cpp desktop appl:
+  -- {
+  --   name = "Launch cmake file",
+  --   type = "cppdbg",
+  --   request = "launch",
+  --   program = vim.fn.getcwd() .. '/build/main/main',
+  --   cwd = '${workspaceFolder}',
+  --   stopOnEntry = true,
+  -- },
   {
     name = 'esp32 Attach to gdbserver :3333',
     type = 'cppdbg',
     request = 'launch',
     MIMode = 'gdb',
     miDebuggerServerAddress = 'localhost:3333',
-    -- miDebuggerPath = '/usr/bin/gdb',
     miDebuggerPath = 'xtensa-esp32-elf-gdb',
     cwd = '${workspaceFolder}',
-    program = vim.fn.getcwd() .. '/build/driver_testing.elf',
+    program = string.format(vim.fn.getcwd() .. '/build/%s', elf),
+    -- externalConsole = true,
+   --setupCommands = {  
+     --{ text = 'set remotetimeout 15000' },
+     --{ text = 'file build/hello_world.elf' },
+     --{ text = 'target remote :3333' },
+     --{ text = 'set remote hardware-watchpoint-limit 2'},
+     --{ text = 'mon reset halt' },
+     --{ text = 'hb app_main' },
+     --{ text = 'flushregs' },
+     --{ text = '-enable-pretty-printing' }
+   --},
+    
+    logging = { 
+      engineLogging = true 
+      }
   },
 }
+dap.configurations.c = dap.configurations.cpp
 
 EOF
