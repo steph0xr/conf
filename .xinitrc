@@ -11,8 +11,6 @@ xrandr --output HDMI-0 --auto --mode "1920x1080" --right-of eDP-1-1
 # alias monitor='xrandr --output LVDS1 --off --output $_vga --auto'
 # alias dual='xrandr --output LVDS1 --auto --left-of $_vga --output $_vga --auto'
 
-# caps lock remap to ctrl
-setxkbmap -option ctrl:nocaps
 
 # bg image
 feh --bg-scale /home/steph/Immagini/elCap.jpg
@@ -20,5 +18,35 @@ feh --bg-scale /home/steph/Immagini/elCap.jpg
 # keyring chiavi ssh
 eval $(/usr/bin/gnome-keyring-daemon --start)
 export SSH_AUTH_SOCK
+
+### KEY REMAPPING ###
+# caps lock remap to ctrl_l
+setxkbmap -option ctrl:nocaps
+setxkbmap -option ctrl:menu_lctrl
+
+# win_r key to ctrl_r
+xmodmap -e "remove mod4 = Super_R"
+xmodmap -e "add control = Super_R"
+
+# # context menu key à to ctrl_r
+# xmodmap -e 'remove control = Control_R'
+# xmodmap -e 'keycode 48 = Control_R'
+# xmodmap -e 'add control = Control_R'
+# # à key to ctrl_r
+# xmodmap -e "keycode 51 = ugrave agrave"
+
+# remap "#" as shift-3 key
+xmodmap -e "keycode  12 = 3 numbersign 3 numbersign threesuperior dead_tilde threesuperior"
+
+# remap $ as shift-ò key
+xmodmap -e "keycode  47 = ograve dollar ograve dollar ccedilla dead_cedilla ccedilla"
+
+# remap @ as shift-4 key
+xmodmap -e "keycode  13 = 4 at 4 at onequarter oneeighth onequarter oneeighth 4 at onequarter oneeighth"
+
+# xmodmap -pm
+# xmodmap -pke
+
+####
 
 exec i3

@@ -157,10 +157,6 @@
   " nnoremap / -
   " vnoremap / -
 
-  "search under cursor no ita 
-  nnoremap é #
-  " nnoremap ) *
-
   nnoremap <leader>t :term<CR>
   tnoremap <c-q> <C-\><C-n>
 
@@ -434,6 +430,8 @@ nnoremap ,R :Dispatch build/main/main<CR>
 " nnoremap ,e :w<CR>:Make -C build<CR><CR>:cw<CR> \| :Start build/main/main<CR><CR>:cw<CR>
 "nnoremap ,cw :CMakeClean<CR>:CMakeGenerate<CR>:make! -C build<CR><CR>:cw<CR>
 
+" compilation: remove jump to warnings  
+set errorformat^=%-G%f:%l:\ warning:%m
 
 "vim.cpp
 " let g:cpp_class_scope_highlight = 1
