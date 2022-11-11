@@ -159,10 +159,18 @@ dap.adapters.cppdbg = {
 }
 
 local env_file = vim.fn.getcwd() .. '/build/project_description.json'
-local esp_env = vim.fn.join(vim.fn.readfile(env_file), "\n")
-local data = vim.fn.json_decode(esp_env)
- local elf = vim.fn.get(data, 'app_elf', {})
---print(elf)
+local elf = ""
+local f, err = io.open(env_file, "r")
+if f then
+  local esp_env = f:read("*all")
+  --print(esp_env)
+  local data = vim.fn.json_decode(esp_env)
+  local elf = vim.fn.get(data, 'app_elf', {})
+  --print(elf)
+  f:close()
+--else
+--   print("no project_description.json found.")
+end
 
 local dap = require('dap')
 dap.configurations.cpp = {
