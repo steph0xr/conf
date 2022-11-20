@@ -38,6 +38,9 @@ xmodmap -e "keycode 51 = ugrave agrave"
 # remap "#" as shift-3 key
 xmodmap -e "keycode  12 = 3 numbersign 3 numbersign threesuperior dead_tilde threesuperior"
 
+# remap ç as ~ key
+xmodmap -e "keycode  47 = ograve asciitilde semicolon colon at asciitilde"
+
 # remap $ as shift-ò key
 #xmodmap -e "keycode  47 = ograve dollar ograve dollar ccedilla dead_cedilla ccedilla"
 
