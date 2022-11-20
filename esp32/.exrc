@@ -1,6 +1,18 @@
 "Termdebug
 packadd termdebug
 let g:termdebugger = "xtensa-esp32-elf-gdb"
+nnoremap ùd :Termdebug -q<CR>G<C-w>j<CR>:term<CR>Asu1<CR><C-\><C-n>G
+nnoremap ùr :Termdebug -q<CR>G<C-w>j<CR>:term<CR>Asu1<CR><C-\><C-n>G<C-w>l:Continue<CR>
+nnoremap ùt :Termdebug -q<CR>G<C-w>j<CR>:term<CR>Asu1<CR><C-\><C-n>G:call TermDebugSendCommand('esp-all')<CR>
+nnoremap ùa :call TermDebugSendCommand('eflash')<CR>
+nnoremap ùw :call TermDebugSendCommand('esp-all')<CR>
+nnoremap ùq :call TermDebugSendCommand('q')<CR>:Gdb<CR>:call TermDebugSendCommand('save break .breakpoints')<CR>:q<CR>A<C-a>x<CR><C-\><C-n>:q<CR>
+nnoremap ùi :call TermDebugSendCommand('esp-restart')<CR>
+nnoremap ùz :call TermDebugSendCommand('esp-restart-continue')<CR>
+
+
+" nnoremap ùd :Termdebug $velf<CR>
+
 
 "xtensa-clang
 let g:ycm_clangd_uses_ycmd_caching = 0
@@ -40,6 +52,7 @@ nnoremap ,J :Dispatch idf.py flash monitor<CR>
 nnoremap ,aa :Dispatch! idf.py flash monitor<CR>
 nnoremap ,Z :Dispatch idf.py monitor<CR>
 nnoremap ,zz :Dispatch! idf.py monitor<CR>
+nnoremap \o :Dispatch openocd -f .conf/openocd.cfg<CR><leader>ddd
 nnoremap ,k :exe "!tmux send -t make 'C-]'"<CR><C-L>
 nnoremap ,< :exe "!tmux select-window -t make"<CR>
 " nnoremap ,< :exe "!tmux set mouse on"<CR>

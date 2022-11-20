@@ -318,24 +318,27 @@ set statusline+=\%b\ 0x%B\|\ %l,%c%V\ \ %P
 "Termdebug
 packadd termdebug
 " let g:termdebugger = "/home/steph/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gdb"
-
 " let g:termdebug_popup = 0
-let g:termdebug_wide = 163
-nnoremap <leader>dd :Termdebug<CR>
-nnoremap <leader>ddd :Termdebug<CR>
-
+" let g:termdebug_wide = 163
+let g:termdebug_wide = 0 
+nnoremap ùd :Termdebug<CR>
 " nnoremap <leader>dg :Gdb<CR>
-nnoremap <leader>ddb :Break<CR>
-" nnoremap <leader>dbs :call TermDebugSendCommand('save br .breaks')<CR>
-" nnoremap <leader>dbl :call TermDebugSendCommand('source .breaks')<CR>
-nnoremap <leader>ddx :Clear<CR>
-nnoremap <leader>dds :Step<CR>
-nnoremap <leader>ddr :Run<CR>
-nnoremap <leader>ddn :Over<CR>
-nnoremap <leader>dds :Step<CR>
-nnoremap <leader>ddf :Finish<CR>
-nnoremap <leader>ddc :Continue<CR>
-nnoremap <leader>ddq :call TermDebugSendCommand('q')<CR>
+nnoremap ùb :Break<CR>
+nnoremap ùc :Continue<CR>
+nnoremap ùe :Evaluate<CR>
+nnoremap ùf :Finish<CR>
+nnoremap ùh :Stop<CR>
+nnoremap ùm :call TermDebugSendCommand('source .breakpoints')<CR>
+nnoremap ùo :call TermDebugSendCommand('save br .breakpoints')<CR>
+nnoremap ùy :call TermDebugSendCommand('info breakpoints')<CR>
+nnoremap ùu :call TermDebugSendCommand('delete breakpoints')<CR>
+nnoremap ùn :Over<CR>
+nnoremap ùx :Clear<CR>
+nnoremap ùs :Step<CR>
+nnoremap ùr :Run<CR>
+nnoremap ùs :Step<CR>
+nnoremap ùq :call TermDebugSendCommand('q')<CR>:Gdb<CR>:q<CR>:call TermDebugSendCommand('save br .breakpoints')<CR>
+nnoremap ùv :call TermDebugSendCommand('signal SIGINT')<CR>
 "termina sessione remota gdbServer:
 " nnoremap ,de :call TermDebugSendCommand('mon exit')<CR>
 "packadd! vimspector

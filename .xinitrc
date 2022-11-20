@@ -28,24 +28,25 @@ setxkbmap -option ctrl:menu_lctrl
 xmodmap -e "remove mod4 = Super_R"
 xmodmap -e "add control = Super_R"
 
-# # context menu key à to ctrl_r
-# xmodmap -e 'remove control = Control_R'
-# xmodmap -e 'keycode 48 = Control_R'
-# xmodmap -e 'add control = Control_R'
-# # à key to ctrl_r
-# xmodmap -e "keycode 51 = ugrave agrave"
+# context menu key à to ctrl_r
+xmodmap -e 'remove control = Control_R'
+xmodmap -e 'keycode 48 = Control_R'
+xmodmap -e 'add control = Control_R'
+# à key to ctrl_r
+xmodmap -e "keycode 51 = ugrave agrave"
 
 # remap "#" as shift-3 key
 xmodmap -e "keycode  12 = 3 numbersign 3 numbersign threesuperior dead_tilde threesuperior"
 
 # remap $ as shift-ò key
-xmodmap -e "keycode  47 = ograve dollar ograve dollar ccedilla dead_cedilla ccedilla"
+#xmodmap -e "keycode  47 = ograve dollar ograve dollar ccedilla dead_cedilla ccedilla"
 
 # remap @ as shift-4 key
-xmodmap -e "keycode  13 = 4 at 4 at onequarter oneeighth onequarter oneeighth 4 at onequarter oneeighth"
+#xmodmap -e "keycode  13 = 4 at 4 at onequarter oneeighth onequarter oneeighth 4 at onequarter oneeighth"
 
 # xmodmap -pm
 # xmodmap -pke
+#setxkbmap -layout it
 
 ####
 

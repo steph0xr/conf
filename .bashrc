@@ -174,8 +174,9 @@ export PS1="${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 #cose per expressif
-alias get_idf='. /hdd1/esp/esp-idf-v4.3/export.sh'
-alias get_idf_44='. /hdd1/esp/esp-idf-v4.4/export.sh'
+alias idf43='. /hdd1/esp/esp-idf-v4.3/export.sh'
+alias idf44='. /hdd1/esp/esp-idf-v4.4/export.sh'
+alias idf50='. /hdd1/esp/esp-idf-v5.0/export.sh'
 #alias python=python3
 
 # export NVM_DIR="$HOME/.nvm"
