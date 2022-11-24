@@ -1,0 +1,42 @@
+#! /bin/bash
+
+SESSIONNAME="my_project_name"
+DIRECTORY="project_folder"
+ESP_DIRECTORY="/hdd1/esp/esp-idf-v4.4"
+
+tmux has-session -t $SESSIONNAME &> /dev/null
+
+if [ $? != 0 ] 
+ then
+    tmux new-session -s $SESSIONNAME -n 'bash' -c $DIRECTORY -d
+    tmux send-keys -t $SESSIONNAME "idf44" C-m 
+    tmux send-keys -t $SESSIONNAME "clear" C-m 
+
+    tmux new-window -n 'git' -c $DIRECTORY -t 0 
+    tmux send-keys -t $SESSIONNAME "idf44" C-m 
+    tmux send-keys -t $SESSIONNAME "clear" C-m 
+
+    tmux new-window -n 'vim' -c $DIRECTORY -t 9
+    tmux send-keys -t $SESSIONNAME "idf44" C-m 
+    tmux send-keys -t $SESSIONNAME "clear" C-m 
+    tmux send-keys -t $SESSIONNAME "vi" C-m 
+
+    tmux new-window -n 'openocd' -c $DIRECTORY -t 8
+    tmux send-keys -t $SESSIONNAME "idf44" C-m 
+    tmux send-keys -t $SESSIONNAME "clear" C-m 
+    tmux send-keys -t $SESSIONNAME "openocd -f openocd.cfg" C-m 
+
+    tmux new-window -n 'menuconfig' -c $DIRECTORY -t 7
+    tmux send-keys -t $SESSIONNAME "idf44" C-m 
+    tmux send-keys -t $SESSIONNAME "clear" C-m 
+    tmux send-keys -t $SESSIONNAME "idf.py menuconfig" C-m 
+
+    tmux new-window -n 'esp' -c $ESP_DIRECTORY -t 6
+    tmux send-keys -t $SESSIONNAME "idf44" C-m 
+    tmux send-keys -t $SESSIONNAME "clear" C-m 
+
+
+    tmux select-window -t 0 
+fi
+
+tmux attach -t $SESSIONNAME
