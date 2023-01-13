@@ -53,7 +53,7 @@ nnoremap ,aa :Dispatch! idf.py flash monitor<CR>
 nnoremap ,Z :Dispatch idf.py monitor<CR>
 nnoremap ,zz :Dispatch! idf.py monitor<CR>
 nnoremap \o :Dispatch openocd -f .conf/openocd.cfg<CR><leader>ddd
-nnoremap ,k :exe "!tmux send -t make 'C-]'"<CR><C-L>
+nnoremap ,k :exe "!tmux send -t make 'A'"<CR>:exe "!tmux send -t make 'C-]'"<CR><C-L>
 nnoremap ,< :exe "!tmux select-window -t make"<CR>
 " nnoremap ,< :exe "!tmux set mouse on"<CR>
 nmap ,a ,k,aa,<

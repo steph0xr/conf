@@ -10,9 +10,6 @@
   "set bg=light
   set bg=dark
   highlight Comment cterm=italic gui=italic
-  " colorscheme gruvbox
-  "highlight Normal guibg=NONE ctermbg=NONE
-  "colorscheme desert
 
   syntax enable
   set mouse=a
@@ -42,8 +39,16 @@
   set path+=** "search down into subfolders-provides tab-completion for all file related task
 
   " set foldmethod=syntax "folding
-  autocmd FileType c setlocal foldmethod=syntax
-  set foldlevel=99
+  " autocmd FileType c setlocal foldmethod=syntax
+  " set foldlevel=99
+  " nnoremap ,f :setlocal foldmethod=syntax<CR>zM
+
+  " treesitter folding
+  set foldmethod=expr
+  set foldexpr=nvim_treesitter#foldexpr()
+  set nofoldenable                     " Disable folding at startup.
+  nnoremap ,ff :setlocal foldmethod=expr<CR>zM
+  nnoremap ,fs :setlocal foldmethod=syntax<CR>zM
 
   set scrolloff=8
   set signcolumn=yes
@@ -117,10 +122,6 @@
   noremap <C-Left> :vertical resize -5<CR>
   noremap <C-Up> :resize +5<CR>
   noremap <C-Down> :resize -5<CR>
-  noremap \l :vertical resize +5<CR>
-  noremap \h :vertical resize -5<CR>
-  noremap \k :resize +5<CR>
-  noremap \j :resize -5<CR>
 
   "disabilitare freccie
   "nnoremap <Left> :echo "No left for you!"<CR>
@@ -159,6 +160,7 @@
 
   nnoremap <leader>t :term<CR>
   tnoremap <c-q> <C-\><C-n>
+  tnoremap <ESC> <C-\><C-n>
 
   nnoremap <leader>el :20Lex<CR>
   nnoremap <leader>ee :Ex<CR>
@@ -211,7 +213,6 @@
   Plug 'airblade/vim-gitgutter'
   Plug 'preservim/nerdcommenter'
   Plug 'rhysd/vim-clang-format'
-  Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
   Plug 'ThePrimeagen/vim-be-good'
    " Plug 'nvim-telescope/telescope-fzy-native.nvim'
 
@@ -228,13 +229,12 @@
   if has('nvim')
     "lsp Plugins
     Plug 'neovim/nvim-lspconfig'
-    " Plug 'nvim-lua/completion-nvim'
     Plug 'hrsh7th/nvim-cmp'
     Plug 'hrsh7th/cmp-nvim-lsp'
     Plug 'hrsh7th/cmp-buffer'
     Plug 'hrsh7th/cmp-path'
     Plug 'hrsh7th/cmp-cmdline'
-    Plug 'L3MON4D3/LuaSnip'
+    " Plug 'L3MON4D3/LuaSnip'
     " Plug 'hrsh7th/vim-vsnip'
     " Plug 'hrsh7th/cmp-vsnip'
     Plug 'onsails/lspkind-nvim'
@@ -246,12 +246,15 @@
     " Neovim Tree shitter
     Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
     Plug 'nvim-treesitter/playground'
-    Plug 'ThePrimeagen/harpoon'
+    Plug 'nvim-treesitter/nvim-treesitter-textobjects'
 
+    Plug 'ThePrimeagen/harpoon'
     Plug 'mfussenegger/nvim-dap'
     Plug 'rcarriga/nvim-dap-ui'
     Plug 'mfussenegger/nvim-dap-python'
     Plug 'szw/vim-maximizer'
+    Plug 'mbbill/undotree'
+    Plug 'rose-pine/neovim'
 
 
   " else
@@ -273,8 +276,11 @@ nnoremap <leader>fh <cmd>Telescope help_tags<cr>
 nnoremap <leader>f. <cmd>Telescope search_dotfiles<cr>
 nnoremap <leader>fg <cmd>Telescope git_files<cr>
 nnoremap <leader>fc <cmd>Telescope git_commits<cr>
+nnoremap <leader>ft <cmd>Telescope git_status<cr>
 nnoremap <leader>fr <cmd>Telescope git_branches<cr>
 nnoremap <leader>fl <cmd>Telescope live_grep<cr>
+" nnoremap <leader>fx <cmd>Telescope oldfiles<cr>
+nnoremap <leader>fx <cmd>Telescope diagnostics<cr>
 nnoremap <leader>fa :lua require('telescope.builtin').grep_string({ search = vim.fn.input("Grep For > ")})<CR>
 nnoremap <leader>fs :lua require('telescope.builtin').grep_string({ file_ignore_patterns = {'%.js','%.html'}, search = vim.fn.input("Grep For > ")})<CR>
 " nnoremap <leader>fv :lua require('telescope.builtin').grep_string({ file_ignore_patterns = {'%.js','%.html'}, search_dirs={"%:p"}, word_match = "-w", search = vim.fn.input("Grep For > "), previewer = false})<CR>
@@ -428,7 +434,6 @@ nnoremap ,c :CMakeGenerate!<CR>
 nnoremap ,m :Make -C build<CR><CR>:cw<CR>
 nnoremap ,M :make! -C build<CR><CR>:cw<CR>
 set makeprg=ninja
-nnoremap ,r :Start build/src/application/EVStateManagerAPP<CR>
 nnoremap ,R :Dispatch build/main/main<CR>
 " nnoremap ,e :w<CR>:Make -C build<CR><CR>:cw<CR> \| :Start build/main/main<CR><CR>:cw<CR>
 "nnoremap ,cw :CMakeClean<CR>:CMakeGenerate<CR>:make! -C build<CR><CR>:cw<CR>
@@ -505,18 +510,16 @@ map <F4> :match Conceal /\t/
 "set match Error /\S\zs\s\+$
 
 " colorscheme e bg transparent
-function! MyHighlights() abort
-     hi Normal guibg=NONE ctermbg=NONE
-endfunction
+" function! MyHighlights() abort
+     " hi Normal guibg=NONE ctermbg=NONE
+" endfunction
 
-augroup MyColors
-    autocmd!
-    autocmd ColorScheme * call MyHighlights()
-augroup END
-colorscheme gruvbox
-" colorscheme tokyonight-night
-" colorscheme tokyonight-storm
-"hi Normal guibg=NONE ctermbg=NONE
+" augroup MyColors
+    " autocmd!
+    " autocmd ColorScheme * call MyHighlights()
+" augroup END
+" colorscheme gruvbox
+" colorscheme rose-pine
 
 
 "cycle throught items in cwindow and lwindow
@@ -591,10 +594,17 @@ nnoremap N Nzzzv
 
 autocmd FileType cpp set keywordprg=cppman
 
-nnoremap ,f :setlocal foldmethod=syntax<CR>zM
 
 nnoremap ,p iprintf("\n");<ESC>
 
 " map ,f :call getline(search("^[^ \t#/]\\{2}.*[^:]\s*$", 'bW')) <CR> %%b
 
 let g:netrw_keepdir=0
+
+nnoremap <leader>u :UndotreeToggle<CR>
+
+" remove // when line before is commented
+" set formatoptions-=cro
+autocmd BufNewFile,BufRead * setlocal formatoptions-=cro
+
+" nnoremap <leader>\ :Copilot enable<CR>

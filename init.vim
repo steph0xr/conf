@@ -2,23 +2,6 @@ set runtimepath^=~/.vim runtimepath+=~/.vim/after
 let &packpath = &runtimepath
 source ~/.vimrc
 
-
-"vim.lsp - nvim-lspconfig
-lua <<EOF
-
-local lspconfig = require'lspconfig'.clangd.setup {
---cmd = { "clangd", "--background-index", "--query-driver=/usr/bin/gcc"}
-  cmd = { 
-    "clangd", 
-    "--background-index" 
-  },
-}
-EOF
-
-" lua vim.lsp.set_log_level("debug")
-"
-
-
 nnoremap gd :lua vim.lsp.buf.definition()<CR>
 nnoremap gi :lua vim.lsp.buf.implementation()<CR>
 nnoremap gr :lua vim.lsp.buf.references()<CR>
@@ -45,80 +28,63 @@ nnoremap <leader>LL :lua vim.cmd('e'..vim.lsp.get_log_path())<CR>
 
 set completeopt=menu,menuone,noselect
 
+"vim.lsp - nvim-lspconfig
 lua <<EOF
--- luasnip setup
--- local luasnip = require 'luasnip'
--- local vsnip = require 'vsnip'
 
--- local lspkind = require("lspkind")
--- require('lspkind').init({
---     with_text = true,
--- })
+local lspconfig = require'lspconfig'.clangd.setup {
+--cmd = { "clangd", "--background-index", "--query-driver=/usr/bin/gcc"}
+  cmd = { 
+    "clangd", 
+    "--background-index" 
+  },
+}
+EOF
 
+" lua vim.lsp.set_log_level("debug")
+
+
+
+lua << EOF
 -- Setup nvim-cmp.
 local cmp = require 'cmp'
-local source_mapping = {
-	buffer = "[Buffer]",
---	nvim_lsp = "[LSP]",
---	nvim_lua = "[Lua]",
---	cmp_tabnine = "[TN]",
---	path = "[Path]",
-}
+local select_opts = {behavior = cmp.SelectBehavior.Select}
+
 cmp.setup({
-	snippet = {
-		expand = function(args)
-			require("luasnip").lsp_expand(args.body)
---			vim.fn["vsnip#anonymous"](args.body)
-			-- vim.fn["UltiSnips#Anon"](args.body)
-		end,
-	},
 	mapping = {
+    ['<C-p>'] = cmp.mapping.select_prev_item(select_opts),
+    ['<C-n>'] = cmp.mapping.select_next_item(select_opts),
 		["<C-u>"] = cmp.mapping.scroll_docs(-4),
 		["<C-d>"] = cmp.mapping.scroll_docs(4),
 		["<C-Space>"] = cmp.mapping.complete(),
 		["<C-e>"] = cmp.mapping.close(),
     ['<CR>'] = cmp.mapping.confirm({ select = true }),
 	},
---  formatting = {
---        format = function(entry, vim_item)
---            vim_item.kind = lspkind.presets.default[vim_item.kind]
---            local menu = source_mapping[entry.source.name]
---            if entry.source.name == 'cmp_tabnine' then
---                if entry.completion_item.data ~= nil and entry.completion_item.data.detail ~= nil then
---                    menu = entry.completion_item.data.detail .. ' ' .. menu
---                end
---                vim_item.kind = ''
---            end
---            vim_item.menu = menu
---            return vim_item
---        end
---  },
 	sources = {
-		-- { name = 'vsnip' },
 		{ name = "nvim_lsp" },
-		{ name = "luasnip" },
-		{ name = "buffer" },
+--		{ name = "buffer" },
+--		{ name = "luasnip" },
 		-- { name = 'ultisnips' },
+		-- { name = 'vsnip' },
 	},
+  formatting = {
+    fields = {'menu', 'abbr', 'kind'},
+    format = function(entry, item)
+      local menu_icon = {
+        nvim_lsp = '⋗',
+        buffer = 'Ω',
+        path = '🖫',
+      }
+
+      item.menu = menu_icon[entry.source.name]
+      return item
+    end,
+  },
+  window = {
+    -- completion = cmp.config.window.bordered(),
+    -- documentation = cmp.config.window.bordered(),
+    },
 })
 EOF
-
-" "nvim-completion
-" autocmd BufEnter * lua require'completion'.on_attach()
-" " lua vim.api.nvim_buf_set_option(0, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-" set completeopt=menuone,noinsert,noselect
-" let g:completion_sorting = "length"
-" let g:completion_matching_strategy_list = ['exact', 'substring', 'fuzzy']
-" let g:completion_trigger_character = ['::'] " c++ class
-" let g:completion_enable_auto_popup = 1
-" " completion with tab
-" inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
-" inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-" " completion trigger in insert mode
-" imap <tab> <Plug>(completion_smart_tab)
-" imap <s-tab> <Plug>(completion_smart_s_tab)
-" " Avoid showing message extra message when using completion
-" set shortmess+=c
 
 
 lua require('dap-python').setup('~/.virtualenvs/debugpy/bin/python')
@@ -221,4 +187,52 @@ dap.configurations.cpp = {
 }
 dap.configurations.c = dap.configurations.cpp
 
+
+
+require('rose-pine').setup({
+	--- @usage 'main' | 'moon'
+	dark_variant = 'moon',
+	bold_vert_split = false,
+	dim_nc_background = false,
+	disable_background = true,
+	disable_float_background = false,
+	disable_italics = false,
+
+	--- @usage string hex value or named color from rosepinetheme.com/palette
+	groups = {
+		background = 'base',
+		panel = 'surface',
+		border = 'highlight_med',
+		comment = 'muted',
+		link = 'iris',
+		punctuation = 'subtle',
+
+		error = 'love',
+		hint = 'iris',
+		info = 'foam',
+		warn = 'gold',
+
+		headings = {
+			h1 = 'iris',
+			h2 = 'foam',
+			h3 = 'rose',
+			h4 = 'gold',
+			h5 = 'pine',
+			h6 = 'foam',
+		}
+		-- or set all headings at once
+		-- headings = 'subtle'
+	},
+
+	-- Change specific vim highlight groups
+	highlight_groups = {
+		ColorColumn = { bg = 'rose' }
+	}
+})
+
+-- set colorscheme after options
+vim.cmd('colorscheme rose-pine')
+
 EOF
+
+

@@ -241,3 +241,5 @@ alias gsu='git submodule update'
 alias gss='git submodule status'
 alias gdt='git difftool --tool=vimdiff --no-prompt'
 alias gmt='git mergetool --tool=vimdiff --no-prompt'
+
+source ~/.nvm/nvm.sh
