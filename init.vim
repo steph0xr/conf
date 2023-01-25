@@ -47,7 +47,8 @@ EOF
 lua << EOF
 -- Setup nvim-cmp.
 local cmp = require 'cmp'
-local select_opts = {behavior = cmp.SelectBehavior.Select}
+-- the following will not autocomplete by default, but needs CR to be hit
+-- local select_opts = {behavior = cmp.SelectBehavior.Select}
 
 cmp.setup({
 	mapping = {
@@ -61,7 +62,7 @@ cmp.setup({
 	},
 	sources = {
 		{ name = "nvim_lsp" },
---		{ name = "buffer" },
+		{ name = "buffer" },
 --		{ name = "luasnip" },
 		-- { name = 'ultisnips' },
 		-- { name = 'vsnip' },
@@ -195,7 +196,7 @@ require('rose-pine').setup({
 	bold_vert_split = false,
 	dim_nc_background = false,
 	disable_background = true,
-	disable_float_background = false,
+	disable_float_background = true,
 	disable_italics = false,
 
 	--- @usage string hex value or named color from rosepinetheme.com/palette
@@ -233,6 +234,100 @@ require('rose-pine').setup({
 -- set colorscheme after options
 vim.cmd('colorscheme rose-pine')
 
+
+
+
+
+-- treesitter
+require'nvim-treesitter.configs'.setup {
+  -- A list of parser names, or "all" (the four listed parsers should always be installed)
+  ensure_installed = { "c", "cpp", "lua", "vim", "help" },
+
+  -- Install parsers synchronously (only applied to `ensure_installed`)
+  sync_install = false,
+
+  -- Automatically install missing parsers when entering buffer
+  -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
+  auto_install = true,
+
+  ---- If you need to change the installation directory of the parsers (see -> Advanced Setup)
+  -- parser_install_dir = "/some/path/to/store/parsers", -- Remember to run vim.opt.runtimepath:append("/some/path/to/store/parsers")!
+
+  highlight = {
+    enable = true,
+    -- disable = { "c", "rust" },
+    -- Or use a function for more flexibility, e.g. to disable slow treesitter highlight for large files
+    disable = function(lang, buf)
+        local max_filesize = 100 * 1024 -- 100 KB
+        local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+        if ok and stats and stats.size > max_filesize then
+            return true
+        end
+    end,
+    -- vim.api.nvim_set_hl(0, "@foo.bar.cpp", { link = "Identifier" })
+  },
+
+  textobjects = {
+    select = {
+      enable = true,
+      lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
+      keymaps = {
+        -- You can use the capture groups defined in textobjects.scm
+        ['aa'] = '@parameter.outer',
+        ['ia'] = '@parameter.inner',
+        ['af'] = '@function.outer',
+        ['if'] = '@function.inner',
+        ['ac'] = '@class.outer',
+        ['ic'] = '@class.inner',
+      },
+    },
+
+    move = {
+      enable = true,
+      set_jumps = true, -- whether to set jumps in the jumplist
+      goto_next_start = {
+        ["]m"] = '@function.outer',
+        [']]'] = '@class.outer',
+      },
+      goto_next_end = {
+        [']M'] = '@function.outer',
+        [']['] = '@class.outer',
+      },
+      goto_previous_start = {
+        ['[m'] = '@function.outer',
+        ['[['] = '@class.outer',
+      },
+      goto_previous_end = {
+        ['[M'] = '@function.outer',
+        ['[]'] = '@class.outer',
+      },
+    },
+    swap = {
+      enable = true,
+      swap_next = {
+        ['<leader>a'] = '@parameter.inner',
+      },
+      swap_previous = {
+        ['<leader>A'] = '@parameter.inner',
+      },
+    },
+  },
+
+  --  indent = { 
+  --    enable = true, disable = { 'python' } 
+  --  },
+  --
+  --  incremental_selection = {
+  --    enable = true,
+  --    keymaps = {
+  --      init_selection = '<c-space>',
+  --      node_incremental = '<c-space>',
+  --      scope_incremental = '<c-s>',
+  --      node_decremental = '<c-backspace>',
+  --    },
+  --  },
+}
+
+
+
 EOF
-
-

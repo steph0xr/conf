@@ -235,7 +235,7 @@ bindsym XF86MonBrightnessUp exec xrandr --output eDP-1-1 --brightness 1 # increa
 bindsym XF86MonBrightnessDown exec xrandr --output eDP-1-1 --brightness 0.5 # decrease screen brightness
 
 # lockscreen
-bindsym $mod+Shift+x exec i3lock -c 000000
+bindsym $mod+Shift+x exec i3lock -c 000000 
 
 # GET DEM BORDERS OUT OF HEREc:w
 for_window [class="^.*"] border pixel 3

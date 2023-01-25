@@ -88,7 +88,7 @@
 
   " command -nargs=* Vgrep vimgrep /\v<args>/g **/* | copen
   command -nargs=* VgrepInGit vimgrep /\v<args>/g `git ls-files` | copen
-  nnoremap § :VgrepInGit<SPACE>
+  " nnoremap § :VgrepInGit<SPACE>
 
 
   " bind  for breakpoints to clipboard for gdb
@@ -202,7 +202,7 @@
   Plug 'jreybert/vimagit'
   Plug 'tpope/vim-dispatch'
   " Plug 'octol/vim-cpp-enhanced-highlight'
-  Plug 'bfrg/vim-cpp-modern'
+  " Plug 'bfrg/vim-cpp-modern'
   Plug 'cdelledonne/vim-cmake'
   Plug 'tpope/vim-obsession'
   Plug 'junegunn/fzf'
@@ -323,7 +323,6 @@ set statusline+=\%b\ 0x%B\|\ %l,%c%V\ \ %P
 
 "Termdebug
 packadd termdebug
-" let g:termdebugger = "/home/steph/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gdb"
 " let g:termdebug_popup = 0
 " let g:termdebug_wide = 163
 let g:termdebug_wide = 0 

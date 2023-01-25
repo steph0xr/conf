@@ -49,6 +49,9 @@
   deleteRemoteBranch = push origin --delete
   co = checkout
   cos = checkout --recurse-submodules
+  pnr  = push -o merge_request.create
+  pnb  = push --set-upstream origin
+  pnbr  = push -o merge_request.create --set-upstream origin
 
 [diff]
 	guitool = kdiff3
