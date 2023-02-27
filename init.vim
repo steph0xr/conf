@@ -34,8 +34,9 @@ lua <<EOF
 local lspconfig = require'lspconfig'.clangd.setup {
 --cmd = { "clangd", "--background-index", "--query-driver=/usr/bin/gcc"}
   cmd = { 
-    "clangd", 
-    "--background-index" 
+    --"clangd-xtensa",
+    "clangd" 
+    -- "--background-index"
   },
 }
 EOF
@@ -254,7 +255,7 @@ require'nvim-treesitter.configs'.setup {
   -- parser_install_dir = "/some/path/to/store/parsers", -- Remember to run vim.opt.runtimepath:append("/some/path/to/store/parsers")!
 
   highlight = {
-    enable = true,
+    enable = false,
     -- disable = { "c", "rust" },
     -- Or use a function for more flexibility, e.g. to disable slow treesitter highlight for large files
     disable = function(lang, buf)

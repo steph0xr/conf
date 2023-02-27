@@ -243,3 +243,7 @@ alias gdt='git difftool --tool=vimdiff --no-prompt'
 alias gmt='git mergetool --tool=vimdiff --no-prompt'
 
 source ~/.nvm/nvm.sh
+export PICO_SDK_PATH=/home/steph/tmp/pico/pico/pico-sdk
+export PICO_EXAMPLES_PATH=/home/steph/tmp/pico/pico/pico-examples
+export PICO_EXTRAS_PATH=/home/steph/tmp/pico/pico/pico-extras
+export PICO_PLAYGROUND_PATH=/home/steph/tmp/pico/pico/pico-playground

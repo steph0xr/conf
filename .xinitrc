@@ -9,6 +9,7 @@ hdmi_active=$(xrandr |grep ' connected' |grep 'HDMI' |awk '{print $1}')
 echo "hdmi state: $hdmi_active"
 [[ ! -z "$hdmi_active" ]] && xrandr --output HDMI-0 --auto --mode "1920x1080" --right-of eDP-1-1
 # xrandr --output HDMI-0 --auto --mode "1920x1080" --right-of eDP-1-1
+# se dopo sospensione non riparte: sudo service gdm3 restart
 
 # _vga=$( xrandr  | sed -n 's/^\(VGA.\).*/\1/pg')
 # alias laptop='xrandr --output LVDS1 --auto --output $_vga --off'

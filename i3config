@@ -85,15 +85,21 @@ bindsym $mod+Shift+Right move right
 bindsym $mod+v split h
 
 # split in vertical orientation
-bindsym $mod+s split v
+bindsym $mod+z split v
 
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
 
 # change container layout (stacked, tabbed, toggle split)
-bindsym $mod+z layout stacking
+bindsym $mod+s layout stacking
 bindsym $mod+w layout tabbed
 bindsym $mod+e layout toggle split
+# Toggle between stacking/tabbed ecc..
+bindsym $mod+x layout toggle all 
+
+# focus the parent container
+bindsym $mod+a focus parent
+bindsym $mod+c focus child
 
 # toggle tiling / floating
 bindsym $mod+Shift+space floating toggle
@@ -101,8 +107,26 @@ bindsym $mod+Shift+space floating toggle
 # change focus between tiling / floating windows
 bindsym $mod+space focus mode_toggle
 
-# focus the parent container
-bindsym $mod+a focus parent
+
+# reload the configuration file
+bindsym $mod+Shift+c reload
+# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $mod+Shift+r restart
+# exit i3 (logs you out of your X session)
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
+
+bindsym $mod+n fullscreen disable, focus left, fullscreen enable
+
+# start explorer 
+bindsym $mod+i exec thunar 
+
+
+# lockscreen
+bindsym $mod+Shift+x exec i3lock -c 000000 
+
+# Moving workspaces between monitors
+bindsym $mod+p move workspace to output right
+bindsym $mod+o move workspace to output left
 
 # focus the child container
 #bindsym $mod+d focus child
@@ -144,12 +168,6 @@ bindsym $mod+Shift+8 move container to workspace number $ws8
 bindsym $mod+Shift+9 move container to workspace number $ws9
 bindsym $mod+Shift+0 move container to workspace number $ws10
 
-# reload the configuration file
-bindsym $mod+Shift+c reload
-# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
-bindsym $mod+Shift+r restart
-# exit i3 (logs you out of your X session)
-bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
@@ -214,9 +232,6 @@ exec --no-startup-id ~/dotfiles/env
 
 workspace_auto_back_and_forth yes
 
-# Moving workspaces between monitors
-bindsym $mod+p move workspace to output right
-bindsym $mod+o move workspace to output left
 
 # # FKeys
 # # Pulse Audio controls
@@ -234,8 +249,6 @@ bindsym $mod+o move workspace to output left
 bindsym XF86MonBrightnessUp exec xrandr --output eDP-1-1 --brightness 1 # increase screen brightness
 bindsym XF86MonBrightnessDown exec xrandr --output eDP-1-1 --brightness 0.5 # decrease screen brightness
 
-# lockscreen
-bindsym $mod+Shift+x exec i3lock -c 000000 
 
 # GET DEM BORDERS OUT OF HEREc:w
 for_window [class="^.*"] border pixel 3
@@ -244,14 +257,21 @@ for_window [class="^.*"] client.focused          #77dd77 #285577 #ffffff #2e9ef4
 
 # startup default application
 exec --no-startup-id i3-msg 'workspace 1; exec /usr/bin/firefox'
-exec --no-startup-id i3-msg 'workspace 6; exec /home/steph/linphone'
+# exec --no-startup-id i3-msg 'workspace 6; exec /home/steph/linphone'
 
-bindsym $mod+n fullscreen disable, focus left, fullscreen enable
-
-# start explorer 
-bindsym $mod+i exec thunar 
-
-# Toggle between stacking/tabbed ecc..
-bindsym $mod+x layout toggle all
 
 # exec --no-startup-id /usr/lib/policykit-1/polkit-agent-helper-1 &
+
+
+#interactive screenshot by pressing printscreen
+bindsym Print exec gnome-screenshot -i 
+#crop-area screenshot by pressing Mod + printscreen
+bindsym $mod+Print exec gnome-screenshot -a
+
+# add named workspace
+bindsym $mod+m exec i3-input -F 'workspace %s' -P 'go to workspace: '
+bindsym $mod+Shift+m exec i3-input -F 'move container to workspace %s' -P 'move to workspace: '
+
+bindsym $mod+backslash workspace next
+bindsym $mod+Shift+backslash workspace previous 
+bindsym $mod+Tab workspace back_and_forth

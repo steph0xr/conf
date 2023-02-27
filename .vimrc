@@ -202,7 +202,7 @@
   Plug 'jreybert/vimagit'
   Plug 'tpope/vim-dispatch'
   " Plug 'octol/vim-cpp-enhanced-highlight'
-  " Plug 'bfrg/vim-cpp-modern'
+  Plug 'bfrg/vim-cpp-modern'
   Plug 'cdelledonne/vim-cmake'
   Plug 'tpope/vim-obsession'
   Plug 'junegunn/fzf'
@@ -256,6 +256,9 @@
     Plug 'mbbill/undotree'
     Plug 'rose-pine/neovim'
 
+    Plug 'aklt/plantuml-syntax'
+    Plug 'scrooloose/vim-slumlord'
+    " Plug 'skanehira/preview-uml.vim'
 
   " else
     " Plug 'ycm-core/YouCompleteMe'
@@ -594,7 +597,7 @@ nnoremap N Nzzzv
 autocmd FileType cpp set keywordprg=cppman
 
 
-nnoremap ,p iprintf("\n");<ESC>
+nnoremap ,p :Dispatch python %<CR> 
 
 " map ,f :call getline(search("^[^ \t#/]\\{2}.*[^:]\s*$", 'bW')) <CR> %%b
 
@@ -607,3 +610,9 @@ nnoremap <leader>u :UndotreeToggle<CR>
 autocmd BufNewFile,BufRead * setlocal formatoptions-=cro
 
 " nnoremap <leader>\ :Copilot enable<CR>
+" alternativa a TAB per accettare il suggerimento
+imap <silent><script><expr> <C-J> copilot#Accept("\<CR>")
+
+let g:NERDCommentEmptyLines = 1
+" Enable trimming of trailing whitespace when uncommenting
+" let g:NERDTrimTrailingWhitespace = 1
