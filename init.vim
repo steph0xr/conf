@@ -31,7 +31,8 @@ set completeopt=menu,menuone,noselect
 "vim.lsp - nvim-lspconfig
 lua <<EOF
 
-local lspconfig = require'lspconfig'.clangd.setup {
+local lspconfig = require'lspconfig'
+lspconfig.clangd.setup {
 --cmd = { "clangd", "--background-index", "--query-driver=/usr/bin/gcc"}
   cmd = { 
     --"clangd-xtensa",
@@ -39,6 +40,9 @@ local lspconfig = require'lspconfig'.clangd.setup {
     -- "--background-index"
   },
 }
+
+lspconfig.pyright.setup{}
+
 EOF
 
 " lua vim.lsp.set_log_level("debug")

@@ -185,6 +185,7 @@ alias idf50='. /hdd1/esp/esp-idf-v5.0/export.sh'
 
 alias vi="nvim"
 alias vim="nvim"
+alias gdbp="gdb -ex 'source /home/steph/pwndbg/gdbinit.py'"
 alias hidden='ls -a | grep "^\."'
 
 # #ssh x i3wm

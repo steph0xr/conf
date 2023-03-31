@@ -191,6 +191,11 @@
 
 
   "######      PLUGIN      #######
+  let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+if empty(glob(data_dir . '/autoload/plug.vim'))
+  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
 
   call plug#begin('~/.vim/plugged')
 
@@ -616,3 +621,5 @@ imap <silent><script><expr> <C-J> copilot#Accept("\<CR>")
 let g:NERDCommentEmptyLines = 1
 " Enable trimming of trailing whitespace when uncommenting
 " let g:NERDTrimTrailingWhitespace = 1
+
+let g:copilot_enabled = 0
