@@ -25,15 +25,25 @@ class EspInit(gdb.Command):
 
   def invoke (self, arg, from_tty):
     print ("initializing esp connection..")
-    #  os.system("uname -a")
+    ret = os.system("killall openocd")
+    if ret == 0:
+        print ("Previous openocd process killed")
+    print ("Launching new openocd istance")
+    os.system("openocd -f openocd.cfg &")
+    print ("Starting gdb ops..")
     gdb.execute("file build/" + binary_name + ".elf")
     gdb.execute("set remotetimeout 15000")
     gdb.execute("set print pretty on")
     gdb.execute("target extended-remote :3333")
-    gdb.execute("set remote hardware-watchpoint-limit 2")
+    gdb.execute("mon reset init")
     gdb.execute("mon reset halt")
-    gdb.execute("flushregs")
+    gdb.execute("set remote hardware-watchpoint-limit 2")
     gdb.execute("set scheduler-locking on")
+    #  gdb.execute("mon esp appimage_offset 0x10000")
+    gdb.execute("source .breakpoints")
+    gdb.execute("hb app_main")
+    gdb.execute("flushregs")
+    gdb.execute("continue")
 EspInit()
 
 

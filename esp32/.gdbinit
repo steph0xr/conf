@@ -1,5 +1,6 @@
 source .commands.py
-# esp-init
+esp-init
+# esp-all
 ##set remotetimeout 15000
 # file build/driver_testing.elf
 # target remote :3333
@@ -14,7 +15,7 @@ source .commands.py
 # flash-esp
 ##mon reset halt
 ##flushregs
-b app_main
+# b app_main
 # thb app_main
 # hb IQS7222B.cpp:199
 # hb IQS7222B.cpp:206

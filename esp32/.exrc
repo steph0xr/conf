@@ -6,7 +6,7 @@ nnoremap ùr :Termdebug -q<CR>G<C-w>j<CR>:term<CR>Asu1<CR><C-\><C-n>G<C-w>l:Cont
 nnoremap ùt :Termdebug -q<CR>G<C-w>j<CR>:term<CR>Asu1<CR><C-\><C-n>G:call TermDebugSendCommand('esp-all')<CR>
 nnoremap ùa :call TermDebugSendCommand('eflash')<CR>
 nnoremap ùw :call TermDebugSendCommand('esp-all')<CR>
-nnoremap ùq :call TermDebugSendCommand('q')<CR>:Gdb<CR>:call TermDebugSendCommand('save break .breakpoints')<CR>:q<CR>A<C-a>x<CR><C-\><C-n>:q<CR>
+nnoremap ùq :call TermDebugSendCommand('save break .breakpoints')<CR>:call TermDebugSendCommand('q')<CR>:Gdb<CR>:q<CR>A<C-a>x<CR><C-\><C-n>:q<CR>
 nnoremap ùi :call TermDebugSendCommand('esp-restart')<CR>
 nnoremap ùz :call TermDebugSendCommand('esp-restart-continue')<CR>
 
