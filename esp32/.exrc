@@ -2,6 +2,7 @@
 packadd termdebug
 let g:termdebugger = "xtensa-esp32-elf-gdb"
 nnoremap ùd :Termdebug -q<CR>G<C-w>j<CR>:term<CR>Asu1<CR><C-\><C-n>G
+nnoremap ùt <C-w>j<CR>:term<CR>Asu1<CR><C-\><C-n>G
 nnoremap ùr :Termdebug -q<CR>G<C-w>j<CR>:term<CR>Asu1<CR><C-\><C-n>G<C-w>l:Continue<CR>
 nnoremap ùt :Termdebug -q<CR>G<C-w>j<CR>:term<CR>Asu1<CR><C-\><C-n>G:call TermDebugSendCommand('esp-all')<CR>
 nnoremap ùa :call TermDebugSendCommand('eflash')<CR>
