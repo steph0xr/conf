@@ -34,11 +34,11 @@ lua <<EOF
 local lspconfig = require'lspconfig'
 lspconfig.clangd.setup {
 --cmd = { "clangd", "--background-index", "--query-driver=/usr/bin/gcc"}
-  cmd = { 
-    --"clangd-xtensa",
-    "clangd" 
+--  cmd = { 
+    -- "clangd-xtensa",
+ --   "clangd" 
     -- "--background-index"
-  },
+--  },
 }
 
 lspconfig.pyright.setup{}

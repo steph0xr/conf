@@ -1,12 +1,13 @@
 "Termdebug
 packadd termdebug
 let g:termdebugger = "xtensa-esp32-elf-gdb"
-nnoremap ùd :Termdebug -q<CR>G<C-w>j<CR>:term<CR>Asu1<CR><C-\><C-n>G
+nnoremap ùd :Termdebug -q<CR>G<C-w>
+" nnoremap ùd :Termdebug -q<CR>G<C-w>j<CR>:term<CR>Asu1<CR><C-\><C-n>G
 nnoremap ùt <C-w>j<CR>:term<CR>Asu1<CR><C-\><C-n>G
 nnoremap ùr :Termdebug -q<CR>G<C-w>j<CR>:term<CR>Asu1<CR><C-\><C-n>G<C-w>l:Continue<CR>
 nnoremap ùt :Termdebug -q<CR>G<C-w>j<CR>:term<CR>Asu1<CR><C-\><C-n>G:call TermDebugSendCommand('esp-all')<CR>
-nnoremap ùa :call TermDebugSendCommand('eflash')<CR>
-nnoremap ùw :call TermDebugSendCommand('esp-all')<CR>
+nnoremap ùa :Gdb<CR>G:call TermDebugSendCommand('eflash')<CR>
+nnoremap ùw :Gdb<CR>G:call TermDebugSendCommand('esp-all')<CR>
 nnoremap ùq :call TermDebugSendCommand('save break .breakpoints')<CR>:call TermDebugSendCommand('q')<CR>:Gdb<CR>:q<CR>A<C-a>x<CR><C-\><C-n>:q<CR>
 nnoremap ùi :call TermDebugSendCommand('esp-restart')<CR>
 nnoremap ùz :call TermDebugSendCommand('esp-restart-continue')<CR>
@@ -47,6 +48,7 @@ nnoremap ,cv :!cd build && ninja clean<CR>
 "nnoremap ,cb :CMakeBuild -v<CR>
 nnoremap ,ce :!cd build && ninja<CR>
 nnoremap ,ca :!cmake -GNinja -B ../build && cmake --build ../build -v<CR>
+nnoremap ,cx :Dispatch idf.py fullclean<CR>
 " nnoremap ,j :!esp-app-flash<CR>
 " nnoremap ,J :Dispatch idf.py app-flash<CR>
 nnoremap ,J :Dispatch idf.py flash monitor<CR>

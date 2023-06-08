@@ -1,5 +1,5 @@
 source .commands.py
-esp-init
+# esp-init
 # esp-all
 ##set remotetimeout 15000
 # file build/driver_testing.elf

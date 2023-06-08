@@ -48,7 +48,7 @@
   set foldexpr=nvim_treesitter#foldexpr()
   set nofoldenable                     " Disable folding at startup.
   nnoremap ,ff :setlocal foldmethod=expr<CR>zM
-  nnoremap ,fs :setlocal foldmethod=syntax<CR>zM
+  nnoremap ,f :setlocal foldmethod=syntax<CR>zM
 
   set scrolloff=8
   set signcolumn=yes
@@ -93,7 +93,7 @@
 
   " bind  for breakpoints to clipboard for gdb
   command! Xg :let @+ = 'b ' . expand('%:p') . ':' . line('.')
-  nnoremap °° :Xg<CR>
+  nnoremap \\ :Xg<CR>
 
   command! Diff :windo diffthis
   nnoremap ,d :Diff<CR>
@@ -428,7 +428,8 @@ nnoremap <leader>6 :lua require("harpoon.ui").nav_file(6)<CR>
 
 "cdelledonne/vim-cmake
 let g:cmake_default_config = 'build'
-let g:cmake_root_markers = ['.git', 'build']
+" let g:cmake_root_markers = ['.git', 'build']
+let g:cmake_root_markers = ['build', '.git']
 let g:cmake_generate_options = ['-GNinja', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON']
 " let g:cmake_link_compile_commands = 1
 " let g:cmake_jump = 1
