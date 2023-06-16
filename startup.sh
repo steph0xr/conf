@@ -9,3 +9,6 @@ sudo apt install git curl i3 rcm tilix tmux kdiff3 make cmake gettext vim-gtk3 x
 # remove pwd when sudo:
 # sudo visudo
 # add line steph ALL=NOPASSWD: ALL
+
+#
+# gsettings get org.gnome.desktop.screensaver ubuntu-lock-on-suspend
