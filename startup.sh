@@ -1,6 +1,6 @@
 #! /bin/bash
 
-sudo apt install git curl i3 rcm tilix tmux kdiff3 make cmake gettext vim-gtk3 xclip g++ fzf thunar zathura feh xcompmgr gnome-shell-extensions
+sudo apt install git curl i3 rcm tilix tmux kdiff3 make cmake gettext vim-gtk3 xclip ripgrep g++ fzf thunar zathura feh xcompmgr gnome-shell-extensions
 
 # set tilix as default
 # sudo update-alternatives --config x-terminal-emulator
