@@ -1,0 +1,80 @@
+[user]
+	email = stefano.offredi@daosgroup.it
+  # These values are set in ~/.gitconfig_local
+[include]
+  path = ~/.gitconfig_local
+
+[alias]
+   prettylog = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+  lb = log --graph --abbrev-commit --decorate=no --format=format:'%C(bold blue)%>|(26)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(dim white)%s%C(reset) %C(bold blue)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all --tags
+  l = log --graph --abbrev-commit --decorate=no --format=format:'%C(bold blue)%>|(26)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(dim white)%s%C(reset) %C(bold blue)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all --tags --author-date-order
+
+	s = status -s
+	lg = log --graph --full-history --all --color --pretty=format:"%x1b[31m%h%x09%x1b[32m%d%x1b[0m%x20%s"
+	cm = commit -m
+	a = add -A
+	acm = commit -am
+	ckb = checkout -b
+	su = submodule update
+  f = fetch --all --tags
+
+	g = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%>|(26)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(dim white)%s%C(reset) %C(bold blue)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all --author-date-order -n 15 --tags
+	gg = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%>|(26)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(dim white)%s%C(reset) %C(bold blue)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all --author-date-order --tags
+	ggg = log --graph --abbrev-commit --decorate --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:'%C(bold blue)%>|(26)%h%C(reset) - %C(bold green)(%ad)%C(bold dim green)(%ar)%C(reset) %C(dim white)%s%C(reset) %C(bold blue)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all --author-date-order --tags
+
+	gb = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%>|(26)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(dim white)%s%C(reset) %C(bold blue)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all  -n 10 --tags
+	ggb = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%>|(26)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(dim white)%s%C(reset) %C(bold blue)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all  --tags
+	ggbnw = log --no-walk --abbrev-commit --decorate --format=format:'%C(bold blue)%>|(26)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(dim white)%s%C(reset) %C(bold blue)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all  --tags
+	gggb = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%>|(26)%h%C(reset) - %C(bold green)(%ai)%C(bold dim green)(%ar)%C(reset) %C(dim white)%s%C(reset) %C(bold blue)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all  --tags
+
+
+	sgb = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%>|(26)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(dim white)%s%C(reset) %C(bold blue)- %an%C(reset)%C(bold yellow)%d%C(reset)' -n 10 --tags
+	sggb = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%>|(26)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(dim white)%s%C(reset) %C(bold blue)- %an%C(reset)%C(bold yellow)%d%C(reset)' --tags
+
+
+	ggs = log --stat --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(dim white)%s%C(reset) %C(bold blue)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all --author-date-order --tags
+	ggsp = log -p --stat --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(dim white)%s%C(reset) %C(bold blue)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all --author-date-order --tags
+
+	gp = log --graph --abbrev-commit --decorate --date=default --all --tags
+
+	t = tag -n
+	conflicts = diff --name-only --diff-filter=U
+	followsimple = log --follow -p --
+	followextrasimple = log --follow --
+	follow = log --follow --oneline --decorate --format='%C(blue)%h%C(reset) | %s | %an' -p --
+	fc = log --follow --oneline --
+	string = log --oneline -S #va aggiunto il nome della stringa poi. cerca in quale commit  una stringa è stata modificata
+	d = diff --color | /hdd1/repos/diff-so-fancy/diff-so-fancy 
+	listalltracked = ls-tree --full-tree --name-only -r HEAD
+  deleteRemoteBranch = push origin --delete
+  co = checkout
+  cos = checkout --recurse-submodules
+  pnr  = push -o merge_request.create
+  pnb  = push --set-upstream origin
+  pnbr  = push -o merge_request.create --set-upstream origin
+  resetsubmodules  = submodule foreach --recursive git reset --hard
+
+[diff]
+	guitool = kdiff3
+	tool = vimdiff 
+[core]
+	editor = nvim
+	autocrlf = false #mettere a true sotto windows
+  ; pager = /hdd1/repos/diff-so-fancy/diff-so-fancy | less --tabs=1,5 -R
+[push]
+	default = simple
+	followTags = true
+[grep]
+	lineNumber = true
+[difftool]
+	prompt = true
+  trustExitCode = true #esce completamente dal processo di diff con C-q (vim)
+[mergetool]
+	guitool = kdiff3
+	tool = vimdiff 
+  trustExitCode = true
+[merge]
+	guitool = kdiff3
+	tool = vimdiff 
+[credential]
+	helper = store
