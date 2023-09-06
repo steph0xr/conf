@@ -603,7 +603,8 @@ nnoremap N Nzzzv
 autocmd FileType cpp set keywordprg=cppman
 
 
-nnoremap ,p :Dispatch python %<CR> 
+nnoremap ,pp :Dispatch python %<CR> 
+nnoremap ,pd :term python %<CR> 
 
 " map ,f :call getline(search("^[^ \t#/]\\{2}.*[^:]\s*$", 'bW')) <CR> %%b
 

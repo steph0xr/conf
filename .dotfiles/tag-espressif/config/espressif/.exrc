@@ -59,7 +59,7 @@ nnoremap \o :Dispatch openocd -f .conf/openocd.cfg<CR><leader>ddd
 nnoremap ,k :exe "!tmux send -t make 'A'"<CR>:exe "!tmux send -t make 'C-]'"<CR><C-L>
 nnoremap ,< :exe "!tmux select-window -t make"<CR>
 " nnoremap ,< :exe "!tmux set mouse on"<CR>
-nmap ,a ,k,aa,<
+" nmap ,a ,k,aa,<
 nmap ,z ,k,zz,<
 
 " nnoremap ,k :Dispatch! idf.py monitor<CR>
@@ -69,3 +69,15 @@ nnoremap ,r :silent !esp-reset<CR>
 " nnoremap ,d :Dispatch espcoredump.py --port /dev/ttyUSB1 dbg_corefile build/mini-gateway.elf -o 4284416 --save-core coredump<CR>
 nnoremap ,ee :Dispatch idf.py erase_flash<CR>
 nnoremap ,eo :Dispatch idf.py erase_otadata<CR>
+
+
+function! Esp_flash()
+    ":exe "!tmux send -t make 'A'"
+    :exe "!tmux send -t make 'C-c'"
+    :exe "!tmux send -t make 'C-]'"
+    sleep 100m
+    :Dispatch! idf.py flash monitor
+    sleep 100m
+    :exe "!tmux select-window -t make"
+endfunction
+nnoremap ,a :call Esp_flash()<CR><CR>
