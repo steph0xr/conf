@@ -72,6 +72,7 @@ nnoremap ,eo :Dispatch idf.py erase_otadata<CR>
 
 
 function! Esp_flash()
+    :wa
     ":exe "!tmux send -t make 'A'"
     :exe "!tmux send -t make 'C-c'"
     :exe "!tmux send -t make 'C-]'"
