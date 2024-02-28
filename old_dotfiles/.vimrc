@@ -97,6 +97,8 @@
 
   command! Diff :windo diffthis
   nnoremap ,d :Diff<CR>
+  nnoremap ,dl :diffget //2<CR>
+  nnoremap ,dr :diffget //3<CR>
 
 
   "ALT mapping for moving lines
@@ -292,7 +294,7 @@ nnoremap <leader>fx <cmd>Telescope diagnostics<cr>
 nnoremap <leader>fa :lua require('telescope.builtin').grep_string({ search = vim.fn.input("Grep For > ")})<CR>
 nnoremap <leader>fs :lua require('telescope.builtin').grep_string({ file_ignore_patterns = {'%.js','%.html'}, search = vim.fn.input("Grep For > ")})<CR>
 " nnoremap <leader>fv :lua require('telescope.builtin').grep_string({ file_ignore_patterns = {'%.js','%.html'}, search_dirs={"%:p"}, word_match = "-w", search = vim.fn.input("Grep For > "), previewer = false})<CR>
-vnoremap <leader>fv :lua require('telescope.builtin').grep_string({search_dirs={"%:p"}, search = vim.fn.expand("<cword>"), previewer = false })<CR>
+vnoremap <leader>fv :lua require('telescope.builtin').grep_string({search_dirs={"%:p"}, search = vim.fn.expand("<cword>"), previewer = true })<CR>
 nnoremap <leader>fo :lua require("telescope.builtin").live_grep({search_dirs={vim.fn.expand("%:p")}})<CR>
 " nnoremap <leader>fo :lua require('telescope.builtin').grep_string({ file_ignore_patterns = {'%.js','%.html'}, word_match = "-w", search = vim.fn.input("Grep For > ")})<CR>
 " nnoremap <leader>fo :lua require'telescope.builtin'.live_grep{ file_ignore_patterns = {'%.js','%.html'}, search_dirs={"%:p"} }
@@ -398,12 +400,15 @@ nnoremap <leader>sl :source ~/.saved_vim_sessions/
 "git vim-fugitive \g
 let g:fugitive_summary_format = "%<(18,trunc)%an|| %<(75,trunc)%s|| %<(55,trunc)%d||%<(12,trunc)%ar - %aI"
 nnoremap <leader>g :Git status -s<CR>
-nnoremap <leader>gs :Git<CR>
 nnoremap gs :Git<CR>
+noremap gl :Gclog<CR>
 nnoremap <leader>gc :GBranches<CR>
-nnoremap <leader>gg :Flog -all -date=relative -raw-args=--author-date-order -max-count=2000<CR>
+nnoremap <leader>gg :Flogsplit -all -date=relative -raw-args=--author-date-order -max-count=2000<CR>
 nnoremap <leader>gd :Git difftool<CR>
+nnoremap <leader>gs :Git<CR>
 nnoremap <leader>gl :Gclog<CR>
+"git follow a single file log history:
+noremap  <leader>gf :Gclog -- %<CR> 
 nnoremap <leader>gk :G log --graph --abbrev-commit --decorate=no --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(dim white)%s%C(reset) %C(bold blue)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all --tags <CR>
 " let g:flog_default_arguments = {'max_count': 2000, 'all': 1, 'date': 'relative'}
 " let g:flog_default_arguments = {'max_count': 2000, 'all': 1, 'format': '%C(bold blue)%>|(26)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(dim white)%s%C(reset) %C(bold blue)- %an%C(reset)%C(bold yellow)%d%C(reset)'}
@@ -566,6 +571,7 @@ endif
 nnoremap <leader>cd :cd %:p:h<CR>
 
 
+
 "ripgrep
 " nnoremap <c-f> :RgFzf *<CR>
 "nnoremap <c-f> :Rg -tc -tcpp -ttxt *<CR>
@@ -603,7 +609,8 @@ nnoremap N Nzzzv
 autocmd FileType cpp set keywordprg=cppman
 
 
-nnoremap ,p :Dispatch python %<CR> 
+nnoremap ,pp :Dispatch python %<CR> 
+nnoremap ,pd :term python %<CR> 
 
 " map ,f :call getline(search("^[^ \t#/]\\{2}.*[^:]\s*$", 'bW')) <CR> %%b
 
@@ -624,3 +631,13 @@ let g:NERDCommentEmptyLines = 1
 " let g:NERDTrimTrailingWhitespace = 1
 
 let g:copilot_enabled = 0
+
+" bin to hex
+nnoremap ,bh :%!xxd<CR>
+nnoremap ,bb :%!xxd -r<CR>
+
+" search and replace
+vnoremap <C-r> "hy:%s/<C-r>h//gc<left><left><left>
+
+" copy paragraph below
+nnoremap ,y yap)p
