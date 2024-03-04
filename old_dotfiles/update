@@ -1,0 +1,49 @@
+#!/bin/bash
+
+ref_name=$1
+new_rev=$3
+
+# echo "ref_name: $ref_name"
+# echo "new_rev: $new_rev"
+
+# only check branches, not tags or bare commits
+if [ -z $(echo $ref_name | grep "refs/heads/") ]; then
+  exit 0
+fi
+
+# only check customer_release_branch branch, not all other branches
+if [ -z $(echo $ref_name | grep "refs/heads/customer_release_branch") ]; then
+  echo "customer_release_branch branch has to be format checked with clang-format: exit 0"
+  exit 0
+fi
+
+# don't check empty branches
+if [ "$(expr "${new_rev}" : '0*$')" -ne 0 ]; then
+  exit 0
+fi
+
+# Checkout a copy of the branch (but also changes HEAD)
+my_work_tree=$(mktemp -d -t git-work-tree.XXXXXXXX) 2>/dev/null
+# echo "work tree: ${my_work_tree}"
+git --work-tree="${my_work_tree}" --git-dir="." checkout $new_rev -f 2>/dev/null
+
+# Do the formatter check
+echo ""
+echo "To push on this branch code must be style-formatted. Checking code formatting..."
+echo ""
+pushd ${my_work_tree} >/dev/null
+# clang-format --dry-run --Werror **/*.cpp **/*.h      #solo subfolders
+find . -iname '*.h' -o -iname '*.cpp' -o -iname '*.c'| xargs clang-format -i --dry-run --Werror
+my_status=$?
+popd >/dev/null
+
+# reset HEAD to master, and cleanup
+git --work-tree="${my_work_tree}" --git-dir="." checkout master -f 2>/dev/null
+rm -rf "${my_work_tree}"
+
+# handle error, if any
+if [ "0" != "$my_status" ]; then
+  echo "Please format the files listed above and re-commit."
+  echo "use the custom .clang-format style file"
+  exit 1
+fi

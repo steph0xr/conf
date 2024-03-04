@@ -1,0 +1,8 @@
+Utilizzo hooks
+
+- in home file .clang-format, must be created with custom format style
+- update: this hook go server side to stop the push if files are not correctly formatted (BARE_REPO/hooks/)
+- pre-commit: this hook go client side to stop the commit of unformatted code.
+
+this two hooks work only for the customer specific branch, called here "customer_release_branch"
+
