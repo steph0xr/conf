@@ -1,0 +1,64 @@
+#! /bin/bash
+
+# keyboard settings
+xset r rate 250 60 
+
+# multi screen
+xrandr --output HDMI-1 --auto
+hdmi_active=$(xrandr |grep ' connected' |grep -e 'HDMI-1' -e 'DP-2-9' |awk '{print $1}')
+echo "hdmi state: $hdmi_active"
+[[ ! -z "$hdmi_active" ]] && xrandr --output $hdmi_active --auto --mode "1920x1080" --same-as eDP-1
+
+hdmi_active2=$(xrandr |grep ' connected' |grep -e 'HDMI-1' -e 'DP-2-8' |awk '{print $1}')
+[[ ! -z "$hdmi_active2" ]] && xrandr --output $hdmi_active2 --auto --mode "1920x1080" --left-of eDP-1
+# xrandr --output HDMI-1 --auto --mode "1920x1080" --right-of eDP-1-1
+# se dopo sospensione non riparte: sudo service gdm3 restart
+
+# _vga=$( xrandr  | sed -n 's/^\(VGA.\).*/\1/pg')
+# alias laptop='xrandr --output LVDS1 --auto --output $_vga --off'
+# alias monitor='xrandr --output LVDS1 --off --output $_vga --auto'
+# alias dual='xrandr --output LVDS1 --auto --left-of $_vga --output $_vga --auto'
+
+
+# bg image
+feh --bg-scale /home/steph/Pictures/wallpaper.jpg
+
+# keyring chiavi ssh
+eval $(/usr/bin/gnome-keyring-daemon --start)
+export SSH_AUTH_SOCK
+
+### KEY REMAPPING ###
+# caps lock remap to ctrl_l
+setxkbmap -option ctrl:nocaps
+setxkbmap -option ctrl:menu_lctrl
+
+# win_r key to ctrl_r
+xmodmap -e "remove mod4 = Super_R"
+xmodmap -e "add control = Super_R"
+
+# context menu key à to ctrl_r
+xmodmap -e 'remove control = Control_R'
+xmodmap -e 'keycode 48 = Control_R'
+xmodmap -e 'add control = Control_R'
+# à key to ctrl_r
+xmodmap -e "keycode 51 = ugrave agrave"
+
+# remap "#" as shift-3 key
+xmodmap -e "keycode  12 = 3 numbersign 3 numbersign threesuperior dead_tilde threesuperior"
+
+# remap ç as / key
+xmodmap -e "keycode  47 = ograve slash semicolon colon at slash"
+
+# remap $ as shift-ò key
+#xmodmap -e "keycode  47 = ograve dollar ograve dollar ccedilla dead_cedilla ccedilla"
+
+# remap @ as shift-4 key
+#xmodmap -e "keycode  13 = 4 at 4 at onequarter oneeighth onequarter oneeighth 4 at onequarter oneeighth"
+
+# xmodmap -pm
+# xmodmap -pke
+#setxkbmap -layout it
+
+####
+
+exec i3

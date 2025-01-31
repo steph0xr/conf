@@ -1,0 +1,16 @@
+#! /bin/bash
+
+# keyboard settings
+xset r rate 250 60
+
+# multi screen
+xrandr --output HDMI-0 --auto --right-of eDP-1-1
+
+# caps lock remap to ctrl
+setxkbmap -option ctrl:nocaps
+
+# bg image
+feh --bg-scale /home/steph/Immagini/elCap.jpg
+
+# screen brightness
+# xrandr --output eDP-1-1 --brightness 0.5
