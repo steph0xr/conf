@@ -37,6 +37,7 @@
 
 	gp = log --graph --abbrev-commit --decorate --date=default --all --tags
 
+
 	t = tag -n
 	conflicts = diff --name-only --diff-filter=U
 	followsimple = log --follow -p --
@@ -53,6 +54,7 @@
   pnb  = push --set-upstream origin
   pnbr  = push -o merge_request.create --set-upstream origin
   resetsubmodules  = submodule foreach --recursive git reset --hard
+  sf = submodule foreach git
 
 [diff]
 	guitool = kdiff3
@@ -75,6 +77,10 @@
   trustExitCode = true
 [merge]
 	guitool = kdiff3
-	tool = vimdiff 
+	tool = vimdiff
 [credential]
 	helper = store
+[mergetool "fugitive"]
+	cmd = nvim -d -c \"wincmd l\" \"$LOCAL\" \"$MERGED\" \"$REMOTE\"
+[color]
+	ui = auto

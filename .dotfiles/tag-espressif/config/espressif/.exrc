@@ -16,11 +16,6 @@ nnoremap ùz :call TermDebugSendCommand('esp-restart-continue')<CR>
 " nnoremap ùd :Termdebug $velf<CR>
 
 
-"xtensa-clang
-let g:ycm_clangd_uses_ycmd_caching = 0
-let g:ycm_clangd_binary_path = "clangd-xtensa"
-let g:ycm_clangd_args = ['-log=verbose', '-pretty'] "-background-index
-
 "formatting
 let g:clang_format#detect_style_file = 1
 let g:clang_format#enable_fallback_style = 0

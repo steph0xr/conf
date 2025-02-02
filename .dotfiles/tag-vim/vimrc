@@ -23,10 +23,10 @@
   "set autochdir
 
   set expandtab
-  set tabstop=2 "number of visual spaces per TAB
-  set softtabstop=2 " number of spaces in tab when editing
-  set smartindent
-  set shiftwidth=2
+  set tabstop=8 "number of visual spaces per TAB
+  set softtabstop=8 " number of spaces in tab when editing
+  " set smartindent
+  set shiftwidth=8
 
   set relativenumber "set numbers to lines
   set nu "add absolute number to current line
@@ -88,7 +88,7 @@
 
   " command -nargs=* Vgrep vimgrep /\v<args>/g **/* | copen
   command -nargs=* VgrepInGit vimgrep /\v<args>/g `git ls-files` | copen
-  " nnoremap § :VgrepInGit<SPACE>
+  nnoremap ìg :VgrepInGit<SPACE>
 
 
   " bind  for breakpoints to clipboard for gdb
@@ -97,6 +97,8 @@
 
   command! Diff :windo diffthis
   nnoremap ,d :Diff<CR>
+  nnoremap ,dl :diffget //2<CR>
+  nnoremap ,dr :diffget //3<CR>
 
 
   "ALT mapping for moving lines
@@ -104,8 +106,8 @@
   "nnoremap <C-k> ddkP
 
   "in insert and visual mode ctrl-jk to move line up and down
-  inoremap <C-j> <Esc>:m .+1<CR>zR<CR>==gi
-  inoremap <C-k> <Esc>:m .-2<CR>zR<CR>==gi
+  " inoremap <C-j> <Esc>:m .+1<CR>zR<CR>==gi
+  " inoremap <C-k> <Esc>:m .-2<CR>zR<CR>==gi
   vnoremap <C-j> :m '>+1<CR>zR<CR>gv=gv
   vnoremap <C-k> :m '<-2<CR>zR<CR>gv=gv
 
@@ -140,9 +142,6 @@
   "remap esc and :
   nnoremap ò :
   vnoremap ò :
-  nnoremap - /
-  nnoremap à /
-  vnoremap - /
   nnoremap ) }
   nnoremap ( {
   inoremap jk <ESC>
@@ -153,8 +152,8 @@
   nnoremap <leader><leader> <c-^>
   nnoremap <leader>. @:
 
-  nnoremap : ò
-  vnoremap : ò
+  " nnoremap : ò
+  " vnoremap : ò
   " nnoremap / -
   " vnoremap / -
 
@@ -173,7 +172,8 @@
   vnoremap p pgvy
   "vnoremap <leader>p "_dP
   "vnoremap p "_dP
-  noremap <leader>p "+p
+  noremap <leader>p viwpgvy
+  " noremap <leader>p "+p
   nnoremap <leader>y "+yy
   vnoremap <leader>y "+y
   nnoremap <leader>Y gg"+yG
@@ -219,6 +219,7 @@ endif
   Plug 'preservim/nerdcommenter'
   Plug 'rhysd/vim-clang-format'
   Plug 'ThePrimeagen/vim-be-good'
+  Plug 'habamax/vim-rst'
    " Plug 'nvim-telescope/telescope-fzy-native.nvim'
 
   "Plug 'junegunn/gv.vim'
@@ -255,7 +256,9 @@ endif
 
     Plug 'ThePrimeagen/harpoon'
     Plug 'mfussenegger/nvim-dap'
+    Plug 'nvim-neotest/nvim-nio'
     Plug 'rcarriga/nvim-dap-ui'
+    Plug 'mortepau/codicons.nvim'
     Plug 'mfussenegger/nvim-dap-python'
     Plug 'szw/vim-maximizer'
     Plug 'mbbill/undotree'
@@ -292,7 +295,7 @@ nnoremap <leader>fx <cmd>Telescope diagnostics<cr>
 nnoremap <leader>fa :lua require('telescope.builtin').grep_string({ search = vim.fn.input("Grep For > ")})<CR>
 nnoremap <leader>fs :lua require('telescope.builtin').grep_string({ file_ignore_patterns = {'%.js','%.html'}, search = vim.fn.input("Grep For > ")})<CR>
 " nnoremap <leader>fv :lua require('telescope.builtin').grep_string({ file_ignore_patterns = {'%.js','%.html'}, search_dirs={"%:p"}, word_match = "-w", search = vim.fn.input("Grep For > "), previewer = false})<CR>
-vnoremap <leader>fv :lua require('telescope.builtin').grep_string({search_dirs={"%:p"}, search = vim.fn.expand("<cword>"), previewer = false })<CR>
+vnoremap <leader>fv :lua require('telescope.builtin').grep_string({search_dirs={"%:p"}, search = vim.fn.expand("<cword>"), previewer = true })<CR>
 nnoremap <leader>fo :lua require("telescope.builtin").live_grep({search_dirs={vim.fn.expand("%:p")}})<CR>
 " nnoremap <leader>fo :lua require('telescope.builtin').grep_string({ file_ignore_patterns = {'%.js','%.html'}, word_match = "-w", search = vim.fn.input("Grep For > ")})<CR>
 " nnoremap <leader>fo :lua require'telescope.builtin'.live_grep{ file_ignore_patterns = {'%.js','%.html'}, search_dirs={"%:p"} }
@@ -398,12 +401,17 @@ nnoremap <leader>sl :source ~/.saved_vim_sessions/
 "git vim-fugitive \g
 let g:fugitive_summary_format = "%<(18,trunc)%an|| %<(75,trunc)%s|| %<(55,trunc)%d||%<(12,trunc)%ar - %aI"
 nnoremap <leader>g :Git status -s<CR>
-nnoremap <leader>gs :Git<CR>
 nnoremap gs :Git<CR>
+noremap gl :Gclog<CR>
 nnoremap <leader>gc :GBranches<CR>
-nnoremap <leader>gg :Flog -all -date=relative -raw-args=--author-date-order -max-count=2000<CR>
+nnoremap <leader>gg :Flogsplit -all -date=relative -raw-args=--author-date-order -max-count=2000<CR>
 nnoremap <leader>gd :Git difftool<CR>
+nnoremap <leader>gs :Git<CR>
 nnoremap <leader>gl :Gclog<CR>
+"git follow a single file log history:
+noremap  <leader>gf :Gclog -- %<CR> 
+noremap  <leader>g1 :Gvdiffsplit HEAD~1<CR> 
+noremap  <leader>g2 :Gvdiffsplit HEAD~2<CR> 
 nnoremap <leader>gk :G log --graph --abbrev-commit --decorate=no --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(dim white)%s%C(reset) %C(bold blue)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all --tags <CR>
 " let g:flog_default_arguments = {'max_count': 2000, 'all': 1, 'date': 'relative'}
 " let g:flog_default_arguments = {'max_count': 2000, 'all': 1, 'format': '%C(bold blue)%>|(26)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(dim white)%s%C(reset) %C(bold blue)- %an%C(reset)%C(bold yellow)%d%C(reset)'}
@@ -439,9 +447,16 @@ nnoremap ,cx :CMakeClean<CR>
 nnoremap ,cz :CMakeClose<CR>
 nnoremap ,c :CMakeGenerate!<CR>
 " Make dispatch to tmux
-nnoremap ,m :Make -C build<CR><CR>:cw<CR>
-nnoremap ,M :make! -C build<CR><CR>:cw<CR>
-set makeprg=ninja
+nnoremap ,m :Make<CR><CR>:cw<CR>
+nnoremap ,MC :Make clean<CR><CR>:cw<CR>
+nnoremap ,M :make!<CR><CR>:cw<CR>
+set makeprg=make
+
+" espressif:
+" nnoremap ,m :Make -C build<CR><CR>:cw<CR>
+" nnoremap ,M :make! -C build<CR><CR>:cw<CR>
+" set makeprg=ninja
+
 nnoremap ,R :Dispatch build/main/main<CR>
 " nnoremap ,e :w<CR>:Make -C build<CR><CR>:cw<CR> \| :Start build/main/main<CR><CR>:cw<CR>
 "nnoremap ,cw :CMakeClean<CR>:CMakeGenerate<CR>:make! -C build<CR><CR>:cw<CR>
@@ -566,6 +581,7 @@ endif
 nnoremap <leader>cd :cd %:p:h<CR>
 
 
+
 "ripgrep
 " nnoremap <c-f> :RgFzf *<CR>
 "nnoremap <c-f> :Rg -tc -tcpp -ttxt *<CR>
@@ -583,7 +599,7 @@ nnoremap <leader>i :so ~/.config/nvim/init.vim<CR>
 "formatting
 let g:clang_format#detect_style_file = 1
 let g:clang_format#enable_fallback_style = 0
-" nnoremap ,f :ClangFormat<CR>
+nnoremap ìf :ClangFormat<CR>
 
 "cpp copy class method definition for pasting in class declaration 
 nnoremap ,h ==wwd2wA;<ESC>:w<CR>
@@ -618,10 +634,20 @@ autocmd BufNewFile,BufRead * setlocal formatoptions-=cro
 
 " nnoremap <leader>\ :Copilot enable<CR>
 " alternativa a TAB per accettare il suggerimento
-imap <silent><script><expr> <C-J> copilot#Accept("\<CR>")
+" imap <silent><script><expr> <C-J> copilot#Accept("\<CR>")
 
 let g:NERDCommentEmptyLines = 1
 " Enable trimming of trailing whitespace when uncommenting
 " let g:NERDTrimTrailingWhitespace = 1
 
 let g:copilot_enabled = 0
+
+" bin to hex
+nnoremap ,bh :%!xxd<CR>
+nnoremap ,bb :%!xxd -r<CR>
+
+" search and replace
+vnoremap <C-r> "hy:%s/<C-r>h//gc<left><left><left>
+
+" copy paragraph below
+nnoremap ,y yap}p

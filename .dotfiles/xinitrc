@@ -7,7 +7,10 @@ xset r rate 250 60
 xrandr --output HDMI-1 --auto
 hdmi_active=$(xrandr |grep ' connected' |grep -e 'HDMI-1' -e 'DP-2-9' |awk '{print $1}')
 echo "hdmi state: $hdmi_active"
-[[ ! -z "$hdmi_active" ]] && xrandr --output $hdmi_active --auto --mode "1920x1080" --right-of eDP-1
+[[ ! -z "$hdmi_active" ]] && xrandr --output $hdmi_active --auto --mode "1920x1080" --same-as eDP-1
+
+hdmi_active2=$(xrandr |grep ' connected' |grep -e 'HDMI-1' -e 'DP-2-8' |awk '{print $1}')
+[[ ! -z "$hdmi_active2" ]] && xrandr --output $hdmi_active2 --auto --mode "1920x1080" --left-of eDP-1
 # xrandr --output HDMI-1 --auto --mode "1920x1080" --right-of eDP-1-1
 # se dopo sospensione non riparte: sudo service gdm3 restart
 
@@ -43,8 +46,18 @@ xmodmap -e "keycode 51 = ugrave agrave"
 # remap "#" as shift-3 key
 xmodmap -e "keycode  12 = 3 numbersign 3 numbersign threesuperior dead_tilde threesuperior"
 
-# remap ç as / key
-xmodmap -e "keycode  47 = ograve slash semicolon colon at slash"
+# remap ò as / and ç as ò key
+xmodmap -e "keycode  47 = colon ograve semicolon colon at slash"
+
+# remap : as / key
+xmodmap -e "keycode  60 = period slash period slash periodcentered dead_diaeresis periodcentered dead_diaeresis period colon periodcentered dead_diaeresis" 
+
+# remap - as / key
+#xmodmap -e "keycode  61 = slash underscore semicolon colon at slash"
+
+# remap : as - key
+#xmodmap -e "keycode  60 = period minus period minus periodcentered dead_diaeresis periodcentered dead_diaeresis period colon periodcentered dead_diaeresis" 
+
 
 # remap $ as shift-ò key
 #xmodmap -e "keycode  47 = ograve dollar ograve dollar ccedilla dead_cedilla ccedilla"

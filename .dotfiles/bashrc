@@ -172,7 +172,7 @@ export PS1="${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\
 
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
-source /usr/share/doc/fzf/examples/key-bindings.bash
+# source /usr/share/doc/fzf/examples/key-bindings.bash
 
 #cose per expressif
 alias idf43='. /opt/esp/esp-idf-v4.3/export.sh'
@@ -185,6 +185,8 @@ alias idf51='. /opt/esp/esp-idf-v5.1.2/export.sh'
 # [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 # [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
+alias r="ranger"
+alias v="nvim"
 alias vi="nvim"
 alias vim="nvim"
 alias gdbp="gdb -ex 'source /home/steph/pwndbg/gdbinit.py' -ex 'set disable-colors off'"
@@ -246,4 +248,11 @@ alias gss='git submodule status'
 alias gdt='git difftool --tool=vimdiff --no-prompt'
 alias gmt='git mergetool --tool=vimdiff --no-prompt'
 
+alias fin="find . -name"
+
 source ~/.nvm/nvm.sh
+
+bind Space:magic-space
+
+# temporaneo crosstoolchain arm
+export PATH=$PATH:/home/steph/yocto/arm-toolchain/gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu/bin

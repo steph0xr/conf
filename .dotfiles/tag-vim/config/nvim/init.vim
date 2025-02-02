@@ -3,7 +3,7 @@ let &packpath = &runtimepath
 source ~/.vimrc
 
 nnoremap gd :lua vim.lsp.buf.definition()<CR>
-nnoremap gi :lua vim.lsp.buf.implementation()<CR>
+" nnoremap gi :lua vim.lsp.buf.implementation()<CR>
 nnoremap gr :lua vim.lsp.buf.references()<CR>
 nnoremap gn :lua vim.lsp.buf.rename()<CR>
 nnoremap gh :lua vim.lsp.buf.hover()<CR>
@@ -26,6 +26,8 @@ nnoremap <leader>LL :lua vim.cmd('e'..vim.lsp.get_log_path())<CR>
 "nnoremap <silent> <C-p> <cmd>lua vim.lsp.diagnostic.goto_next()<CR>
 "
 
+
+"lua require('dap-python').setup('~/.virtualenvs/debugpy/bin/python')
 set completeopt=menu,menuone,noselect
 
 "vim.lsp - nvim-lspconfig
@@ -33,7 +35,11 @@ lua <<EOF
 
 local lspconfig = require'lspconfig'
 lspconfig.clangd.setup {
---cmd = { "clangd", "--background-index", "--query-driver=/usr/bin/gcc"}
+   cmd = { 
+    "clangd", 
+--     "--query-driver=/home/steph/.espressif/tools/xtensa-esp32-elf/esp-2022r1-11.2.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc"
+  -- "--background-index" 
+  }
 --  cmd = { 
     -- "clangd-xtensa",
  --   "clangd" 
@@ -93,21 +99,23 @@ cmp.setup({
 EOF
 
 
-lua require('dap-python').setup('~/.virtualenvs/debugpy/bin/python')
+lua require('dap-python').setup('python')
 lua require("dapui").setup()
 
 nnoremap <silent> <leader>du <Cmd>lua require'dapui'.toggle()<CR>
 
 nnoremap <silent> <leader>dc <Cmd>lua require'dap'.continue()<CR>
-nnoremap <silent> <leader>ds <Cmd>lua require'dap'.terminate()<CR>
+nnoremap <silent> <leader>dq <Cmd>lua require'dap'.terminate()<CR>
 nnoremap <silent> <leader>dn <Cmd>lua require'dap'.step_over()<CR>
-nnoremap <silent> <leader>dj <Cmd>lua require'dap'.step_into()<CR>
-nnoremap <silent> <leader>dk <Cmd>lua require'dap'.step_out()<CR>
+nnoremap <silent> <leader>ds <Cmd>lua require'dap'.step_into()<CR>
+nnoremap <silent> <leader>df <Cmd>lua require'dap'.step_out()<CR>
 nnoremap <silent> <leader>db <Cmd>lua require'dap'.toggle_breakpoint()<CR>
 nnoremap <silent> <leader>dB <Cmd>lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>
 nnoremap <silent> <leader>dlp <Cmd>lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>
 nnoremap <silent> <leader>dr <Cmd>lua require'dap'.repl.open()<CR>
 nnoremap <silent> <leader>dl <Cmd>lua require'dap'.run_last()<CR>
+nnoremap <silent> <leader>dh <Cmd>lua require'dap.ui.widgets'.hover()<CR>
+nnoremap <silent> <leader>dp <Cmd>lua require'dap.ui.widgets'.preview()<CR>
 
 lua <<EOF
 -- automatic launch dap-ui 
@@ -122,12 +130,35 @@ dap.listeners.before.event_exited["dapui_config"] = function()
   dapui.close()
 end
 
--- c++ debug adapter configutation
+-- c debug adapter using gdb adapter
+-- local dap = require('dap')
+--  dap.adapters.gdb = {
+--    type = "executable",
+--    command = "gdb",
+--    args = { "-i", "dap" }
+--  }
+-- end
+-- local dap = require("dap")
+-- dap.configurations.c = {
+--   {
+--     name = "Launch",
+--     type = "gdb",
+--     request = "launch",
+--     program = function()
+--       return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+--     end,
+--     cwd = "${workspaceFolder}",
+--     stopAtBeginningOfMainSubprogram = false,
+--   }
+-- }
+
+
+-- c++ debug adapter configutation with vscode-cpptools
 local dap = require('dap')
 dap.adapters.cppdbg = {
   id = 'cppdbg',
   type = 'executable',
-  command = '/opt/vscode-cpptools/extension/debugAdapters/bin/OpenDebugAD7',
+  command = '/home/steph/.vscode/extensions/ms-vscode.cpptools-1.20.0/debugAdapters/bin/OpenDebugAD7',
 }
 
 local env_file = vim.fn.getcwd() .. '/build/project_description.json'
@@ -166,30 +197,57 @@ dap.configurations.cpp = {
   --   stopOnEntry = true,
   -- },
   {
-    name = 'esp32 Attach to gdbserver :3333',
-    type = 'cppdbg',
-    request = 'launch',
-    MIMode = 'gdb',
-    miDebuggerServerAddress = 'localhost:3333',
-    miDebuggerPath = 'xtensa-esp32-elf-gdb',
-    cwd = '${workspaceFolder}',
-    program = string.format(vim.fn.getcwd() .. '/build/hello_world.elf'),
-    -- externalConsole = true,
-   --setupCommands = {  
-     --{ text = 'set remotetimeout 15000' },
-     --{ text = 'file build/hello_world.elf' },
-     --{ text = 'target remote :3333' },
-     --{ text = 'set remote hardware-watchpoint-limit 2'},
-     --{ text = 'mon reset halt' },
-     --{ text = 'hb app_main' },
-     --{ text = 'flushregs' },
-     --{ text = '-enable-pretty-printing' }
-   --},
-    
-    logging = { 
-      engineLogging = true 
-      }
+	name = "kernel Attach to gdbserver :1234",
+	type = "cppdbg",
+	request = "launch",
+	MIMode = "gdb",
+	miDebuggerServerAddress = "localhost:1234",
+	miDebuggerPath = "/usr/bin/gdb",
+	cwd = "${workspaceFolder}",
+	stopAtEntry = false,
+	args = { "-ex", "continue" },
+	program = "/home/steph/buildroot/output/build/linux-5.15.18/vmlinux",
+	-- program = function()
+	--   return vim.fn.input("Path to vmlinux: ", vim.fn.getcwd() .. "/", "file")
+	-- end,
   },
+  {
+	name = "kernel Attach to gdbserver /dev/ttyUSB0",
+	type = "cppdbg",
+	request = "launch",
+	MIMode = "gdb",
+	miDebuggerPath = "/home/steph/rbuildroot/output/host/bin/arm-buildroot-linux-gnueabihf-gdb",
+	cwd = "${workspaceFolder}",
+	stopAtEntry = false,
+        externalConsole = false,
+	args = { "-ex", "set serial baud 115200", "-ex", "target remote /dev/ttyUSB0" },
+	program = "/home/steph/rbuildroot/output/build/linux-custom/vmlinux",
+  },
+--   {
+--     name = 'esp32 Attach to gdbserver :3333',
+--     type = 'cppdbg',
+--     request = 'launch',
+--     MIMode = 'gdb',
+--     miDebuggerServerAddress = 'localhost:3333',
+--     miDebuggerPath = 'xtensa-esp32-elf-gdb',
+--     cwd = '${workspaceFolder}',
+--     program = string.format(vim.fn.getcwd() .. '/build/hello_world.elf'),
+--     -- externalConsole = true,
+--    --setupCommands = {  
+--      --{ text = 'set remotetimeout 15000' },
+--      --{ text = 'file build/hello_world.elf' },
+--      --{ text = 'target remote :3333' },
+--      --{ text = 'set remote hardware-watchpoint-limit 2'},
+--      --{ text = 'mon reset halt' },
+--      --{ text = 'hb app_main' },
+--      --{ text = 'flushregs' },
+--      --{ text = '-enable-pretty-printing' }
+--    --},
+--     
+--     logging = { 
+--       engineLogging = true 
+--       }
+--   }
 }
 dap.configurations.c = dap.configurations.cpp
 
@@ -240,7 +298,35 @@ require('rose-pine').setup({
 vim.cmd('colorscheme rose-pine')
 
 
-
+-- telescope keybinding
+require("telescope").setup {
+  pickers = {
+    find_files = {
+      mappings = {
+        i = {
+          ["<C-t>"] = require("telescope.actions.layout").toggle_preview,
+          ["<C-j>"] = require("telescope.actions").select_default
+        },
+      },
+    },
+    grep_string = {
+      mappings = {
+        i = {
+          ["<C-t>"] = require("telescope.actions.layout").toggle_preview,
+          ["<C-j>"] = require("telescope.actions").select_default
+        },
+      },
+    },
+    git_branches = {
+      mappings = {
+        i = {
+          ["<C-t>"] = require("telescope.actions.layout").toggle_preview,
+          ["<C-j>"] = require("telescope.actions").select_default
+        },
+      },
+    },
+  },
+}
 
 
 -- treesitter
