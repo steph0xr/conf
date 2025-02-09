@@ -78,8 +78,6 @@
 [merge]
 	guitool = kdiff3
 	tool = vimdiff
-[credential]
-	helper = store
 [mergetool "fugitive"]
 	cmd = nvim -d -c \"wincmd l\" \"$LOCAL\" \"$MERGED\" \"$REMOTE\"
 [color]

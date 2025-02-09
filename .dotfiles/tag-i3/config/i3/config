@@ -56,8 +56,9 @@ floating_modifier $mod
 
 # start a terminal
 bindsym $mod+Return exec i3-sensible-terminal
-bindsym $mod+n split h exec i3-sensible-terminal
-bindsym $mod+Shift+n split v exec i3-sensible-terminal
+bindsym $mod+n layout stacking exec i3-sensible-terminal
+bindsym $mod+m split h exec i3-sensible-terminal
+bindsym $mod+Shift+m split v exec i3-sensible-terminal
 
 # kill focused window
 bindsym $mod+q kill
@@ -66,7 +67,7 @@ bindsym $mod+q kill
 #bindsym $mod+d exec -no-startup-id dmenu_run -l 10
 bindsym $mod+d exec --no-startup-id dmenu_run -l 10 -p 'Run:' -m 0 -fn 'DejaVu Sans Mono-12' 
 #win key 114
-bindcode 133 exec --no-startup-id dmenu_run -l 10 -p 'Run:' -m 0 -fn 'DejaVu Sans Mono-12'
+#bindcode 133 exec --no-startup-id dmenu_run -l 10 -p 'Run:' -m 0 -fn 'DejaVu Sans Mono-12'
 
 # There also is the (new) i3-dmenu-desktop which only displays applications
 # shipping a .desktop file. It is a wrapper around dmenu, so you need that
@@ -97,10 +98,7 @@ bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 
 # split in vertical orientation
-bindsym $mod+v split v
-
-# split in horizontal orientation
-bindsym $mod+Shift+v split h
+bindsym $mod+v split toggle 
 
 # enter fullscreen mode for the focused container
 # bindsym $mod+f fullscreen toggle
@@ -109,17 +107,17 @@ bindsym $mod+s fullscreen toggle
 
 # change container layout (stacked, tabbed, toggle split)
 # Toggle between stacking/tabbed ecc..
-bindsym $mod+w layout toggle stacking tabbed splith splitv
+bindsym $mod+w layout toggle stacking splith splitv
 
 # focus the parent container
 bindsym $mod+a focus parent
 bindsym $mod+z focus child
 
 # toggle tiling / floating
-bindsym $mod+Shift+space floating toggle
+bindsym $mod+space floating toggle
 
 # change focus between tiling / floating windows
-bindsym $mod+space focus mode_toggle
+bindsym $mod+Shift+space focus mode_toggle
 
 
 # reload the configuration file
@@ -129,7 +127,7 @@ bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
 
-bindsym $mod+u fullscreen disable, focus left, fullscreen enable
+bindsym $mod+u fullscreen disable, focus next, fullscreen enable
 
 # start explorer 
 bindsym $mod+i exec thunar
@@ -213,7 +211,12 @@ mode "resize" {
         bindsym $mod+r mode "default"
 }
 
-bindsym $mod+r mode "resize"
+# bindsym $mod+r mode "resize"
+
+# rename workspaces
+bindsym $mod+r exec i3-input -F "rename workspace to "$(i3-msg -t get_workspaces | jq -r "map(select(.focused))[0].num"):%s"" -P "new workspace name: "
+# clear workspace name
+bindsym $mod+c exec i3-msg "rename workspace to "$(i3-msg -t get_workspaces | jq -r "map(select(.focused))[0].num")""
 
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
@@ -272,7 +275,7 @@ bindsym XF86MonBrightnessDown exec xrandr --output eDP-1 --brightness 0.5 # decr
 
 
 # GET DEM BORDERS OUT OF HEREc:w
-for_window [class="^.*"] border pixel 3 
+for_window [class="^.*"] border pixel 4 
                           # class                 border  backgr. text    indicator child_border
 for_window [class="^.*"] client.focused          #77dd77 #285577 #ffffff #2e9ef4   #285577
 
@@ -291,10 +294,17 @@ bindsym Print exec gnome-screenshot -i
 bindsym $mod+Print exec gnome-screenshot -a
 
 # add named workspace
-bindsym $mod+m exec i3-input -F 'workspace %s' -P 'go to workspace: '
-bindsym $mod+Shift+m exec i3-input -F 'move container to workspace %s' -P 'move to workspace: '
+bindsym $mod+t exec i3-input -F 'workspace %s' -P 'go to workspace: '
+bindsym $mod+Shift+t exec i3-input -F 'move container to workspace %s' -P 'move to workspace: '
 
 bindsym $mod+backslash workspace next
 bindsym $mod+Shift+backslash workspace previous 
 bindsym $mod+Tab workspace back_and_forth
 bindsym $mod+y exec --no-startup-id /home/steph/script/mic_set_headphone
+
+#focus_follows_mouse no
+#workspace_layout stacking
+workspace_layout stacking
+for_window [class="Firefox"] layout stacking
+for_window [class="onlyoffice-descktopeditors"] layout stacking
+for_window [class="i3-sensible-terminal"] layout stacking

@@ -227,6 +227,8 @@ alias dul='du -h --max-depth=1'
 alias hi='history | tail -20'
 alias gdb='gdb -q' 
 alias sx='source /home/steph/.xinitrc'
+alias sd='source /home/steph/.x-enter-disable'
+alias sg='source sg/sg/bin/activate'
 
 # Git aliases
 alias ga='git add'
@@ -239,7 +241,8 @@ alias gp='git push'
 alias gs='git status -s'
 alias gt='git tag'
 alias gg='git gg'
-alias g='git g'
+#alias g='git g'
+alias g='tig'
 alias s='git s'
 alias gf='git fetch --all'
 alias grh='git reset --hard'
@@ -256,3 +259,4 @@ bind Space:magic-space
 
 # temporaneo crosstoolchain arm
 export PATH=$PATH:/home/steph/yocto/arm-toolchain/gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu/bin
+export OPENAI_API_KEY=***REMOVED-OPENAI-KEY***

@@ -47,10 +47,16 @@ xmodmap -e "keycode 51 = ugrave agrave"
 xmodmap -e "keycode  12 = 3 numbersign 3 numbersign threesuperior dead_tilde threesuperior"
 
 # remap ò as / and ç as ò key
-xmodmap -e "keycode  47 = colon ograve semicolon colon at slash"
+xmodmap -e "keycode  47 = ograve slash slash colon at slash"
+
+# restore enter e back if disabled
+xmodmap -e "keycode 36 = Return"
+xmodmap -e "keycode 22 = BackSpace"
+
+#xmodmap -e "keycode  43 = h H BackSpace H hstroke Hstroke hstroke Hstroke h H hstroke Hstroke"
 
 # remap : as / key
-xmodmap -e "keycode  60 = period slash period slash periodcentered dead_diaeresis periodcentered dead_diaeresis period colon periodcentered dead_diaeresis" 
+#xmodmap -e "keycode  60 = period slash period slash periodcentered dead_diaeresis periodcentered dead_diaeresis period colon periodcentered dead_diaeresis" 
 
 # remap - as / key
 #xmodmap -e "keycode  61 = slash underscore semicolon colon at slash"
