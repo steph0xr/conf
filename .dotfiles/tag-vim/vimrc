@@ -22,11 +22,14 @@
   set noswapfile
   "set autochdir
 
-  set expandtab
+  " set expandtab
+  set noexpandtab
   set tabstop=8 "number of visual spaces per TAB
   set softtabstop=8 " number of spaces in tab when editing
   " set smartindent
   set shiftwidth=8
+  set cindent
+  set cinoptions+=(0
 
   set relativenumber "set numbers to lines
   set nu "add absolute number to current line
@@ -37,18 +40,6 @@
   set incsearch           " search as characters are entered
   set hidden "switch between buffer witout saving
   set path+=** "search down into subfolders-provides tab-completion for all file related task
-
-  " set foldmethod=syntax "folding
-  " autocmd FileType c setlocal foldmethod=syntax
-  " set foldlevel=99
-  " nnoremap ,f :setlocal foldmethod=syntax<CR>zM
-
-  " treesitter folding
-  set foldmethod=expr
-  set foldexpr=nvim_treesitter#foldexpr()
-  set nofoldenable                     " Disable folding at startup.
-  nnoremap ,ff :setlocal foldmethod=expr<CR>zM
-  nnoremap ,f :setlocal foldmethod=syntax<CR>zM
 
   set scrolloff=8
   set signcolumn=yes
@@ -96,9 +87,18 @@
   nnoremap \\ :Xg<CR>
 
   command! Diff :windo diffthis
+  command! Diffoff :windo diffoff
   nnoremap ,d :Diff<CR>
+  nnoremap ,dd :Diffoff<CR>
   nnoremap ,dl :diffget //2<CR>
   nnoremap ,dr :diffget //3<CR>
+  set diffopt+=algorithm:histogram
+  set diffopt+=indent-heuristic
+  nnoremap ,dv :DiffviewOpen
+  nnoremap ,do :DiffviewOpen<CR>
+  nnoremap ,dc :DiffviewClose<CR>
+  noremap ,dh :DiffviewFileHistory<CR>
+  nnoremap ,df :DiffviewFileHistory %<CR>
 
 
   "ALT mapping for moving lines
@@ -266,6 +266,8 @@ endif
 
     Plug 'aklt/plantuml-syntax'
     Plug 'scrooloose/vim-slumlord'
+    Plug 'sindrets/diffview.nvim'
+
     " Plug 'skanehira/preview-uml.vim'
 
   " else
@@ -336,25 +338,44 @@ set statusline+=\%b\ 0x%B\|\ %l,%c%V\ \ %P
 packadd termdebug
 " let g:termdebug_popup = 0
 " let g:termdebug_wide = 163
-let g:termdebug_wide = 0 
-nnoremap ùd :Termdebug<CR>
+" let g:termdebug_wide = 1
+let g:termdebug_config = {'wide': 163}
+nnoremap èd :set norelativenumber<CR>:Termdebug<CR>
+nnoremap èdd :set norelativenumber<CR>:Termdebug ./build/debug/app<CR>:call TermDebugSendCommand('b main')<CR>:Run<CR><C-w>l
 " nnoremap <leader>dg :Gdb<CR>
-nnoremap ùb :Break<CR>
-nnoremap ùc :Continue<CR>
-nnoremap ùe :Evaluate<CR>
-nnoremap ùf :Finish<CR>
-nnoremap ùh :Stop<CR>
-nnoremap ùm :call TermDebugSendCommand('source .breakpoints')<CR>
-nnoremap ùo :call TermDebugSendCommand('save br .breakpoints')<CR>
-nnoremap ùy :call TermDebugSendCommand('info breakpoints')<CR>
-nnoremap ùu :call TermDebugSendCommand('delete breakpoints')<CR>
-nnoremap ùn :Over<CR>
-nnoremap ùx :Clear<CR>
-nnoremap ùs :Step<CR>
-nnoremap ùr :Run<CR>
-nnoremap ùs :Step<CR>
-nnoremap ùq :call TermDebugSendCommand('q')<CR>:Gdb<CR>:q<CR>:call TermDebugSendCommand('save br .breakpoints')<CR>
-nnoremap ùv :call TermDebugSendCommand('signal SIGINT')<CR>
+nnoremap èc :Continue<CR>
+nnoremap èe :Evaluate<CR>
+nnoremap èf :Finish<CR>
+nnoremap èh :Stop<CR>
+nnoremap èn :Over<CR>
+nnoremap èx :Clear<CR>
+nnoremap ès :Step<CR>
+nnoremap èr :Run<CR>
+nnoremap ès :Step<CR>
+nnoremap èb :Break<CR>
+nnoremap èbb :call <SID>ToggleBreakpoint()<CR>
+nnoremap èbl :call TermDebugSendCommand('source .bp.gdb')<CR>
+nnoremap èbs :call TermDebugSendCommand('save br .bp.gdb')<CR>
+nnoremap èbi :call TermDebugSendCommand('info breakpoints')<CR>
+nnoremap èbd :call TermDebugSendCommand('delete breakpoints')<CR>
+nnoremap èq :call TermDebugSendCommand('save br .bp.gdb')<CR>:call TermDebugSendCommand('q')<CR>:Gdb<CR>:q<CR>
+nnoremap èv :call TermDebugSendCommand('signal SIGINT')<CR>
+nnoremap èg :Gdb<CR><CR>A<CR>
+tnoremap èj <ESC><C-w>l
+
+function! s:ToggleBreakpoint() abort
+  let l:bufnr = bufnr('%')
+  let l:lnum  = line('.')
+  let l:signs = sign_getplaced(l:bufnr, {'group': 'TermDebug', 'lnum': l:lnum})
+  if !empty(l:signs) && !empty(l:signs[0].signs)
+    execute 'Clear'
+  else
+    execute 'Break'
+  endif
+endfunction
+
+
+
 "termina sessione remota gdbServer:
 " nnoremap ,de :call TermDebugSendCommand('mon exit')<CR>
 "packadd! vimspector
@@ -400,16 +421,18 @@ nnoremap <leader>sl :source ~/.saved_vim_sessions/
 
 "git vim-fugitive \g
 let g:fugitive_summary_format = "%<(18,trunc)%an|| %<(75,trunc)%s|| %<(55,trunc)%d||%<(12,trunc)%ar - %aI"
-nnoremap <leader>g :Git status -s<CR>
 nnoremap gs :Git<CR>
 noremap gl :Gclog<CR>
-nnoremap <leader>gc :GBranches<CR>
-nnoremap <leader>gg :Flogsplit -all -date=relative -raw-args=--author-date-order -max-count=2000<CR>
+" Flog auto-update needs that u is pressed anyway if something is done outside Flog tab
+nnoremap <leader>g :Flog -all -date=relative -raw-args=--author-date-order -max-count=2000 -auto-update<CR>
+nnoremap <leader>gg :Flogsplit -all -date=relative -raw-args=--author-date-order -max-count=2000 -auto-update<CR>
 nnoremap <leader>gd :Git difftool<CR>
 nnoremap <leader>gs :Git<CR>
 nnoremap <leader>gl :Gclog<CR>
-"git follow a single file log history:
-noremap  <leader>gf :Gclog -- %<CR> 
+"git follow a single file log history (show the raw file):
+noremap  <leader>gf :0Gclog<CR> 
+"git follow a single file log history (show the diffs):
+nnoremap <leader>gc :Gclog -- %<CR>
 noremap  <leader>g1 :Gvdiffsplit HEAD~1<CR> 
 noremap  <leader>g2 :Gvdiffsplit HEAD~2<CR> 
 nnoremap <leader>gk :G log --graph --abbrev-commit --decorate=no --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(dim white)%s%C(reset) %C(bold blue)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all --tags <CR>
@@ -448,8 +471,10 @@ nnoremap ,cz :CMakeClose<CR>
 nnoremap ,c :CMakeGenerate!<CR>
 " Make dispatch to tmux
 nnoremap ,m :Make<CR><CR>:cw<CR>
-nnoremap ,MC :Make clean<CR><CR>:cw<CR>
 nnoremap ,M :make!<CR><CR>:cw<CR>
+nnoremap ,Mc :Make clean<CR><CR>:cw<CR>
+" bear cmq to create compile_commands.json to avoid lsp warning on libs:
+nnoremap ,Mb :!bear -- make<CR><CR>:cw<CR>
 set makeprg=make
 
 " espressif:
@@ -457,7 +482,7 @@ set makeprg=make
 " nnoremap ,M :make! -C build<CR><CR>:cw<CR>
 " set makeprg=ninja
 
-nnoremap ,R :Dispatch build/main/main<CR>
+nnoremap ,r :Dispatch build/debug/app<CR>
 " nnoremap ,e :w<CR>:Make -C build<CR><CR>:cw<CR> \| :Start build/main/main<CR><CR>:cw<CR>
 "nnoremap ,cw :CMakeClean<CR>:CMakeGenerate<CR>:make! -C build<CR><CR>:cw<CR>
 
@@ -561,6 +586,7 @@ nnoremap <leader>r :checktime<CR>
 
 "vimdiff
 if &diff
+	" those colors not used. see init.vim higlight
   hi DiffAdd    guifg=#003300 guibg=#DDFFDD
   hi DiffDelete    guifg=#003300 guibg=#FF0000
   hi DiffChange guifg=#003300 guibg=#DDDDFF
@@ -576,6 +602,7 @@ if &diff
   nnoremap <leader>< /<<<<<<<<CR>
   nnoremap <C-q> :cquit<CR>
 endif
+
 
 "set curernt file to path
 nnoremap <leader>cd :cd %:p:h<CR>
@@ -651,3 +678,21 @@ vnoremap <C-r> "hy:%s/<C-r>h//gc<left><left><left>
 
 " copy paragraph below
 nnoremap ,y yap}p
+
+set grepprg=grep\ -E
+
+" treesitter folding
+set foldexpr=nvim_treesitter#foldexpr()
+set foldmethod=expr
+"set foldenable
+set nofoldenable                     " Disable folding at startup.
+nnoremap ,ff :setlocal foldmethod=expr<CR>zM
+nnoremap ,f :setlocal foldmethod=syntax<CR>zM
+
+
+" ---- netrw (built-in file browser) -----------------------------------------
+let g:netrw_banner = 0
+let g:netrw_liststyle = 3
+let g:netrw_winsize = 22
+let g:netrw_browse_split = 4
+

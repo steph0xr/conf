@@ -4,6 +4,9 @@
 [include]
   path = ~/.gitconfig_local
 
+[pretty]
+  ste = %C(yellow)%h%Creset | %C(green)%ad%Creset | %s
+
 [alias]
    prettylog = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
   lb = log --graph --abbrev-commit --decorate=no --format=format:'%C(bold blue)%>|(26)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(dim white)%s%C(reset) %C(bold blue)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all --tags
@@ -59,6 +62,8 @@
 [diff]
 	guitool = kdiff3
 	tool = vimdiff 
+	algorithm = histogram
+	indentHeuristic = true
 [core]
 	editor = nvim
 	autocrlf = false #mettere a true sotto windows
@@ -82,3 +87,5 @@
 	cmd = nvim -d -c \"wincmd l\" \"$LOCAL\" \"$MERGED\" \"$REMOTE\"
 [color]
 	ui = auto
+[credential]
+	helper = store

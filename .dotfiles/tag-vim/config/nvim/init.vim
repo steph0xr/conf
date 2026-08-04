@@ -37,9 +37,11 @@ local lspconfig = require'lspconfig'
 lspconfig.clangd.setup {
    cmd = { 
     "clangd", 
+    "--background-index", 
+    "--pch-storage=memory",
+    "--limit-results=20",
 --     "--query-driver=/home/steph/.espressif/tools/xtensa-esp32-elf/esp-2022r1-11.2.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc"
-  -- "--background-index" 
-  }
+  },
 --  cmd = { 
     -- "clangd-xtensa",
  --   "clangd" 
@@ -297,6 +299,13 @@ require('rose-pine').setup({
 -- set colorscheme after options
 vim.cmd('colorscheme rose-pine')
 
+vim.cmd([[
+highlight DiffAdd    guifg=#73c991 guibg=#262626
+highlight DiffDelete guifg=#f14c4c guibg=#262626
+highlight DiffChange guifg=#e2c08d guibg=#333343
+highlight DiffText   guifg=#569cd6  guibg=#333343
+]])
+
 
 -- telescope keybinding
 require("telescope").setup {
@@ -423,3 +432,16 @@ require'nvim-treesitter.configs'.setup {
 
 
 EOF
+
+
+
+"set foldmethod=expr
+"set foldexpr=nvim_treesitter#foldexpr()
+"set foldenable
+"set foldlevelstart=99  " Start with all folds open
+
+"nnoremap ,ff :setlocal foldmethod=expr<CR>zM
+"nnoremap ,f :setlocal foldmethod=syntax<CR>zM
+
+
+autocmd FileType fugitive,git lua vim.treesitter.stop()
