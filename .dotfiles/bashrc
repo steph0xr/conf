@@ -205,6 +205,7 @@ alias vim="nvim"
 alias gdbp="gdb -ex 'source /home/steph/pwndbg/gdbinit.py' -ex 'set disable-colors off'"
 alias hidden='ls -a | grep "^\."'
 alias python="python3"
+alias cl="cd ~/claude && claude"
 
 # #ssh x i3wm
 # SSH_ENV="$HOME/.ssh/agent-environment"

@@ -1,0 +1,36 @@
+# apt packages installed on a fresh machine.
+# One per line. Lines starting with # and blank lines are ignored.
+# Edit freely, then re-run bootstrap.sh (apt install is idempotent).
+
+# --- base tooling ---
+git
+curl
+make
+cmake
+gettext
+g++
+
+# --- shell / terminal / multiplexer ---
+rcm
+tilix
+tmux
+fzf
+ripgrep
+xclip
+
+# --- editor ---
+vim-gtk3
+
+# --- window manager / desktop (i3) ---
+i3
+feh
+xcompmgr
+thunar
+zathura
+
+# --- gnome helpers ---
+gnome-shell-extensions
+gnome-tweaks
+
+# --- diff/merge ---
+kdiff3
