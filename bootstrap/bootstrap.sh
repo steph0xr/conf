@@ -59,6 +59,15 @@ fi
 log "Linking dotfiles (rcup)"
 DOTFILES_DIRS="$repo/.dotfiles" rcup -v
 
+# rcm skips dot-prefixed files in nested dirs, so it can't manage these
+# (they must stay named .gdbinit/.exrc/.commands.py). Link them by hand.
+log "Linking espressif configs (rcm can't manage dotted nested files)"
+esp_src="$repo/.dotfiles/tag-espressif/config/espressif"
+mkdir -p "$HOME/.config/espressif"
+for f in .gdbinit .exrc .commands.py; do
+  ln -sfn "$esp_src/$f" "$HOME/.config/espressif/$f"
+done
+
 log "Done. Log out and back in for group membership to apply."
 
 # ---------------------------------------------------------------------------
