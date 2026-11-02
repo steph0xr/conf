@@ -292,7 +292,7 @@ client.urgent           #ff0000 #900000 #ffffff #ff0000 #ff0000
 
 # startup default application
 exec --no-startup-id i3-msg 'workspace 1; exec /snap/bin/firefox'
-exec --no-startup-id i3-msg 'workspace 9; exec /home/steph/linphone'
+#exec --no-startup-id i3-msg 'workspace 9; exec /home/steph/linphone'
 
 
 # exec --no-startup-id /usr/lib/policykit-1/polkit-agent-helper-1 &

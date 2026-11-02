@@ -40,6 +40,8 @@ lspconfig.clangd.setup {
     "--background-index", 
     "--pch-storage=memory",
     "--limit-results=20",
+    -- let clangd ask the ARM cross gcc (STM32CubeCLT) for its system headers
+    "--query-driver=/opt/st/stm32cubeclt/GNU-tools-for-STM32/bin/arm-none-eabi-*",
 --     "--query-driver=/home/steph/.espressif/tools/xtensa-esp32-elf/esp-2022r1-11.2.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc"
   },
 --  cmd = { 
@@ -157,10 +159,20 @@ end
 
 -- c++ debug adapter configutation with vscode-cpptools
 local dap = require('dap')
+-- pick the newest executable OpenDebugAD7, so a cpptools update doesn't break the path
+local function find_open_debug_ad7()
+  local found = vim.fn.glob(vim.fn.expand('~') .. '/.vscode/extensions/ms-vscode.cpptools-*/debugAdapters/bin/OpenDebugAD7', false, true)
+  for i = #found, 1, -1 do
+    if vim.fn.executable(found[i]) == 1 then
+      return found[i]
+    end
+  end
+  return 'OpenDebugAD7'
+end
 dap.adapters.cppdbg = {
   id = 'cppdbg',
   type = 'executable',
-  command = '/home/steph/.vscode/extensions/ms-vscode.cpptools-1.20.0/debugAdapters/bin/OpenDebugAD7',
+  command = find_open_debug_ad7(),
 }
 
 local env_file = vim.fn.getcwd() .. '/build/project_description.json'
@@ -252,6 +264,10 @@ dap.configurations.cpp = {
 --   }
 }
 dap.configurations.c = dap.configurations.cpp
+
+-- STM32 projects (folders with nvim-project.lua): build/flash/OpenOCD/serial keymaps,
+-- "STM32 ..." dap configurations in front of the ones above, LiveWatch. See lua/stm32/init.lua
+require('stm32').autoload()
 
 
 

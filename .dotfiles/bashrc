@@ -206,6 +206,7 @@ alias gdbp="gdb -ex 'source /home/steph/pwndbg/gdbinit.py' -ex 'set disable-colo
 alias hidden='ls -a | grep "^\."'
 alias python="python3"
 alias cl="cd ~/claude && claude"
+alias cr="claude -r"
 
 # #ssh x i3wm
 # SSH_ENV="$HOME/.ssh/agent-environment"
