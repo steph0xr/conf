@@ -16,7 +16,7 @@
 -- In the window: a = add (with <Tab> completion), f = pick, dd = delete, q = close
 
 local M = {}
-local uv = vim.loop
+local uv = vim.uv
 local ffi = require('ffi')
 
 local cfg = {

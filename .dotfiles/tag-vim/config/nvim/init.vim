@@ -10,7 +10,7 @@ nnoremap gh :lua vim.lsp.buf.hover()<CR>
 nnoremap gca :lua vim.lsp.buf.code_action()<CR>
 " nnoremap gsd :lua vim.lsp.util.show_line_diagnostics(); vim.lsp.util.show_line_diagnostics()<CR>
 " nnoremap gsh :lua vim.lsp.buf.signature_help()<CR>
-nnoremap gn :lua vim.lsp.diagnostic.goto_next()<CR>
+nnoremap gn :lua vim.diagnostic.jump({ count = 1, float = true })<CR>
 nnoremap grn :lua vim.lsp.buf.rename()<CR>
 nnoremap gc :lua vim.lsp.buf.completion()<CR>
 nnoremap <leader>LS :LspStop<CR>
@@ -33,9 +33,8 @@ set completeopt=menu,menuone,noselect
 "vim.lsp - nvim-lspconfig
 lua <<EOF
 
-local lspconfig = require'lspconfig'
-lspconfig.clangd.setup {
-   cmd = { 
+local clangd = {
+   cmd = {
     "clangd", 
     "--background-index", 
     "--pch-storage=memory",
@@ -51,7 +50,27 @@ lspconfig.clangd.setup {
 --  },
 }
 
-lspconfig.pyright.setup{}
+-- per project root: ESP-IDF projects get Espressif's esp-clangd (Xtensa / RISC-V target, ESP gcc
+-- headers), see mcu/esp32.lua clangd_cmd; everything else the clangd above (ARM query-driver)
+local clangd_default = clangd.cmd
+clangd.cmd = function(dispatchers, config)
+  local argv, env = require('mcu.esp32').clangd_cmd(config.root_dir)
+  return vim.lsp.rpc.start(argv or clangd_default, dispatchers, {
+    cwd = config.cmd_cwd,
+    env = vim.tbl_extend('force', config.cmd_env or {}, env or {}),
+    detached = config.detached,
+  })
+end
+-- nvim-project.lua / sdkconfig: MCU project folders without .clangd / .git still get a root
+clangd.root_markers = { '.clangd', '.clang-tidy', '.clang-format', 'compile_commands.json',
+  'compile_flags.txt', 'configure.ac', 'nvim-project.lua', 'sdkconfig', '.git' }
+
+-- built-in LSP config (nvim-lspconfig only supplies the server defaults in lsp/*.lua)
+vim.lsp.config('clangd', clangd)
+vim.lsp.enable({ 'clangd', 'pyright' })
+
+-- diagnostic message at the end of the line, as before nvim 0.11 (which turned it off by default)
+vim.diagnostic.config({ virtual_text = true })
 
 EOF
 
@@ -117,6 +136,8 @@ nnoremap <silent> <leader>db <Cmd>lua require'dap'.toggle_breakpoint()<CR>
 nnoremap <silent> <leader>dB <Cmd>lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>
 nnoremap <silent> <leader>dlp <Cmd>lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>
 nnoremap <silent> <leader>dr <Cmd>lua require'dap'.repl.open()<CR>
+" run the last config again (= dap-ui's round arrow). With that session still active it is stopped
+" and relaunched from the original config, so MCU projects flash the new build: <leader>mb, <leader>dl
 nnoremap <silent> <leader>dl <Cmd>lua require'dap'.run_last()<CR>
 nnoremap <silent> <leader>dh <Cmd>lua require'dap.ui.widgets'.hover()<CR>
 nnoremap <silent> <leader>dp <Cmd>lua require'dap.ui.widgets'.preview()<CR>
@@ -265,50 +286,46 @@ dap.configurations.cpp = {
 }
 dap.configurations.c = dap.configurations.cpp
 
--- STM32 projects (folders with nvim-project.lua): build/flash/OpenOCD/serial keymaps,
--- "STM32 ..." dap configurations in front of the ones above, LiveWatch. See lua/stm32/init.lua
-require('stm32').autoload()
+-- MCU projects (folders with nvim-project.lua, platform = 'stm32' | 'esp32'): build/flash/OpenOCD/serial
+-- keymaps, "STM32 ..." / "ESP32 ..." dap configurations in front of the ones above. See lua/mcu/init.lua
+require('mcu').autoload()
 
 
 
 require('rose-pine').setup({
 	--- @usage 'main' | 'moon'
 	dark_variant = 'moon',
-	bold_vert_split = false,
-	dim_nc_background = false,
-	disable_background = true,
-	disable_float_background = true,
-	disable_italics = false,
+	dim_inactive_windows = false,
+
+	styles = {
+		italic = true,
+		transparency = true, -- no background: the terminal's (transparent) one shows through
+	},
 
 	--- @usage string hex value or named color from rosepinetheme.com/palette
 	groups = {
-		background = 'base',
 		panel = 'surface',
 		border = 'highlight_med',
-		comment = 'muted',
 		link = 'iris',
-		punctuation = 'subtle',
 
 		error = 'love',
 		hint = 'iris',
 		info = 'foam',
 		warn = 'gold',
 
-		headings = {
-			h1 = 'iris',
-			h2 = 'foam',
-			h3 = 'rose',
-			h4 = 'gold',
-			h5 = 'pine',
-			h6 = 'foam',
-		}
-		-- or set all headings at once
-		-- headings = 'subtle'
+		h1 = 'iris',
+		h2 = 'foam',
+		h3 = 'rose',
+		h4 = 'gold',
+		h5 = 'pine',
+		h6 = 'foam',
 	},
 
 	-- Change specific vim highlight groups
 	highlight_groups = {
-		ColorColumn = { bg = 'rose' }
+		ColorColumn = { bg = 'rose' },
+		Comment = { fg = 'muted' },
+		['@punctuation'] = { fg = 'subtle' },
 	}
 })
 
@@ -355,95 +372,36 @@ require("telescope").setup {
 
 
 -- treesitter
-require'nvim-treesitter.configs'.setup {
-  -- A list of parser names, or "all" (the four listed parsers should always be installed)
-  -- ensure_installed = { "c", "cpp", "lua", "vim", "help" },
-  ensure_installed = { "c", "cpp", "lua", "vim" },
-
-  -- Install parsers synchronously (only applied to `ensure_installed`)
-  sync_install = false,
-
-  -- Automatically install missing parsers when entering buffer
-  -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
-  auto_install = true,
-
-  ---- If you need to change the installation directory of the parsers (see -> Advanced Setup)
-  -- parser_install_dir = "/some/path/to/store/parsers", -- Remember to run vim.opt.runtimepath:append("/some/path/to/store/parsers")!
-
-  highlight = {
-    enable = false,
-    -- disable = { "c", "rust" },
-    -- Or use a function for more flexibility, e.g. to disable slow treesitter highlight for large files
-    disable = function(lang, buf)
-        local max_filesize = 100 * 1024 -- 100 KB
-        local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-        if ok and stats and stats.size > max_filesize then
-            return true
-        end
-    end,
-    -- vim.api.nvim_set_hl(0, "@foo.bar.cpp", { link = "Identifier" })
-  },
-
-  textobjects = {
-    select = {
-      enable = true,
-      lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
-      keymaps = {
-        -- You can use the capture groups defined in textobjects.scm
-        ['aa'] = '@parameter.outer',
-        ['ia'] = '@parameter.inner',
-        ['af'] = '@function.outer',
-        ['if'] = '@function.inner',
-        ['ac'] = '@class.outer',
-        ['ic'] = '@class.inner',
-      },
-    },
-
-    move = {
-      enable = true,
-      set_jumps = true, -- whether to set jumps in the jumplist
-      goto_next_start = {
-        ["]m"] = '@function.outer',
-        [']]'] = '@class.outer',
-      },
-      goto_next_end = {
-        [']M'] = '@function.outer',
-        [']['] = '@class.outer',
-      },
-      goto_previous_start = {
-        ['[m'] = '@function.outer',
-        ['[['] = '@class.outer',
-      },
-      goto_previous_end = {
-        ['[M'] = '@function.outer',
-        ['[]'] = '@class.outer',
-      },
-    },
-    swap = {
-      enable = true,
-      swap_next = {
-        ['<leader>a'] = '@parameter.inner',
-      },
-      swap_previous = {
-        ['<leader>A'] = '@parameter.inner',
-      },
-    },
-  },
-
-  --  indent = { 
-  --    enable = true, disable = { 'python' } 
-  --  },
-  --
-  --  incremental_selection = {
-  --    enable = true,
-  --    keymaps = {
-  --      init_selection = '<c-space>',
-  --      node_incremental = '<c-space>',
-  --      scope_incremental = '<c-s>',
-  --      node_decremental = '<c-backspace>',
-  --    },
-  --  },
+-- nvim-treesitter 'main' branch: only parsers + queries, highlight/fold/indent are nvim's own.
+-- Parsers for c, lua, vim, vimdoc, query, markdown ship with nvim; others are compiled with the
+-- tree-sitter CLI (>= 0.26.1):  :lua require('nvim-treesitter').install({ 'cpp' })
+-- Highlight stays off as before (per buffer: :lua vim.treesitter.start()).
+require('nvim-treesitter-textobjects').setup {
+  select = { lookahead = true }, -- jump forward to the textobj, like targets.vim
+  move = { set_jumps = true },
 }
+local select = require('nvim-treesitter-textobjects.select')
+for lhs, query in pairs({
+  aa = '@parameter.outer', ia = '@parameter.inner',
+  af = '@function.outer', ['if'] = '@function.inner',
+  ac = '@class.outer', ic = '@class.inner',
+}) do
+  vim.keymap.set({ 'x', 'o' }, lhs, function() select.select_textobject(query, 'textobjects') end)
+end
+local move = require('nvim-treesitter-textobjects.move')
+for fn, maps in pairs({
+  goto_next_start = { [']m'] = '@function.outer', [']]'] = '@class.outer' },
+  goto_next_end = { [']M'] = '@function.outer', [']['] = '@class.outer' },
+  goto_previous_start = { ['[m'] = '@function.outer', ['[['] = '@class.outer' },
+  goto_previous_end = { ['[M'] = '@function.outer', ['[]'] = '@class.outer' },
+}) do
+  for lhs, query in pairs(maps) do
+    vim.keymap.set({ 'n', 'x', 'o' }, lhs, function() move[fn](query, 'textobjects') end)
+  end
+end
+local swap = require('nvim-treesitter-textobjects.swap')
+vim.keymap.set('n', '<leader>a', function() swap.swap_next('@parameter.inner') end)
+vim.keymap.set('n', '<leader>A', function() swap.swap_previous('@parameter.inner') end)
 
 
 

@@ -1,0 +1,7 @@
+# clangd user config for ESP-IDF projects only: mcu/esp32.lua starts Espressif's esp-clangd with
+# XDG_CONFIG_HOME=~/.config/nvim/lua/mcu, so it reads this file instead of ~/.config/clangd/config.yaml.
+# The compile_commands.json from idf.py (build/, found by clangd itself) has GCC-only -f / -m flags
+# (-mlongcalls, -fstrict-volatile-bitfields, -fno-tree-switch-conversion, ...) that clang rejects.
+# Same fix as Espressif's clangd guide; the -D / -I / -std flags stay.
+CompileFlags:
+  Remove: [-f*, -m*]

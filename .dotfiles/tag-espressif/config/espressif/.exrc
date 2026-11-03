@@ -1,5 +1,5 @@
 "Termdebug
-packadd termdebug
+packadd! termdebug
 let g:termdebugger = "xtensa-esp32-elf-gdb"
 nnoremap ùd :Termdebug -q<CR>G<C-w>
 " nnoremap ùd :Termdebug -q<CR>G<C-w>j<CR>:term<CR>Asu1<CR><C-\><C-n>G

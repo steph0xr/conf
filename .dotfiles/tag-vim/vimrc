@@ -214,7 +214,7 @@ endif
 
     " Neovim Tree shitter
     Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-    Plug 'nvim-treesitter/playground'
+    " (nvim-treesitter/playground: archived, use the built-in :InspectTree / :Inspect)
     Plug 'nvim-treesitter/nvim-treesitter-textobjects'
 
     Plug 'ThePrimeagen/harpoon'
@@ -293,8 +293,8 @@ set statusline+=\%b\ 0x%B\|\ %l,%c%V\ \ %P
 " set statusline=%<%f%h%m%r%=%b\ 0x%B\ \ %l,%c%V\ %P
 
 
-"Termdebug
-packadd termdebug
+"Termdebug ('!': only add it to runtimepath, startup loads it once; plain packadd sourced it twice)
+packadd! termdebug
 " let g:termdebug_popup = 0
 " let g:termdebug_wide = 163
 " let g:termdebug_wide = 1
@@ -583,7 +583,9 @@ nnoremap ,y yap}p
 set grepprg=grep\ -E
 
 " treesitter folding
-set foldexpr=nvim_treesitter#foldexpr()
+if has('nvim')
+  set foldexpr=v:lua.vim.treesitter.foldexpr()
+endif
 set foldmethod=expr
 "set foldenable
 set nofoldenable                     " Disable folding at startup.
