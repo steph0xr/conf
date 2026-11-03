@@ -1,0 +1,11 @@
+New STM32 project
+
+  STM32 projects need nvim-project.lua plus a Makefile, not openocd.cfg. OpenOCD is set from nvim-project.lua.
+  - nvim-project.lua: copy it, then change:
+    - openocd_target, for the chip family (target/stm32g4x.cfg, target/stm32f4x.cfg, …). If you leave it out, it defaults to U0, so for any other family you must set it.
+    - defaults: the LiveWatch variables. The template's counter, button_presses and the PA5/PC13 bits only make sense on the hello world.
+    - halt_commands, if you want a timer frozen (DBGMCU address from the reference manual).
+    - serial_baud, if it isn't 115200.
+  - Makefile: nvim reads TARGET := and BUILD := from it to find build/<TARGET>.elf. Keep the template's Makefile and edit only the chip block at the top (TARGET, CPUFLAGS,
+    DEFS, STARTUP, LDSCRIPT, …). The template's README explains this.
+  - Run make compiledb once (or <leader>mb), so clangd gets compile_commands.json.

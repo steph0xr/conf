@@ -1,0 +1,12 @@
+  New ESP32 project (v6.1)
+
+  The only files nvim needs are nvim-project.lua and openocd.cfg. Copy both from hello_world_esp unchanged.
+  - nvim-project.lua: it can be the same file. The only line it really needs is platform = 'esp32'. Set idf = 'v6.1' too, or you'd have to source idf61 before starting nvim.
+    The other fields are just the defaults written out.
+  - openocd.cfg: the same file works as long as you use the same probe and board (esp-prog, an ESP32 matching the WROVER-KIT 3.3V config, your wiring at 10 MHz). It needs
+    changing in these cases:
+    - Another chip (S3, C3, …): change the source [find board/...] line to that chip's board file.
+    - Different wiring or longer cables: if you see OCD_ID = ffffffff errors, go back to adapter speed 5000.
+  - The rest comes from ESP-IDF's own project layout (CMakeLists.txt, main/, sdkconfig). nvim finds the ELF in build/ by itself, and that folder only exists after the first
+    <leader>mb.
+  - Keep the sdkconfig dual-core, which is the IDF default. idf.py create-project or a copied v6.1 example already gives you that.
