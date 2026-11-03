@@ -22,8 +22,6 @@ return {
   -- initial LiveWatch list, used until .livewatch.json exists (it's created on the first change)
   defaults = {
     { expr = 'uwTick' },
-    { expr = 'counter' },
-    { expr = 'button_presses' },
     { name = 'led', expr = 'GPIOA->ODR', formula = 'bit(x, 5)' },    -- LD4 on PA5
     { name = 'button', expr = 'GPIOC->IDR', formula = 'bit(x, 13)' }, -- B1 on PC13 (1 = released)
   },

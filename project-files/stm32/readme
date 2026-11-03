@@ -6,6 +6,27 @@ New STM32 project
     - defaults: the LiveWatch variables. The template's counter, button_presses and the PA5/PC13 bits only make sense on the hello world.
     - halt_commands, if you want a timer frozen (DBGMCU address from the reference manual).
     - serial_baud, if it isn't 115200.
-  - Makefile: nvim reads TARGET := and BUILD := from it to find build/<TARGET>.elf. Keep the template's Makefile and edit only the chip block at the top (TARGET, CPUFLAGS,
-    DEFS, STARTUP, LDSCRIPT, …). The template's README explains this.
-  - Run make compiledb once (or <leader>mb), so clangd gets compile_commands.json.
+  - Makefile: nvim reads TARGET and BUILD (or CubeMX's BUILD_DIR) from it to find build/<TARGET>.elf. Either a plain STM32CubeMX Makefile
+    project, or the template's Makefile (same CubeMX layout): edit TARGET, C_SOURCES, ASM_SOURCES, CPU/FPU/FLOAT-ABI,
+    C_DEFS, C_INCLUDES, LDSCRIPT. The template's README explains this.
+  - Run <leader>mc once (make clean && bear -- make), so clangd gets compile_commands.json. Redo it after adding files or changing flags.
+
+Debug info: -g vs -g3 (LiveWatch / dap expressions)
+
+  - With -g, gdb knows variables, types, functions: globals/statics (uwTick, counter), struct members, locals.
+  - Only -g3 adds the #define macros (GPIOA, TIM1, LED4_PIN, ...). Without it, LiveWatch shows
+    'No symbol "GPIOA" in current context' for an expression like GPIOA->ODR.
+  - Our template Makefile (CubeMX layout) already has CFLAGS += -g3 in the same ifeq ($(DEBUG), 1) block shown below.
+  - A plain STM32CubeMX "Makefile" project has, in the "# compile gcc flags" section:
+        ifeq ($(DEBUG), 1)
+        CFLAGS += -g -gdwarf-2
+        endif
+    Change that middle line to:
+        CFLAGS += -g3
+    then make clean + <leader>mb (or <leader>mB) and flash again. CubeMX has no option for it and rewrites
+    the Makefile on every Generate Code, so the change must be redone each time.
+  - Alternative that works with plain -g (no Makefile change): use the register struct type plus the base address
+    (from the chip header stm32xxxx.h, *_BASE defines, or the reference manual) in nvim-project.lua:
+        { name = 'led', expr = '((GPIO_TypeDef *)0x50000000)->ODR', formula = 'bit(x, 5)' },  -- GPIOA on U0
+        { name = 'led', expr = '*(unsigned int *)0x50000014',        formula = 'bit(x, 5)' },  -- raw GPIOA->ODR
+  - With DEBUG = 0 there is no -g at all: nothing is readable, not even variables.

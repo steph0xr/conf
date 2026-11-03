@@ -2,7 +2,8 @@
 -- nvim-dap over OpenOCD + ST-LINK, LiveWatch, picocom on the ST-LINK virtual COM port.
 --
 --   * tool paths (CubeCLT gcc/gdb, OpenOCD, picocom) and the commands that use them live here
---   * the ELF path comes from the project's Makefile (TARGET := ..., BUILD := ...)
+--   * the ELF path comes from the project's Makefile: TARGET, and BUILD (our template) or BUILD_DIR
+--     (STM32CubeMX "Makefile" toolchain); works with a plain CubeMX-generated Makefile
 --   * nvim-project.lua: openocd_target, serial_baud, halt_commands, LiveWatch helpers/defaults
 
 local mcu = require('mcu')
@@ -32,6 +33,17 @@ local function make_var(root, name, default)
   return default
 end
 
+-- does the Makefile define the rule `name:`?
+local function make_target(root, name)
+  local f = io.open(root .. '/Makefile', 'r')
+  if not f then
+    return false
+  end
+  local found = f:read('a'):find('\n' .. name .. '%s*:') ~= nil
+  f:close()
+  return found
+end
+
 -- PATH for :make, :Make, terminals: the ARM toolchain goes first; CubeCLT's STM32_Programmer_CLI is only
 -- appended as a fallback, so a newer one found earlier on PATH (e.g. ~/.local/bin symlink to the standalone
 -- STM32CubeProgrammer, needed for STM32U0) keeps priority.
@@ -47,16 +59,31 @@ local function setup_path()
 end
 
 function M.setup(root, project)
-  local elf = root .. '/' .. make_var(root, 'BUILD', 'build') .. '/' .. make_var(root, 'TARGET', 'firmware') .. '.elf'
+  local build = make_var(root, 'BUILD') or make_var(root, 'BUILD_DIR', 'build')
+  local elf = root .. '/' .. build .. '/' .. make_var(root, 'TARGET', 'firmware') .. '.elf'
   local halt_commands = project.halt_commands or {}
 
   setup_path()
   vim.o.makeprg = 'make -C ' .. root .. ' -j8'
 
+  -- shell command through vim-dispatch, errors parsed like :Make (gcc)
+  local function dispatch(cmd)
+    vim.cmd('Dispatch -compiler=gcc -dir=' .. vim.fn.fnameescape(root) .. ' sh -c ' .. vim.fn.shellescape(cmd))
+  end
+
   map('<leader>mb', '<Cmd>Make<CR>', 'build')
-  map('<leader>mB', '<Cmd>Make -B OPT=-Og<CR>', 'rebuild for debugging (-Og)')
-  map('<leader>mf', '<Cmd>Make flash<CR>', 'flash (STM32_Programmer_CLI)')
-  map('<leader>mc', '<Cmd>Make compiledb<CR>', 'compile_commands.json for clangd')
+  -- clean + build instead of `make -B`: CubeMX Makefiles have a `$(BUILD_DIR):` mkdir rule that -B breaks
+  map('<leader>mB', function() dispatch('make clean && make -j8 OPT=-Og') end, 'clean rebuild for debugging (-Og)')
+  -- the project's own `flash` rule if it has one (our template), else program the ELF directly
+  map('<leader>mf', function()
+    if make_target(root, 'flash') then
+      vim.cmd('Make flash')
+    else
+      dispatch('STM32_Programmer_CLI -c port=SWD -w ' .. vim.fn.shellescape(elf) .. ' -v -rst')
+    end
+  end, 'flash (STM32_Programmer_CLI)')
+  -- bear records the compiler calls of a full build; works with any Makefile (template, CubeMX, ...)
+  map('<leader>mc', function() dispatch('make clean && bear -- make -j8') end, 'compile_commands.json for clangd (bear)')
 
   -- OpenOCD + serial terminal ----------------------------------------------------------------
   -- `transport select swd` must come before the target: stm32u0x.cfg uses `swd newdap`;

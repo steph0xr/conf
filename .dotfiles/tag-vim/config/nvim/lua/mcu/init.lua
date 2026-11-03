@@ -42,8 +42,49 @@ end
 -- run argv in a terminal split at the bottom of the screen
 function M.term(argv, cwd)
   vim.cmd('botright 10split | enew')
-  vim.fn.termopen(argv, { cwd = cwd })
+  local job = vim.fn.termopen(argv, { cwd = cwd })
+  if job > 0 then
+    M.jobs[job] = vim.fs.basename(argv[1])
+  end
 end
+
+-- terminal jobs started by M.term (OpenOCD, picocom, idf.py monitor): stopped cleanly when nvim exits
+M.jobs = M.jobs or {}
+
+-- the key each program quits on, typed into its terminal like by hand
+local quit_keys = {
+  picocom = '\1\24', -- Ctrl-A Ctrl-X (a Ctrl-C would just go out on the UART)
+  ['idf.py'] = '\29', -- Ctrl-]
+}
+
+-- ExitPre (:qa, :q in the last window, ...): send each running job its quit key (Ctrl-C for OpenOCD:
+-- clean shutdown, frees the probe and ports 3333/6666), wait up to 3 s, then jobstop() what is left.
+-- If a normal buffer has unsaved changes, the quit fails anyway (E37/E162), so the jobs keep running.
+vim.api.nvim_create_autocmd('ExitPre', {
+  group = vim.api.nvim_create_augroup('mcu_jobs', { clear = true }),
+  callback = function()
+    for _, b in ipairs(vim.api.nvim_list_bufs()) do
+      if vim.bo[b].modified and vim.bo[b].buftype == '' then
+        return
+      end
+    end
+    local running = {}
+    for job, prog in pairs(M.jobs) do
+      if vim.fn.jobwait({ job }, 0)[1] == -1 then
+        vim.fn.chansend(job, quit_keys[prog] or '\3')
+        table.insert(running, job)
+      end
+      M.jobs[job] = nil
+    end
+    if #running > 0 then
+      for i, res in ipairs(vim.fn.jobwait(running, 3000)) do
+        if res == -1 then
+          vim.fn.jobstop(running[i])
+        end
+      end
+    end
+  end,
+})
 
 -- only one OpenOCD can own the probe and ports 3333/6666: say who has them
 function M.openocd_busy()
