@@ -5,6 +5,7 @@
 -- nvim-project.lua returns a table; `platform` picks the module (lua/mcu/<platform>.lua):
 --   platform = 'stm32' (default)  see mcu/stm32.lua
 --   platform = 'esp32'            see mcu/esp32.lua
+--   platform = 'linux'            see mcu/linux/init.lua (embedded Linux kernel: kgdb / JTAG / gdb stub)
 -- The file is read through vim.secure.read, so nvim asks once (and after every change) whether to
 -- trust it, like 'exrc'. Load by hand with  :Mcu [dir]
 
@@ -39,23 +40,45 @@ function M.map(lhs, rhs, desc)
   vim.keymap.set('n', lhs, rhs, { silent = true, desc = desc })
 end
 
--- run argv in a terminal split at the bottom of the screen
-function M.term(argv, cwd)
+-- run argv in a terminal split at the bottom of the screen; returns the job id.
+-- prog: the program that reads the keyboard, for the quit key on exit (default: argv[1]),
+-- e.g. 'picocom' for an expect script that ends in picocom
+function M.term(argv, cwd, prog)
   vim.cmd('botright 10split | enew')
   local job = vim.fn.termopen(argv, { cwd = cwd })
   if job > 0 then
-    M.jobs[job] = vim.fs.basename(argv[1])
+    M.jobs[job] = prog or vim.fs.basename(argv[1])
   end
+  return job
+end
+
+-- true while a job started by M.term runs
+function M.running(job)
+  return job ~= nil and M.jobs[job] ~= nil and vim.fn.jobwait({ job }, 0)[1] == -1
+end
+
+-- stop a job started by M.term with its quit key (like typing it), jobstop() after `ms` ms
+function M.quit(job, ms)
+  if not M.running(job) then
+    return
+  end
+  vim.fn.chansend(job, M.quit_keys[M.jobs[job]] or '\3')
+  if vim.fn.jobwait({ job }, ms or 2000)[1] == -1 then
+    vim.fn.jobstop(job)
+  end
+  M.jobs[job] = nil
 end
 
 -- terminal jobs started by M.term (OpenOCD, picocom, idf.py monitor): stopped cleanly when nvim exits
 M.jobs = M.jobs or {}
 
 -- the key each program quits on, typed into its terminal like by hand
-local quit_keys = {
+M.quit_keys = {
   picocom = '\1\24', -- Ctrl-A Ctrl-X (a Ctrl-C would just go out on the UART)
   ['idf.py'] = '\29', -- Ctrl-]
+  ssh = '\r~.', -- ssh escape: disconnect (a Ctrl-C would go to the remote shell)
 }
+local quit_keys = M.quit_keys
 
 -- ExitPre (:qa, :q in the last window, ...): send each running job its quit key (Ctrl-C for OpenOCD:
 -- clean shutdown, frees the probe and ports 3333/6666), wait up to 3 s, then jobstop() what is left.
@@ -107,22 +130,17 @@ function M.gdb_cmds(list)
   return out
 end
 
--- put our dap configurations first (choice 1, 2, ...), keep the global ones after them,
--- drop the ones a previous project / reload added
+-- the project's dap configurations (replaced by the next project / reload). Given to nvim-dap as a
+-- configuration provider, so <leader>dc offers them from any buffer: also from a terminal (OpenOCD,
+-- kdmx, console), an .S / .dts file or an empty one, not only from c / cpp buffers.
+-- nvim-dap lists the providers sorted by name: '!' puts ours before dap.global (dap.configurations.<ft>)
+M.dap_configs = M.dap_configs or {}
 function M.set_dap_configs(list)
   local dap = require('dap')
-  local configs = {}
-  for _, c in ipairs(list) do
-    c.mcu = true -- marker: replaced on the next reload / project
-    table.insert(configs, c)
+  M.dap_configs = list
+  if not dap.providers.configs['!mcu'] then
+    dap.providers.configs['!mcu'] = function() return M.dap_configs end
   end
-  for _, c in ipairs(dap.configurations.c or {}) do
-    if not c.mcu then
-      table.insert(configs, c)
-    end
-  end
-  dap.configurations.c = configs
-  dap.configurations.cpp = configs
 end
 
 -- loading ---------------------------------------------------------------------------------------

@@ -1,0 +1,16 @@
+#!/bin/sh
+# Build jtag/dts/*.dts against the local kernel sources (kernel/src, from ./sync-kernel) with the
+# kernel's own include paths, like "make dtbs", without bitbake. Output: jtag/dts/<name>.dtb
+set -eu
+here=$(cd "$(dirname "$0")" && pwd)
+K=$here/../kernel/src
+D=$K/arch/arm64/boot/dts
+for src in "$here"/dts/*.dts; do
+  out=${src%.dts}.dtb
+  cpp -nostdinc -undef -D__DTS__ -x assembler-with-cpp \
+      -I "$D/freescale" -I "$D" -I "$K/include" -I "$K/scripts/dtc/include-prefixes" \
+      "$src" -o "$out.pre"
+  dtc -I dts -O dtb -@ -q -i "$D/freescale" -o "$out" "$out.pre"
+  rm -f "$out.pre"
+  ls -l "$out"
+done

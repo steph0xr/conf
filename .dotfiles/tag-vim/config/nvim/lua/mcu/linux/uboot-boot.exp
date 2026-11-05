@@ -1,0 +1,66 @@
+#!/usr/bin/expect -f
+# Boot the board once with a few U-Boot commands typed first, through U-Boot's console:
+# reset (ssh reboot, or by hand), stop autoboot, type the commands, `boot`, wait for the kernel.
+#
+#   uboot-boot.exp <tty> <baud> <ssh|-> <keep> <wait> <command>...
+#     tty       console: the UART, or kdmx's terminal pty (.kdmx_trm)
+#     ssh       user@board: "reboot" is sent over ssh; "-": reset the board by hand
+#     keep      1: stay in the console (picocom) afterwards; 0: quit picocom, so gdb can open the
+#               UART itself (kgdb without kdmx)
+#     wait      what the kernel prints when it is where we want it, e.g.
+#               "Waiting for connection from remote gdb" (kgdbwait) or "login:"
+#     command   U-Boot commands, one per argument, typed before `boot`, e.g.
+#               'setenv mmcargs "${mmcargs} kgdboc=ttyLP0,115200 kgdbwait"'   (kgdb, <leader>mr)
+#               'setenv fdtfile imx93-11x11-evk-jtag.dtb'                      (JTAG, <leader>mj)
+#
+# Run by <leader>mr / <leader>mj (lua/mcu/linux). One-shot: nothing is saved (no saveenv), the next
+# normal reset boots as usual. Written for the NXP BSP env (bootcmd -> mmcboot -> mmcargs, fdtfile).
+
+if {[llength $argv] < 6} {
+    send_user "usage: uboot-boot.exp <tty> <baud> <ssh|-> <keep> <wait> <command>...\n"
+    exit 2
+}
+set argv [lassign $argv tty baud ssh keep wait]
+set commands $argv
+
+spawn picocom -q -b $baud $tty
+expect {
+    -re "FATAL|cannot open|No such file" { send_user "\n*** cannot open $tty\n"; exit 1 }
+    timeout {}
+}
+
+if {$ssh ne "-"} {
+    send_user "\n*** reboot via ssh $ssh (nothing within ~20 s: press RESET on the board)\n"
+    exec sh -c "timeout 10 ssh -o BatchMode=yes -o ConnectTimeout=5 $ssh reboot >/dev/null 2>&1 &"
+} else {
+    send_user "\n*** press RESET on the board (or power it on)\n"
+}
+
+set timeout 300
+expect {
+    "Hit any key to stop autoboot" { send " " }
+    timeout { send_user "\n*** no U-Boot autoboot prompt within 5 min\n"; exit 1 }
+}
+set timeout 10
+expect "=> "
+# sent as is: ${...} is expanded by U-Boot (e.g. ${mmcargs} now, its own ${console} at boot time)
+foreach c $commands {
+    send "$c\r"
+    expect "=> "
+}
+send "boot\r"
+
+set timeout 120
+expect {
+    "Waiting for connection from remote gdb" { send_user "\n*** kernel waits in kgdb: <leader>dc -> \"Linux kgdb ...\"\n" }
+    $wait { send_user "\n*** kernel is up (\"$wait\")\n" }
+    timeout { send_user "\n*** \"$wait\" not seen within 2 min\n" }
+}
+
+if {$keep} {
+    interact
+} else {
+    send "\x01\x18"
+    expect eof
+    send_user "\n*** console closed, $tty is free for gdb\n"
+}

@@ -155,31 +155,7 @@ dap.listeners.before.event_exited["dapui_config"] = function()
   dapui.close()
 end
 
--- c debug adapter using gdb adapter
--- local dap = require('dap')
---  dap.adapters.gdb = {
---    type = "executable",
---    command = "gdb",
---    args = { "-i", "dap" }
---  }
--- end
--- local dap = require("dap")
--- dap.configurations.c = {
---   {
---     name = "Launch",
---     type = "gdb",
---     request = "launch",
---     program = function()
---       return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
---     end,
---     cwd = "${workspaceFolder}",
---     stopAtBeginningOfMainSubprogram = false,
---   }
--- }
-
-
--- c++ debug adapter configutation with vscode-cpptools
-local dap = require('dap')
+-- c / c++ debug adapter: vscode-cpptools (cppdbg)
 -- pick the newest executable OpenDebugAD7, so a cpptools update doesn't break the path
 local function find_open_debug_ad7()
   local found = vim.fn.glob(vim.fn.expand('~') .. '/.vscode/extensions/ms-vscode.cpptools-*/debugAdapters/bin/OpenDebugAD7', false, true)
@@ -196,98 +172,13 @@ dap.adapters.cppdbg = {
   command = find_open_debug_ad7(),
 }
 
-local env_file = vim.fn.getcwd() .. '/build/project_description.json'
-local elf = ""
-local f, err = io.open(env_file, "r")
-if f then
-  local esp_env = f:read("*all")
-  --print(esp_env)
-  local data = vim.fn.json_decode(esp_env)
-  local elf = vim.fn.get(data, 'app_elf', {})
-  --print(elf)
-  f:close()
---else
---   print("no project_description.json found.")
-end
+-- no global configurations: they come per project (nvim-project.lua), see below
+dap.configurations.c = {}
+dap.configurations.cpp = dap.configurations.c
 
-local dap = require('dap')
-dap.configurations.cpp = {
-  -- {
-  --   name = "Launch file",
-  --   type = "cppdbg",
-  --   request = "launch",
-  --   program = function()
-  --     return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
-  --   end,
-  --   cwd = '${workspaceFolder}',
-  --   stopOnEntry = true,
-  -- },
-  -- default cmake cpp desktop appl:
-  -- {
-  --   name = "Launch cmake file",
-  --   type = "cppdbg",
-  --   request = "launch",
-  --   program = vim.fn.getcwd() .. '/build/main/main',
-  --   cwd = '${workspaceFolder}',
-  --   stopOnEntry = true,
-  -- },
-  {
-	name = "kernel Attach to gdbserver :1234",
-	type = "cppdbg",
-	request = "launch",
-	MIMode = "gdb",
-	miDebuggerServerAddress = "localhost:1234",
-	miDebuggerPath = "/usr/bin/gdb",
-	cwd = "${workspaceFolder}",
-	stopAtEntry = false,
-	args = { "-ex", "continue" },
-	program = "/home/steph/buildroot/output/build/linux-5.15.18/vmlinux",
-	-- program = function()
-	--   return vim.fn.input("Path to vmlinux: ", vim.fn.getcwd() .. "/", "file")
-	-- end,
-  },
-  {
-	name = "kernel Attach to gdbserver /dev/ttyUSB0",
-	type = "cppdbg",
-	request = "launch",
-	MIMode = "gdb",
-	miDebuggerPath = "/home/steph/rbuildroot/output/host/bin/arm-buildroot-linux-gnueabihf-gdb",
-	cwd = "${workspaceFolder}",
-	stopAtEntry = false,
-        externalConsole = false,
-	args = { "-ex", "set serial baud 115200", "-ex", "target remote /dev/ttyUSB0" },
-	program = "/home/steph/rbuildroot/output/build/linux-custom/vmlinux",
-  },
---   {
---     name = 'esp32 Attach to gdbserver :3333',
---     type = 'cppdbg',
---     request = 'launch',
---     MIMode = 'gdb',
---     miDebuggerServerAddress = 'localhost:3333',
---     miDebuggerPath = 'xtensa-esp32-elf-gdb',
---     cwd = '${workspaceFolder}',
---     program = string.format(vim.fn.getcwd() .. '/build/hello_world.elf'),
---     -- externalConsole = true,
---    --setupCommands = {  
---      --{ text = 'set remotetimeout 15000' },
---      --{ text = 'file build/hello_world.elf' },
---      --{ text = 'target remote :3333' },
---      --{ text = 'set remote hardware-watchpoint-limit 2'},
---      --{ text = 'mon reset halt' },
---      --{ text = 'hb app_main' },
---      --{ text = 'flushregs' },
---      --{ text = '-enable-pretty-printing' }
---    --},
---     
---     logging = { 
---       engineLogging = true 
---       }
---   }
-}
-dap.configurations.c = dap.configurations.cpp
-
--- MCU projects (folders with nvim-project.lua, platform = 'stm32' | 'esp32'): build/flash/OpenOCD/serial
--- keymaps, "STM32 ..." / "ESP32 ..." dap configurations in front of the ones above. See lua/mcu/init.lua
+-- MCU / embedded Linux projects (folders with nvim-project.lua, platform = 'stm32' | 'esp32' | 'linux'):
+-- build/flash/OpenOCD/serial/kgdb keymaps and the "STM32 ..." / "ESP32 ..." / "Linux ..." dap
+-- configurations. See lua/mcu/init.lua
 require('mcu').autoload()
 
 
@@ -419,3 +310,12 @@ EOF
 
 
 autocmd FileType fugitive,git lua vim.treesitter.stop()
+
+" files on a network mount (gio/gvfs sftp, e.g. the Yocto kernel sources opened by a Linux kgdb
+" session): no gitgutter. Its git diff runs synchronously and takes minutes on a remote kernel tree,
+" nvim hangs meanwhile. Checked on the real path, so symlinks into /run/user/<uid>/gvfs count too.
+augroup no_git_on_gvfs
+  autocmd!
+  autocmd BufReadPre * if resolve(expand('<afile>:p')) =~# '^/run/user/\d\+/gvfs/' |
+        \ let b:gitgutter = {'enabled': 0} | endif
+augroup END

@@ -1,0 +1,22 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * i.MX93 11x11 EVK for JTAG debugging of the running Linux kernel (J-Link on J1405, SW101 OFF):
+ *  - LPUART5 (Bluetooth) off: its pads DAP_TDI/TDO/TCLK/TMS are the JTAG pins
+ *  - no deep idle (cpu-pd-wait): powered-down cores are unreachable over JTAG (= cpuidle.off=1)
+ * Built from ../build-dtb (kernel sources in ../../kernel/src), copied next to imx93-11x11-evk.dtb
+ * on the boot partition; selected in U-Boot with  setenv fdtfile imx93-11x11-evk-jtag.dtb; boot
+ */
+
+#include "imx93-11x11-evk.dts"
+
+&lpuart5 {
+	status = "disabled";
+};
+
+&A55_0 {
+	/delete-property/ cpu-idle-states;
+};
+
+&A55_1 {
+	/delete-property/ cpu-idle-states;
+};

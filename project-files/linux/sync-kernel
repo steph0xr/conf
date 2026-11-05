@@ -1,0 +1,48 @@
+#!/bin/sh
+# Copy the i.MX93 kernel debug files from the Yocto build on falcon into kernel/ (next to this script):
+#   src    kernel sources (devtool workspace, without .git)        -> kernel/src/
+#   build  vmlinux, vmlinux-gdb.py + scripts/gdb (lx-*), .config   -> kernel/
+# No argument: both. rsync over ssh: only what changed is transferred (compressed), files deleted
+# on falcon are deleted here too. Much faster than the sftp mount (no round trip per file).
+# Run after every kernel bitbake; nvim's <leader>mv runs it too.
+#
+#   ./sync-kernel [src|build|all]
+set -eu
+
+HOST=falcon
+BUILD=/home/rescue/yocto/nxp/docker-container/imx-6.6.36-2.1.0-build/build_imx93_fsl-imx-xwayland
+SRC=$BUILD/workspace/sources/linux-imx
+B=$BUILD/tmp/work/imx93_11x11_lpddr4x_evk-poky-linux/linux-imx/6.6.36+git/linux-imx-6.6.36+git
+
+KDIR=$(cd "$(dirname "$0")" && pwd)/kernel
+what=${1:-all}
+
+case $what in
+  src|build|all) ;;
+  *) echo "usage: $0 [src|build|all]" >&2; exit 2 ;;
+esac
+
+ssh -o BatchMode=yes -o ConnectTimeout=10 "$HOST" true || {
+  echo "sync-kernel: ssh $HOST does not work without a password prompt (key / agent / VPN?)" >&2
+  exit 1
+}
+
+mkdir -p "$KDIR"
+RSYNC="rsync -az --info=stats1"
+
+if [ "$what" != build ]; then
+  echo "== sources: $HOST:$SRC -> $KDIR/src"
+  $RSYNC --delete --exclude=/.git "$HOST:$SRC/" "$KDIR/src/"
+fi
+
+if [ "$what" != src ]; then
+  echo "== build: $HOST:$B -> $KDIR"
+  # -L: vmlinux-gdb.py is a symlink into the source tree; of scripts/gdb only the .py are needed
+  $RSYNC -L "$HOST:$B/vmlinux" "$HOST:$B/vmlinux-gdb.py" "$KDIR/"
+  $RSYNC -L --delete -m --exclude=__pycache__/ --include='*/' --include='*.py' --exclude='*' "$HOST:$B/scripts/gdb/" "$KDIR/scripts/gdb/"
+  $RSYNC "$HOST:$B/.config" "$KDIR/config"
+  ls -l "$KDIR/vmlinux"
+  strings "$KDIR/vmlinux" | grep -m1 '^Linux version' || true
+fi
+
+echo "== done"

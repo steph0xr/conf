@@ -1,0 +1,37 @@
+New embedded Linux kernel debug project (platform = 'linux')
+
+  Worked example with every step: ~/tmpcode/imx-example/readme (i.MX93 11x11 EVK, kgdb + J-Link).
+  Copy this folder to the project folder, then change:
+
+  - nvim-project.lua: console.port (ls /dev/serial/by-id/), sdk, source_map (the <PV> of the .S path:
+    gdb kernel/vmlinux -batch -ex 'info line <some asm function>'), kgdb_tty, openocd_cfg, jtag_fdtfile.
+    After every change nvim asks to :trust it.
+  - sync-kernel: HOST (ssh name of the build server), BUILD (the Yocto build dir), SRC (devtool workspace
+    sources), B (the kernel build dir with vmlinux). ssh to HOST must work without a password prompt.
+  - fragment-kgdb.cfg: the kernel config fragment (kgdb, gdb scripts, full debug info, no KASLR, no
+    watchdog). Add it to the kernel bbappend with SRC_URI += "file://fragment-kgdb.cfg", plus
+    KERNEL_EXTRA_ARGS:append = " scripts_gdb" for vmlinux-gdb.py, then bitbake the kernel, image and SDK.
+
+  jtag/ (only for JTAG):
+  - imx93.cfg             i.MX93 SoC for OpenOCD (not upstream yet: NXP Gerrit change 8353). Another SoC
+                          needs its own target cfg (TAP id, A55/A53 debug bases, CTI).
+  - imx93-a55-linux.cfg   the shared part for kernel debug: both A55 as one SMP target on :3333 (cores =
+                          gdb threads), hardware breakpoints, resume on gdb detach, no reset (attach only).
+  - imx93-evk-jlink.cfg   the adapter part for a J-Link (set `adapter serial` to your probe, or delete it).
+                          For our own board with an external probe: copy this file, change only the adapter
+                          lines (driver, speed), keep `source ... imx93-a55-linux.cfg`.
+  - imx93-evk.cfg         the adapter part for the EVK's on-board FT4232H (needs bcu remote_en 1 first).
+  - dts/*.dts + build-dtb the JTAG device tree, built against kernel/src (cpp + dtc, no bitbake).
+                          On the EVK: LPUART5 off (Bluetooth uses the JTAG pads), no cpu-pd-wait (a
+                          powered-down core is not reachable over JTAG). On our own board check the same two
+                          things: is anything muxed onto the JTAG pads, and does cpuidle power the cores down.
+                          Copy the dtb to the boot partition with U-Boot loady + fatwrite (example readme B.3).
+
+  OpenOCD must have the J-Link driver: sudo apt install libjaylink-dev, then configure --enable-jlink
+  (example readme B.1).
+
+  Keys (all in lua/mcu/linux/init.lua):
+    kgdb:  <leader>mk kdmx, <leader>ms console, <leader>dk break in + attach, <leader>mr reboot into kgdbwait
+    JTAG:  <leader>mj reboot with jtag_fdtfile, <leader>ms console (no kdmx), <leader>mg OpenOCD,
+           <leader>dc -> "Linux JTAG (OpenOCD :3333)"
+    both:  <leader>mv sync-kernel
