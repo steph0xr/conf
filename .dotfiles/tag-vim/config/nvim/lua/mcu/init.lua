@@ -36,8 +36,17 @@ end
 
 -- helpers shared by the platform modules ------------------------------------------------------
 
+-- normal mode mapping of the project; also listed by <leader>mh (help) with its desc
+M.keys = M.keys or {}
 function M.map(lhs, rhs, desc)
   vim.keymap.set('n', lhs, rhs, { silent = true, desc = desc })
+  for _, k in ipairs(M.keys) do
+    if k.lhs == lhs then
+      k.desc = desc
+      return
+    end
+  end
+  table.insert(M.keys, { lhs = lhs, desc = desc })
 end
 
 -- run argv in a terminal split at the bottom of the screen; returns the job id.
@@ -121,6 +130,85 @@ function M.openocd_busy()
   return true
 end
 
+-- is an OpenOCD TCL server listening on :6666 (ours from <leader>mg, or any other)?
+function M.openocd_tcl_up()
+  return vim.fn.system({ 'ss', '-ltn' }):match(':6666%s') ~= nil
+end
+
+-- send one command to the running OpenOCD's TCL port (:6666) and call on_done(output, err) in the
+-- main loop. `capture` returns what the command prints (e.g. the program / verify messages).
+function M.openocd_tcl(cmd, on_done)
+  local tcp = vim.uv.new_tcp()
+  local buf = ''
+  local function finish(out, err)
+    if not tcp:is_closing() then
+      tcp:close()
+    end
+    vim.schedule(function() on_done(out, err) end)
+  end
+  tcp:connect('127.0.0.1', 6666, function(err)
+    if err then
+      return finish(nil, err)
+    end
+    tcp:read_start(function(rerr, data)
+      if rerr or not data then
+        return finish(buf, rerr or 'connection closed')
+      end
+      buf = buf .. data
+      if buf:sub(-1) == '\26' then
+        finish(buf:sub(1, -2), nil)
+      end
+    end)
+    tcp:write('capture {' .. cmd .. '}\26')
+  end)
+end
+
+-- the <leader>mg key of every platform: start OpenOCD in a terminal split; pressed again while that
+-- OpenOCD runs = restart it (e.g. after a board reset, or a probe that got stuck): a running debug
+-- session is stopped first (its view of the target is stale; the detach lets the target run), OpenOCD
+-- gets Ctrl-C (frees the probe and the ports), the old terminal is closed, a new OpenOCD starts.
+-- argv(): OpenOCD's command line, or nil when something is missing (argv reports it).
+-- Someone else's OpenOCD / gdbserver on the ports: refused with a message (openocd_busy), not killed.
+function M.openocd_key(argv, cwd)
+  local job, buf
+  local function close_old()
+    if buf and vim.api.nvim_buf_is_valid(buf) then
+      vim.api.nvim_buf_delete(buf, { force = true })
+    end
+    buf = nil
+  end
+  local function start(cmd)
+    if M.openocd_busy() then
+      return
+    end
+    close_old() -- an exited one ([Process exited])
+    job = M.term(cmd, cwd)
+    buf = vim.api.nvim_get_current_buf()
+  end
+  return function()
+    local cmd = argv()
+    if not cmd then
+      return
+    end
+    if not M.running(job) then
+      start(cmd)
+      return
+    end
+    local wait = 0
+    local ok, dap = pcall(require, 'dap')
+    if ok and dap.session() then
+      dap.terminate()
+      wait = 1500 -- gdb detaches, then quits
+    end
+    vim.notify('mcu: restarting OpenOCD')
+    vim.defer_fn(function()
+      M.quit(job, 3000)
+      close_old()
+      start(cmd)
+    end, wait)
+  end
+end
+
 -- gdb commands as cppdbg wants them
 function M.gdb_cmds(list)
   local out = {}
@@ -158,11 +246,111 @@ function M.setup(root)
     return false
   end
   M.root = root
+  M.platform, M.module = platform, mod
+  M.keys = {}
+  M.map('<leader>mh', M.help, 'this help: keys + workflow of the project')
   mod.setup(root, project)
   return true
 end
 
+-- help (<leader>mh, :McuHelp) -------------------------------------------------------------------
+
+-- nvim-dap keys from init.vim (the same for every platform)
+local dap_keys = {
+  { '<leader>dc', 'start a session (pick a configuration) / continue' },
+  { '<leader>dq', 'stop the session' },
+  { '<leader>dl', 'run the last configuration again' },
+  { '<leader>db / dB', 'toggle breakpoint / conditional breakpoint' },
+  { '<leader>dlp', 'log point' },
+  { '<leader>dn / ds / df', 'step over / into / out' },
+  { '<leader>dh / dp', 'value under the cursor (hover / preview)' },
+  { '<leader>dr', 'gdb REPL (gdb commands: -exec <cmd>)' },
+  { '<leader>du', 'dap-ui on / off' },
+}
+
+local function table_lines(rows)
+  local w = 3
+  for _, r in ipairs(rows) do
+    w = math.max(w, #r[1] + 2)
+  end
+  local out = { '| Key' .. string.rep(' ', w - 3) .. ' | Action |',
+                '|' .. string.rep('-', w + 2) .. '|--------|' }
+  for _, r in ipairs(rows) do
+    local k = '`' .. r[1] .. '`'
+    table.insert(out, '| ' .. k .. string.rep(' ', w - #k) .. ' | ' .. r[2] .. ' |')
+  end
+  return out
+end
+
+-- a scratch buffer on the right: the project's keys (as mapped, with their desc), the nvim-dap keys,
+-- and the platform's workflow (M.help in mcu/<platform>.lua). q closes it.
+function M.help()
+  if not M.root then
+    vim.notify('mcu: no project loaded (no nvim-project.lua here, or not trusted)', vim.log.levels.WARN)
+    return
+  end
+  local lines = { '# ' .. M.platform .. ' project: ' .. vim.fn.fnamemodify(M.root, ':~'), '',
+                  '## Project keys', '' }
+  local rows = {}
+  for _, k in ipairs(M.keys) do
+    table.insert(rows, { k.lhs, k.desc or '' })
+  end
+  vim.list_extend(lines, table_lines(rows))
+  vim.list_extend(lines, { '', '## Debug keys (nvim-dap)', '' })
+  vim.list_extend(lines, table_lines(dap_keys))
+  local wf = M.module and M.module.help
+  if type(wf) == 'function' then
+    wf = wf()
+  end
+  if wf then
+    vim.list_extend(lines, { '', '## Workflow', '' })
+    vim.list_extend(lines, wf)
+  end
+  vim.list_extend(lines, { '', '(q: close; the keys are defined in ~/.config/nvim/lua/mcu/' .. M.platform
+                           .. (M.platform == 'linux' and '/init.lua' or '.lua') .. ', the dap keys in init.vim)' })
+
+  local name = 'mcu-help://' .. M.platform
+  local buf = vim.fn.bufnr(name)
+  if buf == -1 then
+    buf = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_name(buf, name)
+  end
+  vim.bo[buf].modifiable = true
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+  vim.bo[buf].modifiable = false
+  vim.bo[buf].bufhidden = 'hide'
+  vim.bo[buf].filetype = 'markdown'
+  local win = vim.fn.bufwinid(buf)
+  if win == -1 then
+    vim.cmd('botright vsplit')
+    win = vim.api.nvim_get_current_win()
+    vim.api.nvim_win_set_buf(win, buf)
+    vim.api.nvim_win_set_width(win, math.min(110, math.floor(vim.o.columns * 0.6)))
+  end
+  vim.api.nvim_set_current_win(win)
+  vim.wo[win].wrap = false
+  vim.keymap.set('n', 'q', '<Cmd>close<CR>', { buffer = buf, silent = true })
+end
+
 -- set up the cwd when it is an MCU project (now and after :cd)
+-- No modelines for files of the project. CubeMX main.c ends with "ex: printf(...)" in the
+-- assert_failed() comment: vim takes it for a modeline (E518 on open, and again when :Make / Dispatch
+-- re-checks the buffers).
+function M.no_modelines(root)
+  local function off(buf)
+    if vim.api.nvim_buf_get_name(buf):sub(1, #root + 1) == root .. '/' then
+      vim.bo[buf].modeline = false
+    end
+  end
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    off(buf)
+  end
+  vim.api.nvim_create_autocmd('BufReadPre', {
+    group = vim.api.nvim_create_augroup('mcu_no_modelines', { clear = true }),
+    callback = function(ev) off(ev.buf) end,
+  })
+end
+
 function M.autoload()
   local function try(dir)
     if dir ~= M.root and vim.uv.fs_stat(dir .. '/' .. M.PROJECT_FILE) then
@@ -174,6 +362,11 @@ function M.autoload()
   if vim.v.vim_did_enter == 1 then
     try(vim.fn.getcwd())
   else
+    -- `nvim Src/main.c`: the files on the command line are read before VimEnter
+    local cwd = vim.fn.getcwd()
+    if vim.uv.fs_stat(cwd .. '/' .. M.PROJECT_FILE) then
+      M.no_modelines(cwd)
+    end
     vim.api.nvim_create_autocmd('VimEnter', { group = group, once = true, callback = function() try(vim.fn.getcwd()) end })
   end
   vim.api.nvim_create_autocmd('DirChanged', {
@@ -184,6 +377,7 @@ function M.autoload()
   vim.api.nvim_create_user_command('Mcu', function(c)
     M.setup(c.args ~= '' and c.args or vim.fn.getcwd())
   end, { nargs = '?', complete = 'dir', desc = 'load the MCU (STM32 / ESP32) setup for a project folder' })
+  vim.api.nvim_create_user_command('McuHelp', function() M.help() end, { desc = 'keys + workflow of the MCU project' })
 end
 
 return M

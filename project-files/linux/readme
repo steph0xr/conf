@@ -27,11 +27,14 @@ New embedded Linux kernel debug project (platform = 'linux')
                           things: is anything muxed onto the JTAG pads, and does cpuidle power the cores down.
                           Copy the dtb to the boot partition with U-Boot loady + fatwrite (example readme B.3).
 
-  OpenOCD must have the J-Link driver: sudo apt install libjaylink-dev, then configure --enable-jlink
+  OpenOCD must have the J-Link driver: sudo apt install libjaylink-dev, then configure --enable-jlink,
+  and jtag/openocd-smp-skip-unexamined.patch (git apply) for debugging from U-Boot / early boot
   (example readme B.1).
 
   Keys (all in lua/mcu/linux/init.lua):
     kgdb:  <leader>mk kdmx, <leader>ms console, <leader>dk break in + attach, <leader>mr reboot into kgdbwait
     JTAG:  <leader>mj reboot with jtag_fdtfile, <leader>ms console (no kdmx), <leader>mg OpenOCD,
-           <leader>dc -> "Linux JTAG (OpenOCD :3333)"
+           <leader>dc -> "Linux JTAG (OpenOCD :3333)". From U-Boot / early boot: stop autoboot, <leader>mg,
+           <leader>dc, breakpoint, continue, type boot (needs jtag/openocd-smp-skip-unexamined.patch in
+           OpenOCD; without it <leader>mG = core 0 only)
     both:  <leader>mv sync-kernel

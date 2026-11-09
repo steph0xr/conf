@@ -33,7 +33,9 @@
 --   <leader>mj  reboot for JTAG (the same, U-Boot: one-shot fdtfile = jtag_fdtfile), then <leader>mg
 --   <leader>mx  break into the running kernel (sysrq-g over ssh, else typed on the console), then <leader>dc
 --   <leader>dk  the same + start "Linux kgdb ..." right away: one key from a running kernel to gdb
---   <leader>mg  OpenOCD (JTAG) gdb server :3333
+--   <leader>mg  OpenOCD (JTAG) gdb server :3333; again while it runs = restart (stops the debug session)
+--   <leader>mG  the same with core 0 only (openocd -c 'set CHIPCORES 1'): from U-Boot / early boot with an
+--               OpenOCD without jtag/openocd-smp-skip-unexamined.patch (with it, <leader>mg works there too)
 --   <leader>mS  ssh shell on the board
 --   <leader>mv  update vmlinux + gdb scripts + sources: runs `sync`, else rsync of remote_build / remote_src
 -- dap (<leader>dc): "Linux kgdb (kdmx)" | "Linux kgdb (serial)" | "Linux JTAG (OpenOCD :3333)" | "Linux gdb server ..."
@@ -235,14 +237,26 @@ function M.setup(root, project)
   end, 'break into kgdb (sysrq-g over ssh / console)')
 
   if project.openocd_cfg then
-    map('<leader>mg', function()
+    -- again while it runs = restart (e.g. after a board reset: the cores are examined fresh; core 1
+    -- exists only once Linux has started it), see mcu.openocd_key
+    -- <leader>mG: core 0 only (cfg variable CHIPCORES = 1, see jtag/imx93-a55-linux.cfg), for U-Boot /
+    -- early boot while core 1 is off. One OpenOCD for both keys: either key while it runs = restart
+    -- in that key's mode.
+    local core0_only = false
+    local key = mcu.openocd_key(function()
       local cfg = abs(project.openocd_cfg)
       if not vim.uv.fs_stat(cfg) then
         vim.notify('linux: ' .. cfg .. ' not found', vim.log.levels.ERROR)
-      elseif not mcu.openocd_busy() then
-        mcu.term({ project.openocd or 'openocd', '-f', cfg }, root)
+        return nil
       end
-    end, 'OpenOCD (JTAG) gdb server (:3333)')
+      local cmd = { project.openocd or 'openocd' }
+      if core0_only then vim.list_extend(cmd, { '-c', 'set CHIPCORES 1' }) end
+      return vim.list_extend(cmd, { '-f', cfg })
+    end, root)
+    map('<leader>mg', function() core0_only = false; key() end,
+      'OpenOCD (JTAG) gdb server (:3333), both cores; again = restart it (stops the debug session)')
+    map('<leader>mG', function() core0_only = true; key() end,
+      'OpenOCD core 0 only (U-Boot / early boot with an unpatched OpenOCD); again = restart it')
   end
 
   if ssh then
@@ -352,5 +366,40 @@ function M.setup(root, project)
                vim.log.levels.WARN)
   end
 end
+
+-- workflow part of <leader>mh (mcu.help)
+M.help = {
+  'After every kernel bitbake: `<leader>mv` (copies vmlinux, gdb scripts and sources from the build server).',
+  'After changing nvim-project.lua: `:trust`.',
+  '',
+  '### JTAG (OpenOCD; e.g. J-Link on the i.MX93 EVK)',
+  '1. board: boot the JTAG dtb (`<leader>mj`, press RESET when asked; or saved in U-Boot: fdtfile)',
+  '2. `<leader>ms`: console directly on the UART (no kdmx), log in',
+  '3. `<leader>mg`: OpenOCD (in Linux both cores "Examination succeed")',
+  '4. `<leader>dc` -> "Linux JTAG (OpenOCD :3333)": halts both cores (threads = CPUs)',
+  '5. breakpoints (hardware, 6), continue; stop the session = the kernel keeps running',
+  '6. after a board reset: `<leader>mg` again = restart OpenOCD (stops the session), then `<leader>dc`',
+  'While halted the whole SoC stops, the console too.',
+  '',
+  '### JTAG from early boot (e.g. `kernel_init`)',
+  '1. reset the board, stop autoboot (any key) -> `u-boot=>`',
+  '2. `<leader>mg`: "a55.1 examination failed" is normal (core 1 is off until the kernel\'s smp_init)',
+  '3. `<leader>dc` -> "Linux JTAG": core 0 halts in U-Boot (`?? ()` and some aborts: normal)',
+  '4. breakpoint(s), `<leader>dc` continue (U-Boot answers again), type `boot` on the console',
+  'Core 1 is examined at the first halt after smp_init ("core 1 is up" in the OpenOCD log), its gdb',
+  'thread appears at the halt after that. Breakpoints set before: core 0 only. The kernel wipes all',
+  'hardware breakpoints at arch_initcall (inside `kernel_init_freeable`): set later ones again after it.',
+  'Needs OpenOCD with jtag/openocd-smp-skip-unexamined.patch; without it: `<leader>mG` (core 0 only).',
+  '',
+  '### kgdb (serial console)',
+  '1. `<leader>mk`: kdmx (splits the console UART: gdb + terminal), then `<leader>ms` and log in as root',
+  '2. `<leader>dk`: breaks into the running kernel (sysrq-g) and attaches gdb',
+  '   (or `<leader>mx` = break-in only, then `<leader>dc` -> "Linux kgdb ...")',
+  '3. breakpoints, continue; stop the session = the kernel keeps running',
+  '4. from early boot: `<leader>mr` reboots once with kgdbwait (kgdb starts late in boot: earlier code = JTAG)',
+  'One debugger at a time: close OpenOCD before kgdb and the other way round.',
+  '',
+  'gdb REPL (`<leader>dr`): `-exec lx-dmesg`, `-exec lx-ps`, `-exec lx-symbols` (modules), `-exec info threads`.',
+}
 
 return M

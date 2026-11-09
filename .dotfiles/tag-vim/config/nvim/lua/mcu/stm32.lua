@@ -66,6 +66,9 @@ function M.setup(root, project)
   setup_path()
   vim.o.makeprg = 'make -C ' .. root .. ' -j8'
 
+  -- CubeMX main.c has "ex: printf(...)" near its end: no modelines in the project (see mcu.no_modelines)
+  mcu.no_modelines(root)
+
   -- shell command through vim-dispatch, errors parsed like :Make (gcc)
   local function dispatch(cmd)
     vim.cmd('Dispatch -compiler=gcc -dir=' .. vim.fn.fnameescape(root) .. ' sh -c ' .. vim.fn.shellescape(cmd))
@@ -92,17 +95,29 @@ function M.setup(root, project)
   local openocd_args = { openocd, '-f', 'interface/stlink.cfg', '-c', 'transport select swd', '-f', openocd_target }
   local serial_baud = project.serial_baud or 115200
 
-  map('<leader>mg', function()
-    if not mcu.openocd_busy() then
-      mcu.term(openocd_args, root)
-    end
-  end, 'OpenOCD gdb server (:3333, TCL :6666)')
+  map('<leader>mg', mcu.openocd_key(function() return openocd_args end, root),
+      'OpenOCD gdb server (:3333, TCL :6666); again = restart it (stops the debug session)')
 
+  -- an OpenOCD gdb server already running (<leader>mg) owns the probe: flash through its TCL port,
+  -- it keeps running (LiveWatch too). Otherwise a one-shot OpenOCD in a terminal.
   map('<leader>mF', function()
-    if not mcu.openocd_busy() then
+    if mcu.openocd_tcl_up() then
+      local ok, dap = pcall(require, 'dap')
+      if ok and dap.session() then
+        vim.notify('flash: stop the debug session first (<leader>dq), gdb would keep the old program',
+                   vim.log.levels.WARN)
+        return
+      end
+      vim.notify('flash: programming through the running OpenOCD ...')
+      mcu.openocd_tcl('program ' .. elf .. ' verify reset', function(out, err)
+        local good = not err and out and out:find('Verified OK', 1, true)
+        vim.notify('flash: ' .. (good and 'verified OK, target reset' or ('FAILED\n' .. (err or '') .. (out or ''))),
+                   good and vim.log.levels.INFO or vim.log.levels.ERROR)
+      end)
+    elseif not mcu.openocd_busy() then
       mcu.term(vim.list_extend(vim.deepcopy(openocd_args), { '-c', 'program ' .. elf .. ' verify reset exit' }), root)
     end
-  end, 'flash with OpenOCD')
+  end, 'flash with OpenOCD (through the running gdb server if there is one)')
 
   -- printf goes to the UART / ST-LINK virtual COM port, not to the DAP console.
   -- picocom: quit with Ctrl-A Ctrl-X; --imap lfcrlf so a bare "\n" in printf still starts a new line
@@ -157,5 +172,20 @@ function M.setup(root, project)
     vim.fn.setreg('z', saved)
   end, { silent = true, desc = 'live watch: add selection' })
 end
+
+-- workflow part of <leader>mh (mcu.help)
+M.help = {
+  '1. once, and after adding files / changing flags: `<leader>mc` (compile_commands.json for clangd)',
+  '2. build: `<leader>mb` (errors in the quickfix list); for stepping `<leader>mB` (clean rebuild, -Og)',
+  '3. `<leader>mg`: OpenOCD in a terminal split, leave it running',
+  '4. `<leader>dc` -> "STM32 flash + debug (stop at main)": flashes the ELF, stops at main',
+  '   or "STM32 attach (no reset, no flash)": debug what already runs',
+  '5. after a change: `<leader>mb`, then `<leader>dl` (runs the last config again = flashes the new build)',
+  '6. `<leader>dw`: LiveWatch, variables read while the target runs (`a` add, `f` search, `dd` delete, `q` close)',
+  '7. `<leader>ms`: serial terminal on the ST-LINK virtual COM port (quit: Ctrl-A Ctrl-X)',
+  '',
+  'Without a debug session: `<leader>mf` flashes with STM32_Programmer_CLI, `<leader>mF` with OpenOCD.',
+  'LiveWatch on #define registers (GPIOA->ODR) needs -g3, see ~/dotfiles/project-files/stm32/readme.',
+}
 
 return M

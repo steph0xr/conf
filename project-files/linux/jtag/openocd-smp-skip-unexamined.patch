@@ -1,0 +1,24 @@
+diff --git a/src/target/breakpoints.c b/src/target/breakpoints.c
+index a08041629..f1d91bbd8 100644
+--- a/src/target/breakpoints.c
++++ b/src/target/breakpoints.c
+@@ -220,6 +220,10 @@ int breakpoint_add(struct target *target,
+ 
+ 		foreach_smp_target(head, target->smp_targets) {
+ 			struct target *curr = head->target;
++			/* a core not examined yet (e.g. still powered off) gets none: the debugger
++			 * sets them again once it runs (hw breakpoints are core-local anyway) */
++			if (!target_was_examined(curr))
++				continue;
+ 			int retval = breakpoint_add_internal(curr, address, length, type);
+ 			if (retval != ERROR_OK)
+ 				return retval;
+@@ -573,6 +577,8 @@ int watchpoint_add(struct target *target, target_addr_t address,
+ 
+ 		foreach_smp_target(head, target->smp_targets) {
+ 			struct target *curr = head->target;
++			if (!target_was_examined(curr))
++				continue;
+ 			int retval = watchpoint_add_internal(curr, address, length, rw, value, mask);
+ 			if (retval != ERROR_OK)
+ 				return retval;

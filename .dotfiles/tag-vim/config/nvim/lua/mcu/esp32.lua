@@ -266,17 +266,14 @@ function M.setup(root, project)
       vim.notify('ESP32: ' .. openocd_cfg .. ' not found in ' .. root, vim.log.levels.ERROR)
       return false
     end
-    return not mcu.openocd_busy()
+    return true
   end
 
   -- ESP_RTOS has to be set before the target is created, i.e. before -f
   local openocd_argv = { openocd, '-c', 'set ESP_RTOS ' .. (project.rtos or 'hwthread'), '-f', openocd_cfg }
 
-  map('<leader>mg', function()
-    if openocd_ok() then
-      mcu.term(openocd_argv, root)
-    end
-  end, 'OpenOCD (Espressif) gdb server (:3333)')
+  map('<leader>mg', mcu.openocd_key(function() return openocd_ok() and openocd_argv or nil end, root),
+      'OpenOCD (Espressif) gdb server (:3333); again = restart it (stops the debug session)')
 
   map('<leader>mF', function()
     local ok, info = pcall(build_info, root)
@@ -284,7 +281,7 @@ function M.setup(root, project)
       vim.notify(info, vim.log.levels.ERROR)
       return
     end
-    if openocd_ok() then
+    if openocd_ok() and not mcu.openocd_busy() then
       mcu.term(vim.list_extend(vim.deepcopy(openocd_argv),
                  { '-c', string.format('program_esp %s %s verify reset exit', info.bin, info.offset) }), root)
     end
@@ -366,5 +363,19 @@ end
 
 -- for tests: true while an export.sh runs
 function M._loading() return idf.loading ~= nil end
+
+-- workflow part of <leader>mh (mcu.help)
+M.help = {
+  '1. first `<leader>mb` (idf.py build): creates build/ and compile_commands.json for clangd',
+  '2. flash: `<leader>mf` over the UART, or `<leader>mF` over JTAG (OpenOCD)',
+  '3. `<leader>mg`: Espressif OpenOCD in a terminal split, leave it running',
+  '4. `<leader>dc` -> "ESP32 flash + debug (stop at app_main)": flashes, resets, stops at app_main',
+  '   or "ESP32 attach (no reset, no flash)": debug what already runs',
+  '5. after a change: `<leader>mb`, then `<leader>dl` (runs the last config again = flashes the new build)',
+  '6. console: `<leader>ms` picocom (quit: Ctrl-A Ctrl-X) or `<leader>mS` idf.py monitor (quit: Ctrl-])',
+  '',
+  'Threads view = CPU0 / CPU1 (rtos hwthread), not the FreeRTOS tasks. No LiveWatch on ESP32:',
+  'values are visible in dap-ui only while the target is stopped. `<leader>mB`: idf.py fullclean build.',
+}
 
 return M
