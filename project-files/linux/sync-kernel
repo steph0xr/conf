@@ -2,13 +2,17 @@
 # Copy the i.MX93 kernel debug files from the Yocto build on falcon into kernel/ (next to this script):
 #   src    kernel sources (devtool workspace, without .git)        -> kernel/src/
 #   build  vmlinux, vmlinux-gdb.py + scripts/gdb (lx-*), .config   -> kernel/
+#   ccdb   clangd (nvim gd / hover): compile_commands.json from the kernel's own
+#          scripts/clang-tools/gen_compile_commands.py, run on $HOST over ssh (it only reads the build
+#          dir, output streamed back), paths rewritten to kernel/src + kernel/build, generated headers
+#          -> kernel/build/, .clangd (gcc-only flags dropped) -> kernel/src/
 #   uboot  U-Boot: u-boot (ELF, symbols), u-boot.bin (what gdb writes to RAM: code + appended dtb),
 #          spl/u-boot-spl, .config, System.map -> uboot/, sources (without .git) -> uboot/src/
-# No argument: all three. rsync over ssh: only what changed is transferred (compressed), files deleted
+# No argument: all four. rsync over ssh: only what changed is transferred (compressed), files deleted
 # on falcon are deleted here too. Much faster than the sftp mount (no round trip per file).
 # Run after every kernel bitbake; nvim's <leader>mv runs it too.
 #
-#   ./sync-kernel [src|build|uboot|all]
+#   ./sync-kernel [src|build|ccdb|uboot|all]
 set -eu
 
 HOST=falcon
@@ -23,8 +27,8 @@ UDIR=$(dirname "$KDIR")/uboot
 what=${1:-all}
 
 case $what in
-  src|build|uboot|all) ;;
-  *) echo "usage: $0 [src|build|uboot|all]" >&2; exit 2 ;;
+  src|build|ccdb|uboot|all) ;;
+  *) echo "usage: $0 [src|build|ccdb|uboot|all]" >&2; exit 2 ;;
 esac
 
 ssh -o BatchMode=yes -o ConnectTimeout=10 "$HOST" true || {
@@ -37,7 +41,8 @@ RSYNC="rsync -az --info=stats1"
 
 if [ "$what" = src ] || [ "$what" = all ]; then
   echo "== sources: $HOST:$SRC -> $KDIR/src"
-  $RSYNC --delete --exclude=/.git "$HOST:$SRC/" "$KDIR/src/"
+  # compile_commands.json / .clangd are ours (ccdb): the workspace has an empty compile_commands.json
+  $RSYNC --delete --exclude=/.git --exclude=/compile_commands.json --exclude=/.clangd --exclude=/.cache "$HOST:$SRC/" "$KDIR/src/"
 fi
 
 if [ "$what" = build ] || [ "$what" = all ]; then
@@ -48,6 +53,45 @@ if [ "$what" = build ] || [ "$what" = all ]; then
   $RSYNC "$HOST:$B/.config" "$KDIR/config"
   ls -l "$KDIR/vmlinux"
   strings "$KDIR/vmlinux" | grep -m1 '^Linux version' || true
+fi
+
+if [ "$what" = ccdb ] || [ "$what" = all ]; then
+  echo "== compile_commands.json: gen_compile_commands.py on $HOST (read only) -> $KDIR/src"
+  for g in include/generated arch/arm64/include/generated; do
+    mkdir -p "$KDIR/build/$g"
+    $RSYNC --delete "$HOST:$B/$g/" "$KDIR/build/$g/"
+  done
+  ssh -o BatchMode=yes "$HOST" "python3 '$SRC/scripts/clang-tools/gen_compile_commands.py' -d '$B' -o /dev/stdout" \
+    > "$KDIR/build/compile_commands.falcon.json"
+  python3 - "$KDIR" "$SRC" "$B" <<'PY'
+import json, sys
+kdir, src, b = sys.argv[1:4]
+db = json.load(open(kdir + '/build/compile_commands.falcon.json'))
+def fix(s):  # build dir first: it is longer and both share the BUILD prefix
+    return s.replace(b, kdir + '/build').replace(src, kdir + '/src')
+for e in db:
+    for k in ('directory', 'file', 'command'):
+        if k in e:
+            e[k] = fix(e[k])
+    if 'arguments' in e:
+        e['arguments'] = [fix(a) for a in e['arguments']]
+json.dump(db, open(kdir + '/src/compile_commands.json', 'w'), indent=1)
+print('compile_commands.json: %d files' % len(db))
+PY
+  # the kernel is built with gcc, clangd is clang: drop the gcc-only flags, aarch64 target
+  cat > "$KDIR/src/.clangd" <<'CLANGD'
+# written by sync-kernel (ccdb): kernel built with gcc, clangd is clang
+CompileFlags:
+  Add: ["--target=aarch64-linux-gnu", "-Wno-unknown-warning-option"]
+  Remove: ["-mabi=lp64", "-fconserve-stack", "-fno-allow-store-data-races", "-mstack-protector-guard*",
+           "-fmin-function-alignment*", "-fno-ipa-sra", "-fno-var-tracking-assignments",
+           "-femit-struct-debug-baseline", "-fsanitize-coverage*", "-mno-fdpic", "-fzero-init-padding-bits*",
+           "-Wimplicit-fallthrough=*", "-Werror", "-Werror=*", "-fpatchable-function-entry*",
+           "-fcanon-prefix-map", "-fmacro-prefix-map*", "-fdebug-prefix-map*", "-fuse-ld=*", "--param*",
+           "-Wa,*", "-mbranch-protection=*"]
+Diagnostics:
+  Suppress: ["*"]
+CLANGD
 fi
 
 if [ "$what" = uboot ] || [ "$what" = all ]; then
