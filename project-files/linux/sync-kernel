@@ -2,24 +2,29 @@
 # Copy the i.MX93 kernel debug files from the Yocto build on falcon into kernel/ (next to this script):
 #   src    kernel sources (devtool workspace, without .git)        -> kernel/src/
 #   build  vmlinux, vmlinux-gdb.py + scripts/gdb (lx-*), .config   -> kernel/
-# No argument: both. rsync over ssh: only what changed is transferred (compressed), files deleted
+#   uboot  U-Boot: u-boot (ELF, symbols), u-boot.bin (what gdb writes to RAM: code + appended dtb),
+#          spl/u-boot-spl, .config, System.map -> uboot/, sources (without .git) -> uboot/src/
+# No argument: all three. rsync over ssh: only what changed is transferred (compressed), files deleted
 # on falcon are deleted here too. Much faster than the sftp mount (no round trip per file).
 # Run after every kernel bitbake; nvim's <leader>mv runs it too.
 #
-#   ./sync-kernel [src|build|all]
+#   ./sync-kernel [src|build|uboot|all]
 set -eu
 
 HOST=falcon
 BUILD=/home/rescue/yocto/nxp/docker-container/imx-6.6.36-2.1.0-build/build_imx93_fsl-imx-xwayland
 SRC=$BUILD/workspace/sources/linux-imx
 B=$BUILD/tmp/work/imx93_11x11_lpddr4x_evk-poky-linux/linux-imx/6.6.36+git/linux-imx-6.6.36+git
+UBOOT=$BUILD/tmp/work/imx93_11x11_lpddr4x_evk-poky-linux/u-boot-imx/2024.04
+UB=$UBOOT/build/imx93_11x11_evk_defconfig
 
 KDIR=$(cd "$(dirname "$0")" && pwd)/kernel
+UDIR=$(dirname "$KDIR")/uboot
 what=${1:-all}
 
 case $what in
-  src|build|all) ;;
-  *) echo "usage: $0 [src|build|all]" >&2; exit 2 ;;
+  src|build|uboot|all) ;;
+  *) echo "usage: $0 [src|build|uboot|all]" >&2; exit 2 ;;
 esac
 
 ssh -o BatchMode=yes -o ConnectTimeout=10 "$HOST" true || {
@@ -30,12 +35,12 @@ ssh -o BatchMode=yes -o ConnectTimeout=10 "$HOST" true || {
 mkdir -p "$KDIR"
 RSYNC="rsync -az --info=stats1"
 
-if [ "$what" != build ]; then
+if [ "$what" = src ] || [ "$what" = all ]; then
   echo "== sources: $HOST:$SRC -> $KDIR/src"
   $RSYNC --delete --exclude=/.git "$HOST:$SRC/" "$KDIR/src/"
 fi
 
-if [ "$what" != src ]; then
+if [ "$what" = build ] || [ "$what" = all ]; then
   echo "== build: $HOST:$B -> $KDIR"
   # -L: vmlinux-gdb.py is a symlink into the source tree; of scripts/gdb only the .py are needed
   $RSYNC -L "$HOST:$B/vmlinux" "$HOST:$B/vmlinux-gdb.py" "$KDIR/"
@@ -43,6 +48,16 @@ if [ "$what" != src ]; then
   $RSYNC "$HOST:$B/.config" "$KDIR/config"
   ls -l "$KDIR/vmlinux"
   strings "$KDIR/vmlinux" | grep -m1 '^Linux version' || true
+fi
+
+if [ "$what" = uboot ] || [ "$what" = all ]; then
+  echo "== U-Boot: $HOST:$UBOOT -> $UDIR"
+  mkdir -p "$UDIR/spl"
+  $RSYNC "$HOST:$UB/u-boot" "$HOST:$UB/u-boot.bin" "$HOST:$UB/System.map" "$UDIR/"
+  $RSYNC "$HOST:$UB/.config" "$UDIR/config"
+  $RSYNC "$HOST:$UB/spl/u-boot-spl" "$UDIR/spl/"
+  $RSYNC --delete --exclude=/.git "$HOST:$UBOOT/git/" "$UDIR/src/"
+  strings "$UDIR/u-boot" | grep -m1 '^U-Boot 20' || true
 fi
 
 echo "== done"

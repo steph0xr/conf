@@ -33,6 +33,15 @@ return {
   openocd_cfg = 'jtag/imx93-evk-jlink.cfg',          -- J-Link; jtag/imx93-evk.cfg = EVK on-board FT4232H
   jtag_fdtfile = 'imx93-11x11-evk-jtag.dtb',         -- jtag/build-dtb, copied to the boot partition
 
+  -- U-Boot proper over JTAG (<leader>mu, then <leader>mg + "U-Boot chain-load"); files from ./sync-kernel uboot
+  uboot = {
+    elf = 'uboot/u-boot',                          -- symbols
+    bin = 'uboot/u-boot.bin',                      -- written to RAM (code + appended dtb)
+    text_base = '0x80200000',                      -- CONFIG_TEXT_BASE
+    source_map = { ['/usr/src/debug/u-boot-imx/2024.04'] = 'uboot/src' },
+    gdb_commands = {},                             -- after the load, e.g. 'break board_init_f'
+  },
+
   -- gdb_server = 'localhost:1234',                  -- any TCP gdb stub (QEMU -s)
   gdb_commands = {},                                 -- gdb commands after connecting
 }

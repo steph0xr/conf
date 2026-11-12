@@ -23,6 +23,12 @@
 --   openocd_cfg   = 'jtag/imx93-evk.cfg'    -- JTAG: <leader>mg + "Linux JTAG"
 --   jtag_fdtfile  = 'imx93-11x11-evk-jtag.dtb' -- <leader>mj boots once with this dtb (on the boot
 --                   partition next to the normal one: e.g. JTAG pins not muxed away, no deep idle)
+--   uboot         = { elf = 'uboot/u-boot', bin = 'uboot/u-boot.bin', text_base = '0x80200000',
+--                     source_map = { ['/usr/src/debug/u-boot-imx/2024.04'] = 'uboot/src' },
+--                     kernel = false,                            -- no vmlinux symbols in that session
+--                     gdb_commands = { 'break board_init_f' } }  -- <leader>mu + "U-Boot chain-load"
+--   keep_hw_breakpoints = false             -- JTAG: let the kernel clear the hardware breakpoints at
+--                   arch_initcall (default: skipped, kernel-gdb.py kernel-keep-hwbp, costs 1 of 6)
 --   gdb_server    = 'localhost:1234'        -- "gdb server" config (QEMU -s, kgdb over telnet, ...)
 --   gdb_commands  = { 'source .breakpoints' } -- after connecting
 --
@@ -31,6 +37,7 @@
 --   <leader>ms  console (picocom: on kdmx's terminal pty when kdmx runs, else on the UART). Quit: Ctrl-A Ctrl-X
 --   <leader>mr  reboot into kgdbwait (ssh reboot or RESET, U-Boot: one-shot bootargs, no saveenv)
 --   <leader>mj  reboot for JTAG (the same, U-Boot: one-shot fdtfile = jtag_fdtfile), then <leader>mg
+--   <leader>mu  reset into the U-Boot prompt with caches off (U-Boot debug: then <leader>mg, "U-Boot chain-load")
 --   <leader>mx  break into the running kernel (sysrq-g over ssh, else typed on the console), then <leader>dc
 --   <leader>dk  the same + start "Linux kgdb ..." right away: one key from a running kernel to gdb
 --   <leader>mg  OpenOCD (JTAG) gdb server :3333; again while it runs = restart (stops the debug session)
@@ -183,6 +190,14 @@ function M.setup(root, project)
       map('<leader>mj', function()
         uboot_boot(true, 'login:', { 'setenv fdtfile ' .. project.jtag_fdtfile })
       end, 'reboot for JTAG (one-shot U-Boot fdtfile ' .. project.jtag_fdtfile .. ')')
+    end
+
+    if project.uboot then
+      -- caches (and the MMU) off: the U-Boot copy gdb starts must not inherit this one's page tables
+      -- (it would overwrite them when it relocates), and JTAG writes then go straight to RAM
+      map('<leader>mu', function()
+        uboot_boot(true, '-', { 'dcache off', 'icache off' })
+      end, 'reset into the U-Boot prompt, caches off (then <leader>mg, "U-Boot chain-load")')
     end
   end
 
@@ -342,7 +357,50 @@ function M.setup(root, project)
   if project.openocd_cfg then
     local jtag = config('Linux JTAG (OpenOCD :3333)', 'localhost:3333')
     jtag.useExtendedRemote = true -- what OpenOCD expects ("Prefer GDB command target extended-remote")
+    -- no `run` after connecting (cppdbg's default exec-run): over extended-remote OpenOCD turns it into
+    -- "reset halt" = a board reset (the cfg also makes it a plain halt)
+    jtag.launchCompleteCommand = 'None'
+    -- kernel-keep-hwbp (kernel-gdb.py): the kernel's hw_breakpoint_reset (arch_initcall, hotplug) is
+    -- skipped, so breakpoints survive it; one of the 6 hardware breakpoints. keep_hw_breakpoints = false: off
+    vim.list_extend(jtag.setupCommands, mcu.gdb_cmds({ 'source ' .. here .. '/kernel-gdb.py' }))
+    if project.keep_hw_breakpoints ~= false then
+      table.insert(jtag.postRemoteConnectCommands, 1, { text = 'kernel-keep-hwbp' })
+    end
     table.insert(configs, jtag)
+  end
+  if project.openocd_cfg and project.uboot then
+    -- U-Boot proper from its first instruction: the running U-Boot (halted at its prompt, caches off:
+    -- <leader>mu) is replaced by a fresh copy written over JTAG. u-boot.bin, not the ELF: with
+    -- CONFIG_OF_SEPARATE the dtb is appended to the .bin only. SPL already set up the DDR, so U-Boot
+    -- proper can run again; clocks / pins are set up a second time.
+    local u = project.uboot
+    local elf, bin = abs(u.elf or 'uboot/u-boot'), abs(u.bin or 'uboot/u-boot.bin')
+    local base = u.text_base or '0x80200000'
+    -- + the kernel's paths: its symbols are loaded too (below), for U-Boot -> Linux in one session
+    local umap = vim.deepcopy(source_map)
+    for from, to in pairs(u.source_map or {}) do
+      umap[from] = abs(to)
+    end
+    local c = config('U-Boot chain-load (OpenOCD :3333)', 'localhost:3333')
+    c.useExtendedRemote = true
+    c.launchCompleteCommand = 'None' -- no `run` = no board reset (see the JTAG config)
+    c.program = elf
+    c.cwd = vim.fs.dirname(elf)
+    c.sourceFileMap = umap
+    c.miDebuggerArgs = '-iex "set auto-load local-gdbinit off" -iex "set debuginfod enabled off"'
+    -- uboot-reloc (REPL: -exec uboot-reloc): symbols at the relocated address, see uboot-gdb.py
+    c.setupCommands = mcu.gdb_cmds({ 'source ' .. here .. '/uboot-gdb.py', 'source ' .. here .. '/kernel-gdb.py' })
+    -- restore u-boot.bin, pc = base, x1..x4 = the running copy's boot registers (uboot-gdb.py)
+    -- + vmlinux's symbols (kernel_init ... breakpoints in the same session; ~1 s), unless kernel = false
+    local cmds = { 'uboot-chainload ' .. bin .. ' ' .. base }
+    if u.kernel ~= false then
+      table.insert(cmds, 'uboot-add-symbols ' .. vmlinux)
+      if project.keep_hw_breakpoints ~= false then
+        table.insert(cmds, 'kernel-keep-hwbp') -- see the JTAG config
+      end
+    end
+    c.postRemoteConnectCommands = mcu.gdb_cmds(vim.list_extend(cmds, u.gdb_commands or {}))
+    table.insert(configs, c)
   end
   if project.gdb_server then
     table.insert(configs, config('Linux gdb server ' .. project.gdb_server, project.gdb_server))
@@ -387,9 +445,24 @@ M.help = {
   '3. `<leader>dc` -> "Linux JTAG": core 0 halts in U-Boot (`?? ()` and some aborts: normal)',
   '4. breakpoint(s), `<leader>dc` continue (U-Boot answers again), type `boot` on the console',
   'Core 1 is examined at the first halt after smp_init ("core 1 is up" in the OpenOCD log), its gdb',
-  'thread appears at the halt after that. Breakpoints set before: core 0 only. The kernel wipes all',
-  'hardware breakpoints at arch_initcall (inside `kernel_init_freeable`): set later ones again after it.',
+  'thread appears at the halt after that. Breakpoints set before: core 0 only (gdb re-inserts them on',
+  'both cores at the next continue). The kernel\'s breakpoint reset at arch_initcall is skipped (kernel-keep-hwbp).',
   'Needs OpenOCD with jtag/openocd-smp-skip-unexamined.patch; without it: `<leader>mG` (core 0 only).',
+  '',
+  '### U-Boot proper over JTAG (chain-load: a fresh copy from its first instruction)',
+  '1. `<leader>mv` once (sync: uboot/ = ELF, u-boot.bin, sources)',
+  '2. `<leader>mu`: press RESET when asked; stops at `u-boot=>` and types `dcache off`, `icache off`',
+  '3. `<leader>mg`, then `<leader>dc` -> "U-Boot chain-load": writes u-boot.bin to 0x80200000 (a few s),',
+  '   x1..x4 = the old copy\'s boot registers (OP-TEE base/size), stops at `reset` (start.S, after _start)',
+  '   (OpenOCD log at the halt: "MMU: disabled"; "enabled" = <leader>mu skipped)',
+  '4. breakpoints (e.g. board_init_f), continue: the new U-Boot prints its banner on the console',
+  '5. after relocation (stopped at relocate_code or later): REPL `-exec uboot-reloc` = symbols at the',
+  '   relocated address (breakpoints move along)',
+  'Hardware breakpoints survive the kernel\'s debug-register reset at arch_initcall: a hidden breakpoint',
+  'on hw_breakpoint_reset skips it ("kernel-keep-hwbp: ... skipped" in the debug console); 5 of 6 left.',
+  'The kernel symbols (vmlinux) are loaded too: breakpoints in the kernel (e.g. `kernel_init`) work in',
+  'the same session, U-Boot -> Linux (`uboot.kernel = false` in nvim-project.lua: U-Boot only).',
+  'U-Boot proper only: SPL / DDR init can\'t run again. Clocks / pins are set up a second time.',
   '',
   '### kgdb (serial console)',
   '1. `<leader>mk`: kdmx (splits the console UART: gdb + terminal), then `<leader>ms` and log in as root',

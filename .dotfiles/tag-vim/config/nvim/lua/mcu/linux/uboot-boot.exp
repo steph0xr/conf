@@ -8,16 +8,18 @@
 #     keep      1: stay in the console (picocom) afterwards; 0: quit picocom, so gdb can open the
 #               UART itself (kgdb without kdmx)
 #     wait      what the kernel prints when it is where we want it, e.g.
-#               "Waiting for connection from remote gdb" (kgdbwait) or "login:"
+#               "Waiting for connection from remote gdb" (kgdbwait) or "login:";
+#               "-": no `boot`, stay at the U-Boot prompt (console open) after the commands
 #     command   U-Boot commands, one per argument, typed before `boot`, e.g.
 #               'setenv mmcargs "${mmcargs} kgdboc=ttyLP0,115200 kgdbwait"'   (kgdb, <leader>mr)
 #               'setenv fdtfile imx93-11x11-evk-jtag.dtb'                      (JTAG, <leader>mj)
+#               'dcache off' 'icache off' with wait "-"                        (U-Boot debug, <leader>mu)
 #
 # Run by <leader>mr / <leader>mj (lua/mcu/linux). One-shot: nothing is saved (no saveenv), the next
 # normal reset boots as usual. Written for the NXP BSP env (bootcmd -> mmcboot -> mmcargs, fdtfile).
 
 if {[llength $argv] < 6} {
-    send_user "usage: uboot-boot.exp <tty> <baud> <ssh|-> <keep> <wait> <command>...\n"
+    send_user "usage: uboot-boot.exp <tty> <baud> <ssh|-> <keep> <wait|-> <command>...\n"
     exit 2
 }
 set argv [lassign $argv tty baud ssh keep wait]
@@ -47,6 +49,11 @@ expect "=> "
 foreach c $commands {
     send "$c\r"
     expect "=> "
+}
+if {$wait eq "-"} {
+    send_user "\n*** stopped at the U-Boot prompt\n"
+    interact
+    exit 0
 }
 send "boot\r"
 

@@ -37,4 +37,7 @@ New embedded Linux kernel debug project (platform = 'linux')
            <leader>dc -> "Linux JTAG (OpenOCD :3333)". From U-Boot / early boot: stop autoboot, <leader>mg,
            <leader>dc, breakpoint, continue, type boot (needs jtag/openocd-smp-skip-unexamined.patch in
            OpenOCD; without it <leader>mG = core 0 only)
+    U-Boot: <leader>mu (reset, stop at the prompt, caches off), <leader>mg, <leader>dc -> "U-Boot
+           chain-load" (writes u-boot.bin over JTAG, starts it at _start); REPL -exec uboot-reloc after
+           relocation. nvim-project.lua `uboot`, files from sync-kernel uboot (example readme B.7)
     both:  <leader>mv sync-kernel
