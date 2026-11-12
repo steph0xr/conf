@@ -231,6 +231,100 @@ function M.set_dap_configs(list)
   end
 end
 
+-- breakpoints kept across nvim restarts ---------------------------------------------------------
+-- <root>/.nvim-breakpoints.json: written on quit and when a debug session starts, read when the
+-- project is set up. Paths relative to the project when inside it. Each file with breakpoints is
+-- loaded (and its filetype detected), so nvim-dap sends them at the next session start.
+M.BP_FILE = '.nvim-breakpoints.json'
+local bp_root -- the project whose breakpoints are loaded (only that one is saved)
+
+function M.save_breakpoints()
+  if not bp_root then
+    return
+  end
+  local ok, bps = pcall(require, 'dap.breakpoints')
+  if not ok then
+    return
+  end
+  local list = {}
+  for bufnr, items in pairs(bps.get()) do
+    local name = vim.api.nvim_buf_get_name(bufnr)
+    if name ~= '' then
+      local path = name:sub(1, #bp_root + 1) == bp_root .. '/' and name:sub(#bp_root + 2) or name
+      for _, bp in ipairs(items) do
+        table.insert(list, { file = path, line = bp.line, condition = bp.condition,
+                             hitCondition = bp.hitCondition, logMessage = bp.logMessage })
+      end
+    end
+  end
+  table.sort(list, function(a, b)
+    if a.file == b.file then return a.line < b.line end
+    return a.file < b.file
+  end)
+  local path = bp_root .. '/' .. M.BP_FILE
+  if #list == 0 and not vim.uv.fs_stat(path) then
+    return
+  end
+  vim.fn.writefile({ vim.json.encode(list) }, path)
+end
+
+local function restore_breakpoints(root)
+  -- (also M._restore_breakpoints, for tests)
+  local ok, bps = pcall(require, 'dap.breakpoints')
+  if not ok then
+    return
+  end
+  bp_root = root
+  local f = io.open(root .. '/' .. M.BP_FILE, 'r')
+  if not f then
+    return
+  end
+  local okj, list = pcall(vim.json.decode, f:read('*a'))
+  f:close()
+  if not okj or type(list) ~= 'table' then
+    vim.notify('mcu: ' .. M.BP_FILE .. ' unreadable, breakpoints not restored', vim.log.levels.WARN)
+    return
+  end
+  local n, missing = 0, 0
+  local function opt(v) return v ~= vim.NIL and v or nil end
+  for _, bp in ipairs(list) do
+    local path = bp.file:sub(1, 1) == '/' and bp.file or root .. '/' .. bp.file
+    if vim.uv.fs_stat(path) then
+      local bufnr = vim.fn.bufadd(path)
+      if not vim.api.nvim_buf_is_loaded(bufnr) then
+        vim.fn.bufload(bufnr)
+        vim.api.nvim_buf_call(bufnr, function() vim.cmd('silent! filetype detect') end)
+      end
+      if bp.line <= vim.api.nvim_buf_line_count(bufnr) then
+        bps.set({ condition = opt(bp.condition), hit_condition = opt(bp.hitCondition),
+                  log_message = opt(bp.logMessage) }, bufnr, bp.line)
+        n = n + 1
+      else
+        missing = missing + 1
+      end
+    else
+      missing = missing + 1
+    end
+  end
+  if n > 0 or missing > 0 then
+    vim.notify(string.format('mcu: %d breakpoints restored%s', n,
+                             missing > 0 and (', ' .. missing .. ' skipped (file / line gone)') or ''))
+  end
+end
+
+M._restore_breakpoints = function(root) restore_breakpoints(root) end
+
+vim.api.nvim_create_autocmd('VimLeavePre', {
+  group = vim.api.nvim_create_augroup('mcu_breakpoints', { clear = true }),
+  callback = function() M.save_breakpoints() end,
+})
+do
+  local ok, dap = pcall(require, 'dap')
+  if ok then
+    dap.listeners.after.event_initialized['mcu_breakpoints'] = function() M.save_breakpoints() end
+  end
+end
+
 -- loading ---------------------------------------------------------------------------------------
 
 function M.setup(root)
@@ -250,6 +344,14 @@ function M.setup(root)
   M.keys = {}
   M.map('<leader>mh', M.help, 'this help: keys + workflow of the project')
   mod.setup(root, project)
+  -- breakpoints of this project (another project before: save its own and start clean)
+  if bp_root ~= root then
+    if bp_root then
+      M.save_breakpoints()
+      pcall(function() require('dap.breakpoints').clear() end)
+    end
+    restore_breakpoints(root)
+  end
   return true
 end
 
@@ -298,6 +400,8 @@ function M.help()
   vim.list_extend(lines, table_lines(rows))
   vim.list_extend(lines, { '', '## Debug keys (nvim-dap)', '' })
   vim.list_extend(lines, table_lines(dap_keys))
+  vim.list_extend(lines, { '', 'Breakpoints are kept across nvim restarts: `' .. M.BP_FILE .. '` in the project folder',
+                           '(written on quit and at each session start, read when the project opens).' })
   local wf = M.module and M.module.help
   if type(wf) == 'function' then
     wf = wf()
